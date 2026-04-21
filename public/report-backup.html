@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report • EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/logo.png" alt="EVV" class="brand-badge" /><div><div class="brand-name">Elevate</div><div class="brand-sub">vue</div></div><button class="icon-btn" id="closeSidebar">×</button></div>
+    <nav class="side-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="connect.html">Connect</a>
+      <a class="nav-link" href="upload.html">Scheduling</a>
+      <a class="nav-link" href="report.html">Report</a>
+      <a class="nav-link" href="google.html">Google Data</a>
+    </nav>
+    <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar">☰</button>
+      <div class="brand-inline"><img src="/logo.png" alt="EVV" class="brand-badge" /><div class="brand-name">Elevate <span class="brand-sub">vue</span></div></div>
+      <div class="spacer"></div>
+      <nav class="top-nav">
+        <a href="dashboard.html" class="top-link">Dashboard</a>
+        <a href="connect.html" class="top-link">Connect</a>
+        <a href="upload.html" class="top-link">Scheduling</a>
+        <a href="report.html" class="top-link">Report</a>
+        <a href="google.html" class="top-link">Google Data</a>
+      </nav>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <section class="panel">
+        <div class="panel-head"><div><h1>AI Reports</h1><p>AI-generated insights and performance analysis.</p></div></div>
+        <div class="filters">
+          <div>
+            <div class="filter-title">Create a tailored AI report</div>
+            <div class="filter-sub">Pick the date range you want the AI to analyze. Years 2025 through the current year are supported.</div>
+          </div>
+          <button class="pill-btn ai-trigger" type="button">✨ Generate AI Report</button>
+        </div>
+        <div class="card empty-card">
+          <div class="empty-icon"><img src="/logo.png" alt="EVV" class="stat-glyph" /></div>
+          <div class="empty-title">No reports generated</div>
+          <div class="empty-sub">Generate your first AI analysis to get actionable insights on your performance.</div>
+          <button id="aiCta" class="pill-btn large ai-trigger" type="button" style="margin-top:14px;" onclick="window.__openAiModal && window.__openAiModal()">✨ Generate AI Report</button>
+        </div>
+
+        <div id="reportsList" class="report-list" style="display:none;"></div>
+
+        <div id="reportDetail" class="report-detail" style="display:none;">
+          <div class="detail-head hero-card">
+            <div>
+              <a href="#" id="backToReports" class="back-link">← Back to Reports</a>
+              <h2 id="detailTitle">Report</h2>
+              <div class="detail-dates" id="detailDates"></div>
+            </div>
+            <div class="detail-actions">
+              <div class="report-logo" id="reportLogoSpot"></div>
+              <button class="pill-btn outline" id="exportPdf">🖨 Export PDF</button>
+            </div>
+          </div>
+          <div class="detail-section highlight">
+            <div class="section-title-row">
+              <span class="section-kicker">Executive Summary</span>
+            </div>
+            <p id="detailSummary">Insights summary will appear here.</p>
+          </div>
+          <div class="detail-section">
+            <div class="section-title-row">
+              <span class="section-kicker">Key Metrics</span>
+              <span class="badge subtle" id="detailPlatform">Platform</span>
+            </div>
+            <div class="metric-row" id="detailMetrics"></div>
+          </div>
+          <div class="detail-section">
+            <div class="section-title-row"><span class="section-kicker">Key Takeaways</span></div>
+            <ol id="detailTakeaways" class="takeaways"></ol>
+          </div>
+          <div class="detail-section">
+            <div class="section-title-row"><span class="section-kicker">Action Items</span></div>
+            <ol id="detailActions" class="actions"></ol>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal" id="modal">
+    <div class="modal-header"><h3>Login to <span id="modalPlatform"></span></h3><button class="icon-btn" id="modalClose">×</button></div>
+    <form id="modalForm" class="modal-body">
+      <label>Username / Email</label><input id="modalUser" required />
+      <label>Password</label><input id="modalPass" type="password" required />
+      <button class="btn-outline full" type="submit">Save</button>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="aiModalBackdrop"></div>
+  <div class="modal ai-modal" id="aiModal">
+    <div class="modal-header">
+      <div>
+      <div class="modal-kicker">Generate AI Analysis</div>
+      <h3>Select a date range</h3>
+      <p class="modal-sub">Years available: 2025 up to the current year. Pick start and end dates to create the report.</p>
+      </div>
+      <button class="icon-btn" id="aiModalClose">×</button>
+    </div>
+    <form id="aiForm" class="modal-body ai-modal-body">
+      <div class="date-row">
+        <div class="field">
+          <label for="aiStart">Start Date</label>
+          <div class="input-shell">
+            <input type="date" id="aiStart" required />
+            <span class="input-icon">▾</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="aiEnd">End Date</label>
+          <div class="input-shell">
+            <input type="date" id="aiEnd" required />
+            <span class="input-icon">▾</span>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="aiLogo">Client Logo (optional)</label>
+        <div class="upload-shell">
+          <input type="file" id="aiLogo" accept="image/*" />
+          <div id="aiLogoLabel" class="upload-label">Upload logo image</div>
+        </div>
+      </div>
+      <div class="hint">Supports 2025-01-01 through the current year. End date cannot be before start date.</div>
+      <button class="pill-btn pill-large full" type="submit">Generate Report</button>
+    </form>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    if (window.jspdf && window.jspdf.jsPDF) {
+      window.jsPDF = window.jspdf.jsPDF;
+    }
+  </script>
+  <div class="beams-overlay"></div>
+</body>
+</html>

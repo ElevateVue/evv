@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Data • EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/logo.png" alt="EVV" class="brand-badge" /><div><div class="brand-name">Elevate</div><div class="brand-sub">vue</div></div><button class="icon-btn" id="closeSidebar">×</button></div>
+    <nav class="side-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="connect.html">Connect</a>
+      <a class="nav-link" href="upload.html">Scheduling</a>
+      <a class="nav-link" href="report.html">Report</a>
+      <a class="nav-link" href="google.html">Google Data</a>
+    </nav>
+    <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar">☰</button>
+      <div class="brand-inline"><img src="/logo.png" alt="EVV" class="brand-badge" /><div class="brand-name">Elevate <span class="brand-sub">vue</span></div></div>
+      <div class="spacer"></div>
+      <nav class="top-nav">
+        <a href="dashboard.html" class="top-link">Dashboard</a>
+        <a href="connect.html" class="top-link">Connect</a>
+        <a href="upload.html" class="top-link">Scheduling</a>
+        <a href="report.html" class="top-link">Report</a>
+        <a href="google.html" class="top-link">Google Data</a>
+      </nav>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <section class="panel">
+        <div class="panel-head"><div><h1>Google Data Hub</h1><p>Search Console and GA4 insights in one place.</p></div></div>
+        <div class="google-dashboard" id="googleDashboard">
+          <div class="metric-grid" style="margin-bottom:14px;">
+            <div class="metric-card">
+              <div class="metric-title">GSC Clicks (30d)</div>
+              <div class="metric-value" id="gscClicks">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">GSC Impressions (30d)</div>
+              <div class="metric-value" id="gscImpressions">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">GSC CTR</div>
+              <div class="metric-value" id="gscCtr">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">GA4 Active Users (30d)</div>
+              <div class="metric-value" id="ga4ActiveUsers">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">GA4 New Users (30d)</div>
+              <div class="metric-value" id="ga4NewUsers">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">GA4 Sessions (30d)</div>
+              <div class="metric-value" id="ga4Sessions">—</div>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="chart-head" style="margin-bottom:10px;">
+              <div class="chart-title">Search Console Performance</div>
+              <div class="tab-list" id="googleTabBar">
+                <button class="tab-pill active" data-metric="clicks">Clicks</button>
+                <button class="tab-pill" data-metric="impressions">Impressions</button>
+                <button class="tab-pill" data-metric="ctr">CTR</button>
+              </div>
+            </div>
+            <div class="chart-body">
+              <canvas id="googleTrendChart" width="860" height="260"></canvas>
+              <div class="chart-hint" id="googleChartHint">Connect and refresh to load data.</div>
+            </div>
+          </div>
+
+          <div class="card metric-card" style="padding:16px; margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div><strong>Search Console</strong> <small id="gscStatus">Not connected</small></div>
+              <button id="refreshGsc" class="pill-btn outline" type="button">Refresh</button>
+            </div>
+            <div id="gscSummary" style="margin-top:10px;">Connect GSC on the Connect page first.</div>
+            <div id="gscSitesList" style="margin-top:10px;"></div>
+          </div>
+
+          <div class="card metric-card" style="padding:16px; margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div><strong>GA4</strong> <small id="ga4Status">Not connected</small></div>
+              <button id="refreshGa4" class="pill-btn outline" type="button">Refresh</button>
+            </div>
+            <div id="ga4Summary" style="margin-top:10px;">Connect GA4 on the Connect page first.</div>
+            <div id="ga4PropertiesList" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal" id="modal">
+    <div class="modal-header"><h3>Login to <span id="modalPlatform"></span></h3><button class="icon-btn" id="modalClose">×</button></div>
+    <form id="modalForm" class="modal-body">
+      <label>Username / Email</label><input id="modalUser" required />
+      <label>Password</label><input id="modalPass" type="password" required />
+      <button class="btn-outline full" type="submit">Save</button>
+    </form>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>

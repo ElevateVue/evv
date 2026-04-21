@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connect • EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/logo.png" alt="EVV" class="brand-badge" /><div><div class="brand-name">Elevate</div><div class="brand-sub">vue</div></div><button class="icon-btn" id="closeSidebar" aria-label="Close menu">×</button></div>
+    <nav class="side-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="connect.html">Connect</a>
+      <a class="nav-link" href="upload.html">Scheduling</a>
+      <a class="nav-link" href="report.html">Report</a>
+      <a class="nav-link" href="google.html">Google Data</a>
+    </nav>
+    <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
+      <div class="brand-inline"><img src="/logo.png" alt="EVV" class="brand-badge" /><div class="brand-name">Elevate <span class="brand-sub">vue</span></div></div>
+      <div class="spacer"></div>
+      <nav class="top-nav">
+        <a href="dashboard.html" class="top-link">Dashboard</a>
+        <a href="connect.html" class="top-link">Connect</a>
+        <a href="upload.html" class="top-link">Scheduling</a>
+        <a href="report.html" class="top-link">Report</a>
+        <a href="google.html" class="top-link">Google Data</a>
+      </nav>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <section class="panel">
+        <div class="panel-head"><div><h1>Connect Platforms</h1><p>Link your social media accounts to start tracking metrics</p></div></div>
+        <div class="grid connect-grid">
+          <div class="card connect-card instagram-card">
+            <div class="connect-meta"><div class="platform-badge instagram"><img src="/ig.png" alt="Instagram logo" class="platform-icon" /></div><div><div class="connect-title">Instagram</div><div class="connect-user" data-platform="Instagram"></div></div></div>
+            <button class="pill-btn connect-btn instagram rainbow-border" data-platform="Instagram">+ Connect</button>
+          </div>
+          <div class="card connect-card facebook-card">
+            <div class="connect-meta"><div class="platform-badge facebook"><img src="/fb.png" alt="Facebook logo" class="platform-icon" /></div><div><div class="connect-title">Facebook</div><div class="connect-user" data-platform="Facebook"></div></div></div>
+            <button class="pill-btn connect-btn facebook rainbow-border" data-platform="Facebook">+ Connect</button>
+          </div>
+          <div class="card connect-card linkedin-card">
+            <div class="connect-meta"><div class="platform-badge linkedin"><img src="/linkedin.png" alt="LinkedIn logo" class="platform-icon" /></div><div><div class="connect-title">LinkedIn</div><div class="connect-user" data-platform="LinkedIn"></div></div></div>
+            <button class="pill-btn connect-btn linkedin rainbow-border" data-platform="LinkedIn">+ Connect</button>
+          </div>
+          <div class="card connect-card tiktok-card">
+            <div class="connect-meta"><div class="platform-badge tiktok"><img src="/tiktok.png" alt="TikTok logo" class="platform-icon" /></div><div><div class="connect-title">TikTok</div><div class="connect-user" data-platform="TikTok"></div></div></div>
+            <button class="pill-btn connect-btn tiktok rainbow-border" data-platform="TikTok">+ Connect</button>
+          </div>
+          <div class="card connect-card snapchat-card">
+            <div class="connect-meta"><div class="platform-badge snapchat"><img src="/snap.png" alt="Snapchat logo" class="platform-icon" /></div><div><div class="connect-title">Snapchat</div><div class="connect-user" data-platform="Snapchat"></div></div></div>
+            <button class="pill-btn connect-btn snapchat rainbow-border" data-platform="Snapchat">+ Connect</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal" id="modal">
+    <div class="modal-header"><h3>Login to <span id="modalPlatform"></span></h3><button class="icon-btn" id="modalClose">×</button></div>
+    <form id="modalForm" class="modal-body">
+      <label>Username / Email</label><input id="modalUser" required />
+      <label>User ID (optional)</label><input id="modalUserId" placeholder="@handle or profile id" />
+      <label>Profile Picture (optional)</label><input id="modalAvatar" type="file" accept="image/*" />
+      <label>Password</label><input id="modalPass" type="password" required />
+      <button class="btn-outline full" type="submit">Save</button>
+    </form>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Overview • EVV</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="/logo.png" alt="EVV" class="brand-badge" />
+      <div>
+        <div class="brand-name">Elevate</div>
+        <div class="brand-sub">vue</div>
+      </div>
+      <button class="icon-btn" id="closeSidebar" aria-label="Close menu">×</button>
+    </div>
+    <nav class="side-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-link" href="dashboard.html">Client Hub</a>
+      <a class="nav-link" href="dashboard-overview.html">Dashboard Overview</a>
+      <a class="nav-link" href="connect.html">Connect</a>
+      <a class="nav-link" href="upload.html">Scheduling</a>
+      <a class="nav-link" href="report.html">Report</a>
+      <a class="nav-link" href="google.html">Google Data</a>
+    </nav>
+    <div class="account-card">
+      <div class="avatar">S</div>
+      <div>
+        <div class="name" id="sideUser">Demo User</div>
+        <div class="email">demo@user.com</div>
+      </div>
+      <button class="icon-btn" aria-label="Switch account" style="display:none"></button>
+    </div>
+  </aside>
+
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
+      <div class="brand-inline">
+        <img src="/logo.png" alt="EVV" class="brand-badge" />
+        <div class="brand-name">Elevate <span class="brand-sub">vue</span></div>
+      </div>
+      <div class="spacer"></div>
+      <nav class="top-nav">
+        <a href="dashboard.html" class="top-link">Client Hub</a>
+        <a href="dashboard-overview.html" class="top-link">Dashboard</a>
+        <a href="connect.html" class="top-link">Connect</a>
+        <a href="upload.html" class="top-link">Scheduling</a>
+        <a href="report.html" class="top-link">Report</a>
+        <a href="google.html" class="top-link">Google Data</a>
+      </nav>
+      <div class="avatar small">S</div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panel-head overview-head">
+          <div class="overview-copy">
+            <h1>Dashboard Overview</h1>
+            <p>Monitor your social media performance across all channels.</p>
+          </div>
+          <div class="cta-row">
+            <input type="file" id="dashUploadFile" style="display:none" multiple />
+            <button class="ghost-btn outline rainbow-border" id="dashUploadBtn">↑ Upload Data</button>
+            <span class="upload-status" id="uploadStatus"></span>
+            <a class="pill-btn" href="report.html">Generate AI Report</a>
+          </div>
+        </div>
+
+        <div class="period-label" id="periodLabel">Awaiting upload</div>
+
+        <div class="metric-grid">
+          <div class="metric-card cyan">
+            <div class="metric-icon"><img src="/reach.png" alt="Reach" class="metric-img" /></div>
+            <div class="metric-title">Reach / Impressions</div>
+            <div class="metric-value cyan">0</div>
+          </div>
+          <div class="metric-card purple">
+            <div class="metric-icon"><img src="/interaction.png" alt="Interactions" class="metric-img" /></div>
+            <div class="metric-title">Interactions</div>
+            <div class="metric-value purple">0</div>
+          </div>
+          <div class="metric-card pink">
+            <div class="metric-icon"><img src="/click.png" alt="Clicks" class="metric-img" /></div>
+            <div class="metric-title">Clicks</div>
+            <div class="metric-value pink">0</div>
+          </div>
+          <div class="metric-card orange">
+            <div class="metric-icon"><img src="/reaction.png" alt="Reactions" class="metric-img" /></div>
+            <div class="metric-title">Reactions</div>
+            <div class="metric-value orange">0</div>
+          </div>
+          <div class="metric-card green">
+            <div class="metric-icon"><img src="/view.png" alt="Views" class="metric-img" /></div>
+            <div class="metric-title">Views</div>
+            <div class="metric-value green">0</div>
+          </div>
+          <div class="metric-card yellow">
+            <div class="metric-icon"><img src="/follows.png" alt="Follows" class="metric-img" /></div>
+            <div class="metric-title">Follows</div>
+            <div class="metric-value yellow">0</div>
+          </div>
+          <div class="metric-card cyan">
+            <div class="metric-icon"><img src="/engagement.png" alt="Avg Engagement" class="metric-img" /></div>
+            <div class="metric-title">Avg. Engagement</div>
+            <div class="metric-value cyan">0.00%</div>
+          </div>
+        </div>
+
+        <div class="card chart-card">
+          <div class="chart-header">
+            <span class="chart-title" id="chartTitle">All Metrics Trend</span>
+            <div class="btn-row" id="btnRow"></div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="metricChart"></canvas>
+          </div>
+          <div class="legend" id="legend"></div>
+        </div>
+
+        <div class="card reports-card">
+          <div class="card-head">
+            <h3>Recent AI Reports</h3>
+            <a class="view-link" href="report.html">View All</a>
+          </div>
+          <div id="recentReportsList" class="recent-reports"></div>
+          <div class="empty-report" id="recentReportsEmpty">No reports generated yet.</div>
+        </div>
+
+        <div class="card ai-feedback-card">
+          <div class="card-head">
+            <h3>AI Feedback</h3>
+            <button class="ghost-btn outline small rainbow-border" id="editAIFeedbackBtn">Edit</button>
+          </div>
+          <div id="aiFeedbackContent" class="ai-feedback-paragraph">Loading analysis...</div>
+        </div>
+
+        <div class="card feedback-card collapsed">
+          <div class="feedback-head">
+            <div class="feedback-title">Suggestions & Feedback</div>
+            <button class="ghost-btn outline small rainbow-border" id="feedbackToggle">New</button>
+          </div>
+          <div class="feedback-status" id="feedbackStatus">No feedback yet. Share your suggestions to help improve the dashboard.</div>
+          <div class="feedback-tabs">
+            <button class="chip rainbow-border active" data-type="Suggestion">Suggestion</button>
+            <button class="chip rainbow-border" data-type="Challenges">Challenges</button>
+            <button class="chip rainbow-border" data-type="Ideal Solutions">Ideal Solutions</button>
+            <button class="chip rainbow-border" data-type="AI Suggestions">AI Suggestions</button>
+          </div>
+          <div class="feedback-body">
+            <textarea id="feedbackText" placeholder="Write your suggestion here..."></textarea>
+            <div class="feedback-actions">
+              <button class="pill-btn small" id="feedbackSubmit">Submit</button>
+            </div>
+            <ul class="feedback-list" id="feedbackList"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3>Login to <span id="modalPlatform"></span></h3>
+      <button class="icon-btn" id="modalClose">×</button>
+    </div>
+    <form id="modalForm" class="modal-body">
+      <label>Username / Email</label>
+      <input id="modalUser" required />
+      <label>Password</label>
+      <input id="modalPass" type="password" required />
+      <button class="btn-outline full" type="submit">Save</button>
+    </form>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>

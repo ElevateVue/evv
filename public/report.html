@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report • EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="footer.js"></script>
+  <style>
+    .google-data-section {
+      margin-top: 32px;
+      padding: 24px;
+      background: rgba(124, 93, 250, 0.08);
+      border: 1px solid rgba(124, 93, 250, 0.2);
+      border-radius: 16px;
+    }
+
+    .google-data-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #7c5dfa;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .google-data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .data-card {
+      background: rgba(0, 217, 255, 0.08);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .data-card h4 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: #00d9ff;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .data-card p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      color: #eef1fb;
+    }
+
+    .data-card .sub-label {
+      font-size: 11px;
+      color: #8b92a9;
+      margin-top: 6px;
+    }
+
+    .sheets-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    .sheets-table thead {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sheets-table th {
+      padding: 10px;
+      text-align: left;
+      color: #00d9ff;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+    }
+
+    .sheets-table td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+      color: #eef1fb;
+    }
+
+    .sheets-table tbody tr:hover {
+      background: rgba(0, 217, 255, 0.05);
+    }
+
+    .google-config-input {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .google-config-input input {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 217, 255, 0.2);
+      border-radius: 8px;
+      color: #eef1fb;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+    }
+
+    .google-config-input input::placeholder {
+      color: #8b92a9;
+    }
+
+    .google-hub-section {
+      margin-top: 32px;
+      padding: 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+    }
+
+    .hub-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .hub-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 18px;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hub-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #9aa3b9;
+      margin-bottom: 10px;
+    }
+
+    .hub-card-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #eef1fb;
+    }
+
+    .hub-chart-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .hub-chart-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .hub-chart-wrap {
+      min-height: 240px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hub-no-data {
+      color: #8b92a9;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+  </style>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/logo.png" alt="EVV" class="brand-badge" /><div><div class="brand-name">Elevate</div><div class="brand-sub">vue</div></div><button class="icon-btn" id="closeSidebar">×</button></div>
+    <nav class="side-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="connect.html">Connect</a>
+      <a class="nav-link" href="upload.html">Scheduling</a>
+      <a class="nav-link" href="report.html">Report</a>
+      <a class="nav-link" href="google.html">Google Data</a>
+    </nav>
+    <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar">☰</button>
+      <div class="brand-inline"><img src="/logo.png" alt="EVV" class="brand-badge" /><div class="brand-name">Elevate <span class="brand-sub">vue</span></div></div>
+      <div class="spacer"></div>
+      <nav class="top-nav">
+        <a href="dashboard.html" class="top-link">Dashboard</a>
+        <a href="connect.html" class="top-link">Connect</a>
+        <a href="upload.html" class="top-link">Scheduling</a>
+        <a href="report.html" class="top-link">Report</a>
+        <a href="google.html" class="top-link">Google Data</a>
+      </nav>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <section class="panel">
+        <div class="panel-head"><div><h1>AI Reports</h1><p>AI-generated insights and performance analysis.</p></div></div>
+        <div class="filters">
+          <div>
+            <div class="filter-title">Create a tailored AI report</div>
+            <div class="filter-sub">Pick the date range you want the AI to analyze. Years 2025 through the current year are supported.</div>
+          </div>
+          <button class="pill-btn ai-trigger rainbow-border wide" type="button">✨ Generate AI Report</button>
+        </div>
+        <div class="card empty-card">
+          <div class="empty-icon"><img src="/logo.png" alt="EVV" class="stat-glyph" /></div>
+          <div class="empty-title">No reports generated</div>
+          <div class="empty-sub">Generate your first AI analysis to get actionable insights on your performance.</div>
+          <div id="reportDropZone" class="report-dropzone" tabindex="0">
+            <div class="drop-icon">📁</div>
+            <div class="drop-label">Drag & drop a file here to begin</div>
+            <div class="drop-sub">Drop a report file, image, or logo from your PC.</div>
+            <input id="reportDropInput" type="file" style="display:none" />
+          </div>
+        </div>
+
+        <div id="reportsList" class="report-list" style="display:none;"></div>
+
+        <div id="reportDetail" class="report-detail" style="display:none;">
+          <div class="pdf-header print-only">
+            <div class="pdf-header-left">
+              <div class="report-logo" id="pdfElevateLogoSpot"></div>
+              <div class="pdf-header-text">
+                <div id="pdfReportGeneratedBy" class="report-generated-by">Generated by Elevate vue</div>
+              </div>
+            </div>
+            <div class="pdf-header-right">
+              <div class="report-logo" id="pdfClientLogoSpot"></div>
+            </div>
+          </div>
+          <div class="detail-head hero-card">
+            <div class="detail-head-left">
+              <div class="report-logo" id="reportElevateLogoSpot"></div>
+              <div class="detail-head-text">
+                <a href="#" id="backToReports" class="back-link">← Back to Reports</a>
+                <h2 id="detailTitle">Report</h2>
+                <div class="detail-dates" id="detailDates"></div>
+                <div id="reportGeneratedBy" class="report-generated-by">Generated by Elevate vue</div>
+              </div>
+            </div>
+            <div class="detail-head-right">
+              <div class="report-logo" id="reportClientLogoSpot"></div>
+              <button class="pill-btn outline" id="exportPdf">🖨 Export PDF</button>
+            </div>
+          </div>
+          <div class="report-detail-grid stacked-grid">
+            <div class="detail-section">
+              <div class="section-title-row">
+                <span class="section-kicker">Key Metrics</span>
+                <span class="badge subtle" id="detailPlatform">Platform</span>
+              </div>
+              <div id="detailMetrics" class="metrics-grid"></div>
+            </div>
+            <div class="detail-section graph-panel">
+              <div class="section-title-row">
+                <span class="section-kicker">Performance</span>
+              </div>
+              <div class="chart-header">
+                <span class="chart-title" id="chartTitle">All Metrics Trend</span>
+                <div class="btn-row" id="btnRow"></div>
+              </div>
+              <div class="canvas-wrap">
+                <canvas id="metricChart"></canvas>
+              </div>
+              <div class="legend" id="legend"></div>
+            </div>
+          </div>
+          <div id="googleDashboard" class="detail-section google-hub-section">
+            <div class="section-title-row">
+              <span class="section-kicker">Google Data Hub</span>
+            </div>
+            <div class="hub-summary">
+              <div id="gscSummary" class="hub-summary-item">Search Console metrics will appear here when connected.</div>
+              <div id="ga4Summary" class="hub-summary-item">GA4 metrics will appear here when connected.</div>
+            </div>
+            <div class="hub-cards">
+              <div class="hub-card">
+                <div class="hub-card-label">GSC CLICKS (30D)</div>
+                <div id="gscClicks" class="hub-card-value">—</div>
+              </div>
+              <div class="hub-card">
+                <div class="hub-card-label">GSC IMPRESSIONS (30D)</div>
+                <div id="gscImpressions" class="hub-card-value">—</div>
+              </div>
+              <div class="hub-card">
+                <div class="hub-card-label">GSC CTR</div>
+                <div id="gscCtr" class="hub-card-value">—</div>
+              </div>
+              <div class="hub-card">
+                <div class="hub-card-label">GA4 ACTIVE USERS (30D)</div>
+                <div id="ga4ActiveUsers" class="hub-card-value">—</div>
+              </div>
+              <div class="hub-card">
+                <div class="hub-card-label">GA4 NEW USERS (30D)</div>
+                <div id="ga4NewUsers" class="hub-card-value">—</div>
+              </div>
+              <div class="hub-card">
+                <div class="hub-card-label">GA4 SESSIONS (30D)</div>
+                <div id="ga4Sessions" class="hub-card-value">—</div>
+              </div>
+            </div>
+            <div id="googleTabBar" class="hub-chart-controls">
+              <button class="pill-btn outline small active" type="button" data-metric="clicks">Clicks</button>
+              <button class="pill-btn outline small" type="button" data-metric="impressions">Impressions</button>
+              <button class="pill-btn outline small" type="button" data-metric="ctr">CTR</button>
+            </div>
+            <div class="hub-chart-card">
+              <div class="hub-chart-wrap">
+                <canvas id="googleTrendChart"></canvas>
+              </div>
+              <div id="googleChartHint" class="hub-no-data">No time series data available</div>
+            </div>
+          </div>
+
+          <div class="detail-section keep-on-second-page">
+            <div class="pdf-header print-only">
+              <div class="pdf-header-left">
+                <div class="report-logo" id="pdfElevateLogoSpot2"></div>
+                <div class="pdf-header-text">
+                  <div id="pdfReportGeneratedBy2" class="report-generated-by">Generated by Elevate vue</div>
+                </div>
+              </div>
+              <div class="pdf-header-right">
+                <div class="report-logo" id="pdfClientLogoSpot2"></div>
+              </div>
+            </div>
+            <div class="section-title-row">
+              <span class="section-kicker">Key Takeaways</span>
+              <button class="edit-btn" onclick="editReportPoints('takeaways')">✎ Manage</button>
+            </div>
+            <div id="detailTakeaways" class="takeaways"></div>
+          </div>
+          <div class="detail-section keep-on-second-page">
+            <div class="section-title-row">
+              <span class="section-kicker">Action Plan</span>
+              <button class="edit-btn" onclick="editReportPoints('actions')">✎ Manage</button>
+            </div>
+            <p class="action-intro">Based on the provided social media performance data, here is a clear action plan with specific next steps:</p>
+            <div id="detailActions" class="actions"></div>
+
+            <!-- GA4 & GSC Data Section -->
+            <div class="google-data-section" id="googleDataSection" style="display: none;">
+              <div class="google-data-title">📊 Google Analytics & Search Console Insights</div>
+              
+              <div class="google-config-input" id="googleConfigInputs">
+                <input type="text" id="ga4PropId" placeholder="GA4 Property ID" />
+                <input type="text" id="gscSiteUrl" placeholder="GSC Site URL" />
+              </div>
+
+              <button class="pill-btn" onclick="loadGoogleDataForReport()" style="margin-bottom: 16px;">Load Google Data</button>
+
+              <div id="googleDataContainer"></div>
+
+              <div id="googleDataLoading" style="display: none; text-align: center; color: #00d9ff;">
+                <p>Loading Google data...</p>
+              </div>
+
+              <div id="googleDataError" style="display: none; color: #ff6464; font-size: 12px; padding: 12px; background: rgba(255, 100, 100, 0.1); border-radius: 8px;"></div>
+            </div>
+
+            <div class="print-footer print-only">Generated by ElevateVue • <span id="footerDate2"></span> • Page 2 of 2</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal" id="modal">
+    <div class="modal-header"><h3>Login to <span id="modalPlatform"></span></h3><button class="icon-btn" id="modalClose">×</button></div>
+    <form id="modalForm" class="modal-body">
+      <label>Username / Email</label><input id="modalUser" required />
+      <label>Password</label><input id="modalPass" type="password" required />
+      <button class="btn-outline full" type="submit">Save</button>
+    </form>
+  </div>
+
+  <div class="edit-modal" id="editListModal">
+    <div class="edit-modal-content">
+      <div class="edit-modal-header">
+        <h3 id="editListModalTitle">Edit Report Points</h3>
+        <button class="edit-close-btn" onclick="closeEditListModal()">×</button>
+      </div>
+      <textarea id="editListTextarea" class="edit-textarea" placeholder="Enter one item per line..."></textarea>
+      <input type="hidden" id="editListType" />
+      <div class="edit-actions">
+        <button class="edit-btn-save" onclick="saveEditedList()">Save Changes</button>
+        <button class="edit-btn-cancel" onclick="closeEditListModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="aiModalBackdrop"></div>
+  <div class="modal ai-modal" id="aiModal">
+    <div class="modal-header">
+      <div>
+      <div class="modal-kicker">Generate AI Analysis</div>
+      <h3>Select a date range</h3>
+      <p class="modal-sub">Years available: 2025 up to the current year. Pick start and end dates to create the report.</p>
+      </div>
+      <button class="icon-btn" id="aiModalClose">×</button>
+    </div>
+    <form id="aiForm" class="modal-body ai-modal-body">
+      <div class="field">
+        <div class="field-label-row">
+          <label>Timeline</label>
+          <button type="button" class="pill-btn outline small" id="calendarToggle">Open calendar</button>
+        </div>
+        <div class="range-calendar closed" id="calendarRangePicker">
+          <div class="calendar-header">
+            <button type="button" class="calendar-nav" id="calendarPrev">‹</button>
+            <div class="calendar-month" id="calendarMonthLabel"></div>
+            <button type="button" class="calendar-nav" id="calendarNext">›</button>
+          </div>
+          <div class="calendar-weekdays">
+            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <div class="calendar-legend">
+            <span class="calendar-chip selected">Start</span>
+            <span class="calendar-chip range">End</span>
+          </div>
+          <div class="calendar-range-labels">
+            <span id="calendarStartLabel">Start: Jan 01, 2025</span>
+            <span id="calendarEndLabel">End: Jan 30, 2025</span>
+          </div>
+        </div>
+        <input type="hidden" id="aiStart" required />
+        <input type="hidden" id="aiEnd" required />
+      </div>
+      <div class="field">
+        <label for="aiPlatform">Platform</label>
+        <div class="input-shell">
+          <select id="aiPlatform" required>
+            <option value="Instagram">Instagram</option>
+            <option value="Facebook">Facebook</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="TikTok">TikTok</option>
+          </select>
+          <span class="input-icon">▾</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="aiLogo">Client Logo (optional)</label>
+        <div class="upload-shell">
+          <input type="file" id="aiLogo" accept="image/*" />
+          <div id="aiLogoLabel" class="upload-label">Upload logo image</div>
+        </div>
+      </div>
+      <div class="hint">Supports 2025-01-01 through the current year. End date cannot be before start date.</div>
+      <button class="pill-btn pill-large full" type="submit">Generate Report</button>
+    </form>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    if (window.jspdf && window.jspdf.jsPDF) {
+      window.jsPDF = window.jspdf.jsPDF;
+    }
+
+    function openEditListModal(type) {
+      const reportId = document.getElementById('reportDetail')?.dataset.id;
+      if (!reportId) return;
+      const reports = loadReports();
+      const report = reports.find((item) => item.id === reportId);
+      if (!report) return;
+
+      const isTakeaways = type === 'takeaways';
+      const items = Array.isArray(report[type]) ? report[type] : [];
+      document.getElementById('editListModalTitle').textContent = isTakeaways ? 'Edit Key Takeaways' : 'Edit Action Plan';
+      document.getElementById('editListTextarea').value = items.join('\n');
+      document.getElementById('editListType').value = type;
+      document.getElementById('editListModal').classList.add('show');
+    }
+
+    function closeEditListModal() {
+      document.getElementById('editListModal').classList.remove('show');
+    }
+
+    function saveEditedList() {
+      const type = document.getElementById('editListType').value;
+      const rawValue = document.getElementById('editListTextarea').value;
+      const items = rawValue
+        .split('\n')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      if (!items.length) {
+        return alert('Please enter at least one item.');
+      }
+
+      const reportDetail = document.getElementById('reportDetail');
+      const reportId = reportDetail?.dataset.id;
+      if (!reportId) return;
+      const reports = loadReports();
+      const report = reports.find((item) => item.id === reportId);
+      if (!report) return;
+
+      report[type] = items;
+      saveReports(reports);
+      if (reportDetail?.dataset.id === reportId) {
+        showDetail(report);
+      }
+      closeEditListModal();
+    }
+
+    window.editReportPoints = openEditListModal;
+    window.closeEditListModal = closeEditListModal;
+    window.saveEditedList = saveEditedList;
+
+    // Google Data Integration
+    async function loadGoogleDataForReport() {
+      const ga4PropId = document.getElementById('ga4PropId').value.trim();
+      const gscSiteUrl = document.getElementById('gscSiteUrl').value.trim();
+      const loading = document.getElementById('googleDataLoading');
+      const error = document.getElementById('googleDataError');
+      const container = document.getElementById('googleDataContainer');
+
+      loading.style.display = 'block';
+      error.style.display = 'none';
+      container.innerHTML = '';
+
+      if (!ga4PropId && !gscSiteUrl) {
+        error.textContent = 'Please enter at least GA4 Property ID or GSC Site URL';
+        error.style.display = 'block';
+        loading.style.display = 'none';
+        return;
+      }
+
+      try {
+        // Get date range from report
+        const datesText = document.getElementById('detailDates')?.textContent || '';
+        const dateMatch = datesText.match(/(\d{4}-\d{2}-\d{2})/g) || [];
+        const startDate = dateMatch[0] || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const endDate = dateMatch[1] || new Date().toISOString().split('T')[0];
+
+        const response = await fetch('/api/report/integrated', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            propertyId: ga4PropId || null,
+            siteUrl: gscSiteUrl || null,
+            startDate,
+            endDate
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch Google data');
+        }
+
+        // Display GA4 data
+        if (data.ga4 && data.ga4.rows && data.ga4.rows.length > 0) {
+          container.innerHTML += renderGA4Data(data.ga4);
+        }
+
+        // Display GSC data
+        if (data.gsc && data.gsc.rows && data.gsc.rows.length > 0) {
+          container.innerHTML += renderGSCData(data.gsc);
+        }
+
+        if (data.errors && data.errors.length > 0) {
+          error.textContent = 'Warnings: ' + data.errors.map(e => `${e.source}: ${e.message}`).join('; ');
+          error.style.display = 'block';
+        }
+
+        if (!data.ga4 && !data.gsc) {
+          error.textContent = 'No data available. Please check your Property ID and Site URL.';
+          error.style.display = 'block';
+        }
+
+        loading.style.display = 'none';
+      } catch (err) {
+        error.textContent = 'Error: ' + err.message;
+        error.style.display = 'block';
+        loading.style.display = 'none';
+      }
+    }
+
+    function renderGA4Data(ga4Data) {
+      if (!ga4Data.rows || ga4Data.rows.length === 0) return '';
+
+      let html = '<div style="margin-bottom: 24px;"><h4 style="color: #00d9ff; margin-bottom: 12px;">📈 Google Analytics 4 Performance</h4>';
+      html += '<div class="google-data-grid">';
+
+      // Calculate totals
+      let totalUsers = 0, totalSessions = 0, avgEngagement = 0, totalViews = 0;
+      ga4Data.rows.forEach(row => {
+        if (row.metricValues) {
+          totalUsers += parseInt(row.metricValues[0]?.value || 0);
+          totalSessions += parseInt(row.metricValues[1]?.value || 0);
+          avgEngagement += parseFloat(row.metricValues[2]?.value || 0);
+          totalViews += parseInt(row.metricValues[3]?.value || 0);
+        }
+      });
+
+      avgEngagement = (avgEngagement / ga4Data.rows.length).toFixed(2);
+
+      html += `
+        <div class="data-card">
+          <h4>Active Users</h4>
+          <p>${totalUsers.toLocaleString()}</p>
+          <div class="sub-label">Total for period</div>
+        </div>
+        <div class="data-card">
+          <h4>Sessions</h4>
+          <p>${totalSessions.toLocaleString()}</p>
+          <div class="sub-label">User sessions</div>
+        </div>
+        <div class="data-card">
+          <h4>Engagement Rate</h4>
+          <p>${avgEngagement}%</p>
+          <div class="sub-label">Average engagement</div>
+        </div>
+        <div class="data-card">
+          <h4>Page Views</h4>
+          <p>${totalViews.toLocaleString()}</p>
+          <div class="sub-label">Total views</div>
+        </div>
+      `;
+
+      html += '<table class="sheets-table"><thead><tr>';
+      
+      if (ga4Data.dimensionHeaders) {
+        ga4Data.dimensionHeaders.forEach(h => html += `<th>${h}</th>`);
+      }
+      
+      if (ga4Data.metricHeaders) {
+        ga4Data.metricHeaders.forEach(m => html += `<th>${m.name}</th>`);
+      }
+      
+      html += '</tr></thead><tbody>';
+
+      ga4Data.rows.slice(0, 7).forEach(row => {
+        html += '<tr>';
+        if (row.dimensionValues) {
+          row.dimensionValues.forEach(v => html += `<td>${v.value}</td>`);
+        }
+        if (row.metricValues) {
+          row.metricValues.forEach(v => html += `<td>${v.value}</td>`);
+        }
+        html += '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    function renderGSCData(gscData) {
+      if (!gscData.rows || gscData.rows.length === 0) return '';
+
+      let html = '<div style="margin-top: 24px;"><h4 style="color: #00d9ff; margin-bottom: 12px;">🔍 Google Search Console Performance</h4>';
+      html += '<div class="google-data-grid">';
+
+      // Calculate totals
+      let totalImpressions = 0, totalClicks = 0, avgCTR = 0, avgPosition = 0;
+      gscData.rows.forEach(row => {
+        if (row.values) {
+          totalImpressions += parseInt(row.values[0] || 0);
+          totalClicks += parseInt(row.values[1] || 0);
+          avgCTR += parseFloat(row.values[2] || 0);
+          if (row.values[3]) avgPosition += parseFloat(row.values[3]);
+        }
+      });
+
+      avgCTR = (avgCTR / gscData.rows.length).toFixed(2);
+      avgPosition = (avgPosition / gscData.rows.length).toFixed(1);
+
+      html += `
+        <div class="data-card">
+          <h4>Impressions</h4>
+          <p>${totalImpressions.toLocaleString()}</p>
+          <div class="sub-label">Search impressions</div>
+        </div>
+        <div class="data-card">
+          <h4>Clicks</h4>
+          <p>${totalClicks.toLocaleString()}</p>
+          <div class="sub-label">Search clicks</div>
+        </div>
+        <div class="data-card">
+          <h4>CTR</h4>
+          <p>${avgCTR}%</p>
+          <div class="sub-label">Click-through rate</div>
+        </div>
+        <div class="data-card">
+          <h4>Position</h4>
+          <p>${avgPosition}</p>
+          <div class="sub-label">Average ranking</div>
+        </div>
+      `;
+
+      html += '<table class="sheets-table"><thead><tr>';
+      
+      if (gscData.dimensionHeaders) {
+        gscData.dimensionHeaders.forEach(h => html += `<th>${h}</th>`);
+      }
+      
+      if (gscData.metricHeaders) {
+        gscData.metricHeaders.forEach(m => html += `<th>${m}</th>`);
+      }
+      
+      html += '</tr></thead><tbody>';
+
+      gscData.rows.slice(0, 7).forEach(row => {
+        html += '<tr>';
+        if (row.keys) {
+          row.keys.forEach(k => html += `<td>${k}</td>`);
+        }
+        if (row.values) {
+          row.values.forEach(v => html += `<td>${v}</td>`);
+        }
+        html += '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    // Show Google data section when report is displayed
+    const originalShowDetail = window.showDetail;
+    window.showDetail = function(report) {
+      const result = originalShowDetail?.call(this, report);
+      
+      // Show Google data section
+      const section = document.getElementById('googleDataSection');
+      if (section) {
+        section.style.display = 'block';
+      }
+      
+      return result;
+    };
+  </script>
+  <div class="beams-overlay"></div>
+</body>
+</html>

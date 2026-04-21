@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard - GA4 & GSC</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="footer.js"></script>
+  <style>
+    .analytics-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      padding: 24px;
+    }
+
+    .metric-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .metric-box h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .metric-value {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #7c5dfa, #00d9ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 12px 0;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .input-group {
+      margin: 12px 0;
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-sm {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #7c5dfa, #00d9ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-sm:hover {
+      filter: brightness(1.05);
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .error {
+      background: rgba(255, 100, 100, 0.1);
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      color: #ff6464;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    .success {
+      background: rgba(100, 200, 100, 0.1);
+      border: 1px solid rgba(100, 200, 100, 0.3);
+      color: #64c864;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .data-table th {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      text-align: left;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .chart-container {
+      margin-top: 24px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand-inline">
+        <span>📊</span>
+        <span>Analytics Dashboard</span>
+      </div>
+      <div class="spacer"></div>
+      <span class="top-link" onclick="location.href='/'">Back to Dashboard</span>
+    </div>
+
+    <main>
+      <div class="panel">
+        <h1>GA4 & Google Search Console</h1>
+        <p>Real-time analytics and search performance data</p>
+      </div>
+
+      <!-- GA4 Section -->
+      <div class="panel">
+        <h2>📈 Google Analytics 4</h2>
+        
+        <div class="input-group">
+          <input type="text" id="ga4PropertyId" placeholder="Enter GA4 Property ID" value="">
+          <button class="btn-sm" onclick="loadGA4Properties()">Load Properties</button>
+        </div>
+
+        <div id="ga4-properties-list"></div>
+
+        <h3>Fetch GA4 Report</h3>
+        <div class="input-group">
+          <input type="date" id="ga4StartDate" value="2024-01-01">
+          <input type="date" id="ga4EndDate" value="2024-01-31">
+        </div>
+        <button class="btn-sm" onclick="fetchGA4Report()">Fetch Report</button>
+        
+        <div id="ga4-status"></div>
+        <div id="ga4-data"></div>
+      </div>
+
+      <!-- Real-time Section -->
+      <div class="panel">
+        <h2>🔴 Real-time Users</h2>
+        <div class="input-group">
+          <input type="text" id="realtimePropertyId" placeholder="Enter GA4 Property ID">
+          <button class="btn-sm" onclick="fetchRealtimeData()">Refresh</button>
+        </div>
+        <div id="realtime-data"></div>
+      </div>
+
+      <!-- GSC Section -->
+      <div class="panel">
+        <h2>🔍 Google Search Console</h2>
+        
+        <button class="btn-sm" onclick="loadGSCSites()" style="margin-bottom: 16px;">Load GSC Sites</button>
+        <div id="gsc-sites-list"></div>
+
+        <h3>Fetch GSC Report</h3>
+        <div class="input-group">
+          <input type="text" id="gscSiteUrl" placeholder="Site URL (e.g., https://example.com/)" value="">
+        </div>
+        <div class="input-group">
+          <input type="date" id="gscStartDate" value="2024-01-01">
+          <input type="date" id="gscEndDate" value="2024-01-31">
+        </div>
+        <button class="btn-sm" onclick="fetchGSCReport()">Fetch Report</button>
+        
+        <div id="gsc-status"></div>
+        <div id="gsc-data"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // GA4 Properties
+    async function loadGA4Properties() {
+      const status = document.getElementById('ga4-status');
+      status.innerHTML = '<div class="loading">Loading GA4 properties...</div>';
+
+      try {
+        const response = await fetch('/api/ga4/properties');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to load properties');
+        }
+
+        const list = document.getElementById('ga4-properties-list');
+        list.innerHTML = `
+          <div class="success">
+            Found ${data.properties.length} GA4 propert${data.properties.length !== 1 ? 'ies' : 'y'}
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Display Name</th>
+                <th>Property ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.properties.map(p => `
+                <tr>
+                  <td>${p.displayName || 'Unnamed'}</td>
+                  <td><code>${p.name.split('/')[1]}</code></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+
+        status.innerHTML = '';
+      } catch (err) {
+        status.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+      }
+    }
+
+    // Fetch GA4 Report
+    async function fetchGA4Report() {
+      const propertyId = document.getElementById('ga4PropertyId').value;
+      const startDate = document.getElementById('ga4StartDate').value;
+      const endDate = document.getElementById('ga4EndDate').value;
+      const status = document.getElementById('ga4-status');
+
+      if (!propertyId) {
+        status.innerHTML = '<div class="error">Enter GA4 Property ID first</div>';
+        return;
+      }
+
+      status.innerHTML = '<div class="loading">Fetching GA4 report...</div>';
+
+      try {
+        const response = await fetch('/api/ga4/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            propertyId,
+            startDate,
+            endDate,
+            metrics: ['activeUsers', 'sessions', 'engagementRate']
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch report');
+        }
+
+        let html = `<div class="success">GA4 Report: ${data.rowCount || 0} rows</div>`;
+
+        if (data.rows && data.rows.length > 0) {
+          html += '<table class="data-table"><thead><tr>';
+          data.dimensionHeaders?.forEach(h => html += `<th>${h}</th>`);
+          data.metricHeaders?.forEach(h => html += `<th>${h.name}</th>`);
+          html += '</tr></thead><tbody>';
+
+          data.rows.slice(0, 10).forEach(row => {
+            html += '<tr>';
+            row.dimensionValues?.forEach(v => html += `<td>${v.value}</td>`);
+            row.metricValues?.forEach(v => html += `<td>${v.value}</td>`);
+            html += '</tr>';
+          });
+
+          html += '</tbody></table>';
+        }
+
+        status.innerHTML = '';
+        document.getElementById('ga4-data').innerHTML = html;
+      } catch (err) {
+        status.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+      }
+    }
+
+    // Real-time Data
+    async function fetchRealtimeData() {
+      const propertyId = document.getElementById('realtimePropertyId').value;
+      const container = document.getElementById('realtime-data');
+
+      if (!propertyId) {
+        container.innerHTML = '<div class="error">Enter GA4 Property ID</div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="loading">Loading real-time data...</div>';
+
+      try {
+        const response = await fetch(`/api/ga4/realtime?propertyId=${propertyId}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch real-time data');
+        }
+
+        let html = '<div class="analytics-container">';
+
+        if (data.rows && data.rows.length > 0) {
+          const row = data.rows[0];
+          const values = row.metricValues || [];
+
+          html += `
+            <div class="metric-box">
+              <h3>Active Users</h3>
+              <div class="metric-value">${values[0]?.value || '0'}</div>
+              <div class="metric-label">Currently active</div>
+            </div>
+            <div class="metric-box">
+              <h3>New Users</h3>
+              <div class="metric-value">${values[1]?.value || '0'}</div>
+              <div class="metric-label">This session</div>
+            </div>
+          `;
+        }
+
+        html += '</div>';
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+      }
+    }
+
+    // GSC Sites
+    async function loadGSCSites() {
+      const list = document.getElementById('gsc-sites-list');
+      list.innerHTML = '<div class="loading">Loading GSC sites...</div>';
+
+      try {
+        const response = await fetch('/api/gsc/sites');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to load sites');
+        }
+
+        let html = `<div class="success">Found ${data.sites.length} site${data.sites.length !== 1 ? 's' : ''}</div>`;
+        html += '<table class="data-table"><thead><tr><th>Site URL</th><th>Permission</th></tr></thead><tbody>';
+
+        data.sites.forEach(site => {
+          html += `<tr><td>${site.siteUrl}</td><td>${site.permissionLevel}</td></tr>`;
+        });
+
+        html += '</tbody></table>';
+        list.innerHTML = html;
+      } catch (err) {
+        list.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+      }
+    }
+
+    // GSC Report
+    async function fetchGSCReport() {
+      const siteUrl = document.getElementById('gscSiteUrl').value;
+      const startDate = document.getElementById('gscStartDate').value;
+      const endDate = document.getElementById('gscEndDate').value;
+      const status = document.getElementById('gsc-status');
+
+      if (!siteUrl) {
+        status.innerHTML = '<div class="error">Enter site URL (e.g., https://example.com/)</div>';
+        return;
+      }
+
+      status.innerHTML = '<div class="loading">Fetching GSC report...</div>';
+
+      try {
+        const response = await fetch('/api/gsc/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            siteUrl,
+            startDate,
+            endDate,
+            metrics: ['impressions', 'clicks', 'ctr', 'position']
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch report');
+        }
+
+        let html = `<div class="success">GSC Report: ${data.rows?.length || 0} rows</div>`;
+
+        if (data.rows && data.rows.length > 0) {
+          html += '<table class="data-table"><thead><tr>';
+          data.dimensionHeaders?.forEach(h => html += `<th>${h}</th>`);
+          data.metricHeaders?.forEach(h => html += `<th>${h}</th>`);
+          html += '</tr></thead><tbody>';
+
+          data.rows.slice(0, 10).forEach(row => {
+            html += '<tr>';
+            row.keys?.forEach(k => html += `<td>${k}</td>`);
+            row.values?.forEach(v => html += `<td>${v}</td>`);
+            html += '</tr>';
+          });
+
+          html += '</tbody></table>';
+        }
+
+        status.innerHTML = '';
+        document.getElementById('gsc-data').innerHTML = html;
+      } catch (err) {
+        status.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+      }
+    }
+
+    // Load sample data on page load
+    window.addEventListener('load', () => {
+      // Pre-fill with example values if environment variables are available
+      fetch('/api/health')
+        .then(() => {
+          // Server is running
+          console.log('Analytics dashboard ready');
+        });
+    });
+  </script>
+</body>
+</html>

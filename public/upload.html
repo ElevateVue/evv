@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scheduling • EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/logo.png" alt="EVV" class="brand-badge" /><div><div class="brand-name">Elevate</div><div class="brand-sub">vue</div></div><button class="icon-btn" id="closeSidebar">×</button></div>
+    <nav class="side-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="connect.html">Connect</a>
+      <a class="nav-link active" href="upload.html">Scheduling</a>
+      <a class="nav-link" href="report.html">Report</a>
+      <a class="nav-link" href="google.html">Google Data</a>
+    </nav>
+    <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar">☰</button>
+      <div class="brand-inline"><img src="/logo.png" alt="EVV" class="brand-badge" /><div class="brand-name">Elevate <span class="brand-sub">vue</span></div></div>
+      <div class="spacer"></div>
+      <nav class="top-nav">
+        <a href="dashboard.html" class="top-link">Dashboard</a>
+        <a href="connect.html" class="top-link">Connect</a>
+        <a href="upload.html" class="top-link active">Scheduling</a>
+        <a href="post-queue.html" class="top-link">Post Queue</a>
+        <a href="report.html" class="top-link">Report</a>
+        <a href="google.html" class="top-link">Google Data</a>
+      </nav>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h1>Scheduling</h1>
+            <p>Create, preview and schedule posts for approval.</p>
+          </div>
+          <div class="header-actions">
+            <button class="pill-btn outline small">New Post</button>
+            <a href="post-queue.html" class="pill-btn outline small">Post Queue</a>
+          </div>
+        </div>
+
+        <div class="schedule-layout">
+          <section class="card schedule-panel">
+            <div class="section-header"><h2>Post Details</h2></div>
+            <form id="scheduleForm">
+              <div class="platform-tabs">
+                <button type="button" class="platform-pill active">Instagram</button>
+                <button type="button" class="platform-pill">Facebook</button>
+                <button type="button" class="platform-pill">LinkedIn</button>
+                <button type="button" class="platform-pill">Twitter</button>
+                <button type="button" class="platform-pill">TikTok</button>
+                <button type="button" class="platform-pill">YouTube</button>
+              </div>
+
+            <div class="field field--spaced">
+              <label>Media (image / video / PDF)</label>
+              <div class="upload-shell upload-small">
+                <input type="file" id="postFile" accept=".pdf,.mp4,.mov,.avi,.mkv,.png,video/*,image/*" />
+                <div id="postFileLabel" class="upload-label">Click to upload image, video, or PDF</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Account</label>
+              <div class="input-row">
+                <input type="text" id="accountSearch" placeholder="Search or type account names, press Enter or click Add" />
+                <button type="button" id="addAccountBtn" class="pill-btn outline small">Add</button>
+              </div>
+              <div id="accountList" class="account-list"></div>
+              <div id="accountChips" class="chip-row"></div>
+            </div>
+
+            <div class="field">
+              <label>Post type</label>
+              <select id="postType">
+                <option>Feed Post</option>
+                <option>Story</option>
+                <option>Reel / Short</option>
+                <option>Carousel</option>
+                <option>Video</option>
+              </select>
+            </div>
+
+            <div class="ai-panel">
+              <div class="ai-panel-head">AI Caption & Hashtag Generator</div>
+              <div class="field">
+                <label>Describe what this post is about</label>
+                <input type="text" id="postDescription" placeholder="Professional" />
+              </div>
+              <div class="btn-row left">
+                <button type="button" class="pill-btn outline" id="generateCaption">Generate</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Caption</label>
+              <textarea id="postCaption" rows="4" placeholder="Write your caption..."></textarea>
+            </div>
+
+            <div class="field">
+              <label>Hashtags</label>
+              <div class="input-row">
+                <input id="postHashtags" placeholder="#marketing #socialmedia ..." />
+                <button type="button" class="pill-btn outline small" id="saveHashtags">Save</button>
+              </div>
+              <span class="hint">Save a hashtag set and reuse it for future posts.</span>
+            </div>
+
+            <div class="saved-hashtags-panel">
+              <div class="saved-hashtags-head">Saved hashtag sets</div>
+              <div id="savedHashtagsList" class="saved-hashtags-list">
+                <p class="saved-empty">No saved hashtag sets yet. Generate and save a set to use it later.</p>
+              </div>
+            </div>
+
+            <div class="grid two-col gap">
+              <div class="field">
+                <label>Date</label>
+                <input type="date" id="scheduleDate" />
+              </div>
+              <div class="field">
+                <label>Time</label>
+                <input type="time" id="scheduleTime" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Admin approval email</label>
+              <input id="approvalEmail" placeholder="admin@yourcompany.com" />
+              <span class="hint">An approval request will be sent to this email before scheduling.</span>
+            </div>
+
+            <div class="btn-row">
+              <button type="submit" class="pill-btn">Submit for Approval</button>
+            </div>
+            </form>
+          </section>
+
+          <section class="card preview-panel">
+            <div class="section-header"><h2>Live Preview</h2></div>
+            <div class="post-preview">
+              <div class="preview-header">
+                <span id="previewPlatform" class="preview-platform">Instagram</span>
+              </div>
+              <div class="preview-block">
+                <div id="previewFile" class="preview-file">
+                  <span>No media selected</span>
+                </div>
+              </div>
+              <div class="preview-footer">
+                <div id="previewCaption">No caption yet...</div>
+                <div id="previewHashtags" class="preview-hashtags">No hashtags yet...</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal" id="modal">
+    <div class="modal-header"><h3>Login to <span id="modalPlatform"></span></h3><button class="icon-btn" id="modalClose">×</button></div>
+    <form id="modalForm" class="modal-body">
+      <label>Username / Email</label><input id="modalUser" required />
+      <label>Password</label><input id="modalPass" type="password" required />
+      <button class="btn-outline full" type="submit">Save</button>
+    </form>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>

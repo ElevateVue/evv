@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login • EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="login.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body class="login-shell">
+  <section class="login-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <img src="/logo.png" alt="EVV" class="brand-badge xl" />
+      <h1>Master your<br /><span class="gradient-text">Social Growth</span></h1>
+      <p class="muted lead">Connect your platforms, visualize your metrics, and let AI generate actionable growth strategies for you.</p>
+      <div class="hero-pills">
+        <div class="pill-hero"><span class="pill-icon">Time</span><span>Real-time Analytics</span></div>
+        <div class="pill-hero"><span class="pill-icon">Lock</span><span>Secure Connection</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="login-panel">
+    <div class="panel-inner login-card">
+      <div class="login-brand-stack">
+        <div class="panel-brand login-brand-centered">
+          <img src="/logo.png" alt="EVV" class="brand-badge" />
+          <div class="brand-name">Elevate <span class="brand-sub">vue</span></div>
+        </div>
+        <div class="login-kicker">THE DIGITAL CURATOR</div>
+      </div>
+
+      <div class="login-role-row" role="tablist" aria-label="Login type">
+        <button type="button" class="login-role-tab active" data-role="client" aria-selected="true">Client Login</button>
+        <button type="button" class="login-role-tab" data-role="admin" aria-selected="false">Admin Access</button>
+        <button type="button" class="login-role-tab login-inline-submit" data-role="signup" aria-selected="false">Sign In Page</button>
+      </div>
+
+      <h2 id="loginTitle">Welcome Back</h2>
+      <p class="muted" id="loginSubtitle">Sign in to access your dashboard</p>
+      <div class="login-linkline" id="loginLinkline">Already have an account? <a href="/login.html">Log in</a></div>
+
+      <form id="loginForm" class="stack">
+        <input type="hidden" id="loginRole" value="client" />
+        <div class="signup-name-row">
+          <div class="login-field">
+            <div class="login-input-shell">
+              <input type="text" id="firstName" placeholder="First name" />
+            </div>
+          </div>
+          <div class="login-field">
+            <div class="login-input-shell">
+              <input type="text" id="lastName" placeholder="Last name" />
+            </div>
+          </div>
+        </div>
+
+        <div class="login-field">
+          <div class="login-label-row">
+            <label for="email">Account ID</label>
+          </div>
+          <div class="login-input-shell">
+            <input type="email" id="email" required placeholder="Email or Username" />
+          </div>
+        </div>
+
+        <div class="login-field">
+          <div class="login-label-row">
+            <label for="password">Password</label>
+            <a href="/login.html" class="login-forgot">Forgot?</a>
+          </div>
+          <div class="login-input-shell">
+            <input type="password" id="password" required placeholder="Enter your password" />
+          </div>
+        </div>
+
+        <label class="signup-terms-row">
+          <input type="checkbox" id="signupTerms" />
+          <span>I agree to the <a href="/login.html">Terms &amp; Conditions</a></span>
+        </label>
+
+        <button class="btn-primary full login-submit" type="submit">Log In</button>
+
+        <div class="auth-provider-wrap">
+          <div class="auth-provider-title" id="authProviderTitle">Auth Providers</div>
+          <div class="auth-provider-grid">
+            <a class="auth-provider-btn" id="providerOne" href="/login.html">Google</a>
+            <a class="auth-provider-btn" id="providerTwo" href="/login.html">LinkedIn</a>
+          </div>
+        </div>
+
+        <div class="login-apply">New to the hub? <a href="/login.html">Apply for access</a></div>
+        <p class="tiny muted center">By signing in, you agree to our Terms of Service and Privacy Policy.</p>
+      </form>
+    </div>
+  </section>
+  <div class="beams-overlay"></div>
+</body>
+</html>
