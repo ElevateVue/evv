@@ -258,10 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
   closeSidebarBtn?.addEventListener('click', () => sidebar?.classList.remove('open'));
 
   // Activate current nav link
-  const current = location.pathname.split('/').pop() || 'dashboard.html';
+  const current = location.pathname.split('/').pop() || 'featurehub.html';
   document.querySelectorAll('.nav-link').forEach((link) => {
     const href = link.getAttribute('href');
-    if ((current === '' && href === 'dashboard.html') || href === current) link.classList.add('active');
+    if ((current === '' && href === 'featurehub.html') || href === current) link.classList.add('active');
   });
 
   // Initialize AI modal functionality
@@ -1103,7 +1103,7 @@ async function loadGoogleReport() {
 
 document.getElementById('refreshGsc')?.addEventListener('click', loadGoogleReport);
 document.getElementById('refreshGa4')?.addEventListener('click', loadGoogleReport);
-if (location.pathname.endsWith('/google.html') || location.pathname.endsWith('/report.html')) {
+if (location.pathname.endsWith('/report.html')) {
   loadGoogleReport();
 }
 
@@ -1180,6 +1180,7 @@ const btnRow = document.getElementById('btnRow');
 const legend = document.getElementById('legend');
 const chartTitle = document.getElementById('chartTitle');
 const metricChart = document.getElementById('metricChart');
+const isDashboardPage = window.location.pathname.endsWith('/dashboard-overview.html') || window.location.pathname.endsWith('dashboard-overview.html');
 let chartInstance = null;
 const chartSeriesConfig = [
   { key: 'reach', label: 'Reach' },
@@ -1195,7 +1196,7 @@ const PALETTE = [
   '#7cc6ff','#6fe3b2','#ffb86b','#f58ac8','#c5a3ff','#ffe27a'
 ];
 
-if (btnRow && legend && chartTitle && metricChart) {
+if (isDashboardPage && btnRow && legend && chartTitle && metricChart) {
   buildButtons();
   renderChart();
 }
@@ -1293,6 +1294,7 @@ function renderDashboardChartTooltip(context) {
 }
 
 function renderChart() {
+  if (!isDashboardPage) return;
   if (!btnRow || !legend || !chartTitle || !metricChart) {
     return;
   }
@@ -1493,6 +1495,29 @@ function buildDailyChartData() {
   };
 }
 
+function buildReportChartSnapshot() {
+  const dailyData = buildDailyChartData();
+  if (!dailyData?.days?.length) return null;
+
+  return {
+    title: dailyData.title,
+    days: dailyData.days.map((day) => ({
+      day: day.day,
+      dateLabel: day.dateLabel,
+      summaryLabel: day.summaryLabel,
+      platformLabel: day.platformLabel,
+      totals: {
+        reach: Number(day.totals?.reach || 0),
+        interactions: Number(day.totals?.interactions || 0),
+        clicks: Number(day.totals?.clicks || 0),
+        reactions: Number(day.totals?.reactions || 0),
+        views: Number(day.totals?.views || 0),
+        follows: Number(day.totals?.follows || 0),
+      },
+    })),
+  };
+}
+
 
 
 
@@ -1686,6 +1711,15 @@ function collectDashboardMetrics() {
     if (label && value) metrics[label] = value;
   });
   return metrics;
+}
+
+function hasUploadedAnalytics(metricsPayload = {}, recentPosts = [], uploadName = '') {
+  const totalMetricValue = Object.values(metricsPayload || {}).reduce((sum, value) => {
+    const parsed = Number(value || 0);
+    return sum + (Number.isFinite(parsed) ? parsed : 0);
+  }, 0);
+
+  return Boolean(uploadName) && (totalMetricValue > 0 || recentPosts.length > 0);
 }
 
 feedbackSubmit?.addEventListener('click', async () => {
@@ -2107,6 +2141,7 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
     metrics,
     takeaways,
     actions,
+    chartSnapshot: buildReportChartSnapshot(),
   };
 
   const reports = loadReports();
@@ -2191,26 +2226,77 @@ function renderDashboardReports() {
 }
 
 async function renderAIFeedback() {
+  const feedbackCardEl = document.querySelector('.ai-feedback-card');
   const feedbackEl = document.getElementById('aiFeedbackContent');
-  if (!feedbackEl) return;
+  const editBtn = document.getElementById('editAIFeedbackBtn');
+  if (!feedbackEl || !feedbackCardEl) return;
 
-  const reports = loadReports();
-  if (!reports.length) {
-    feedbackEl.textContent = 'No data available for feedback. Upload data to generate insights.';
+  let metricsPayload = {};
+  let perPlatformPayload = {};
+  let uploadName = '';
+  let recentPosts = [];
+
+  try {
+    const [metricsResponse, postsResponse] = await Promise.all([
+      fetch('/api/metrics'),
+      fetch('/api/posts'),
+    ]);
+
+    if (metricsResponse.ok) {
+      const metricsData = await metricsResponse.json();
+      metricsPayload = metricsData.metrics || {};
+      perPlatformPayload = metricsData.perPlatform || {};
+      perPlatformMetrics = perPlatformPayload;
+      uploadName = metricsData.lastUploadName || '';
+    }
+
+    if (postsResponse.ok) {
+      const postsData = await postsResponse.json();
+      recentPosts = Array.isArray(postsData.posts) ? postsData.posts : [];
+    }
+  } catch (error) {
+    console.error('Error loading uploaded analytics for AI feedback:', error);
+  }
+
+  if (!hasUploadedAnalytics(metricsPayload, recentPosts, uploadName)) {
+    feedbackCardEl.hidden = true;
+    feedbackEl.textContent = 'Upload analytics data to generate AI feedback.';
+    if (editBtn) editBtn.disabled = true;
     return;
   }
 
-  const latest = reports[0];
-  const metrics = latest.metrics || [];
-  const metricsText = metrics.map((m) => `${m.label}: ${m.value}`).join(', ');
+  feedbackCardEl.hidden = false;
+  if (editBtn) editBtn.disabled = false;
+  feedbackEl.textContent = 'Reading uploaded data and generating AI feedback...';
+
+  const sortedPosts = recentPosts
+    .slice()
+    .sort((a, b) => (b.postedAt || 0) - (a.postedAt || 0))
+    .slice(0, 24)
+    .map((post) => ({
+      platform: post.platform || 'Unknown',
+      title: post.title || 'Untitled',
+      postedAt: post.postedAt || 0,
+      engagement: {
+        reach: Number(post.engagement?.reach || 0),
+        interactions: Number(post.engagement?.interactions || 0),
+        clicks: Number(post.engagement?.clicks || 0),
+        reactions: Number(post.engagement?.reactions || 0),
+        views: Number(post.engagement?.views || 0),
+        follows: Number(post.engagement?.follows || 0),
+      },
+    }));
 
   try {
     const response = await fetch('/api/feedback/ai-suggestions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        metrics: metricsText,
-        context: 'Generate a professional metrics-driven AI feedback summary for social media performance, including the key metric insight and next steps the client should take.',
+        uploadName,
+        metrics: metricsPayload,
+        perPlatform: perPlatformPayload,
+        recentPosts: sortedPosts,
+        context: 'Read the uploaded analytics data and generate a professional metrics-driven AI feedback summary for the dashboard, including the key insight and the next best actions.',
       }),
     });
 
@@ -2226,63 +2312,94 @@ async function renderAIFeedback() {
       const feedbackLines = [summary, ''];
       if (takeaways.length) {
         feedbackLines.push('<strong>Key takeaways:</strong>');
-        feedbackLines.push(...takeaways.map((item) => `• ${item}`));
+        feedbackLines.push(...takeaways.map((item) => `&bull; ${item}`));
       }
       if (actions.length) {
         feedbackLines.push('', '<strong>Recommended next steps:</strong>');
-        feedbackLines.push(...actions.map((item) => `• ${item}`));
+        feedbackLines.push(...actions.map((item) => `&bull; ${item}`));
       }
-      feedbackEl.innerHTML = `<div class="ai-feedback-text">${feedbackLines.join('<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">✎ Edit</button>`;
+      feedbackEl.innerHTML = `<div class="ai-feedback-text">${feedbackLines.join('<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
     } else {
       const fallback = buildBrowserAiSuggestions();
-      feedbackEl.innerHTML = `<div class="ai-feedback-text">${formatAiSuggestionText(fallback).replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">✎ Edit</button>`;
+      feedbackEl.innerHTML = `<div class="ai-feedback-text">${formatAiSuggestionText(fallback).replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
     }
   } catch (error) {
     console.error('Error fetching AI feedback:', error);
     const fallback = buildBrowserAiSuggestions();
-    feedbackEl.innerHTML = `<div class="ai-feedback-text">${formatAiSuggestionText(fallback).replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">✎ Edit</button>`;
+    feedbackEl.innerHTML = `<div class="ai-feedback-text">${formatAiSuggestionText(fallback).replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
   }
 }
 
 window.editAIDashFeedback = function() {
+  const feedbackCardEl = document.querySelector('.ai-feedback-card');
   const feedbackEl = document.getElementById('aiFeedbackContent');
-  if (!feedbackEl) return;
-  const textEl = feedbackEl.querySelector('p');
-  const current = textEl ? textEl.textContent : '';
+  if (!feedbackEl || feedbackCardEl?.hidden) return;
+  const textEl = feedbackEl.querySelector('.ai-feedback-text');
+  const current = textEl ? textEl.innerText : '';
   const newFeedback = prompt('Edit feedback:', current);
   if (newFeedback) {
-    feedbackEl.innerHTML = `<p class="ai-feedback-text">${newFeedback}</p><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">✎ Edit</button>`;
+    feedbackEl.innerHTML = `<div class="ai-feedback-text">${newFeedback.replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
   }
 };
 
 function renderPerformanceChart(report) {
   const chartSvgContainer = document.getElementById('chartSvgContainer');
   const chartLegend = document.getElementById('chartLegend');
+  const reportChartTitle = document.getElementById('reportChartTitle');
   if (!chartSvgContainer || !chartLegend) return;
 
+  const snapshot = report.chartSnapshot;
   const metrics = report.metrics || [];
   const lookupValue = (label) => Number(metrics.find((m) => m.label === label)?.value || 0);
   const reach = lookupValue('Reach');
   const interactions = lookupValue('Interactions');
   const clicks = lookupValue('Clicks');
-  const maxValue = Math.max(reach, interactions, clicks, 1);
 
-  const series = [
-    { name: 'Reach', color: '#4d7aff', values: [0.28, 0.42, 0.55, 0.7, 0.64, 0.83, 1] },
-    { name: 'Interactions', color: '#8a5cff', values: [0.18, 0.32, 0.4, 0.5, 0.58, 0.7, 0.85] },
-    { name: 'Clicks', color: '#00d4ff', values: [0.14, 0.22, 0.3, 0.42, 0.5, 0.63, 0.79] },
-  ];
+  const series = snapshot?.days?.length
+    ? [
+        {
+          name: 'Reach',
+          color: '#4d7aff',
+          values: snapshot.days.map((day) => Number(day.totals?.reach || 0)),
+          labels: snapshot.days.map((day) => day.dateLabel || `Day ${day.day}`),
+        },
+        {
+          name: 'Interactions',
+          color: '#8a5cff',
+          values: snapshot.days.map((day) => Number(day.totals?.interactions || 0)),
+          labels: snapshot.days.map((day) => day.dateLabel || `Day ${day.day}`),
+        },
+        {
+          name: 'Clicks',
+          color: '#00d4ff',
+          values: snapshot.days.map((day) => Number(day.totals?.clicks || 0)),
+          labels: snapshot.days.map((day) => day.dateLabel || `Day ${day.day}`),
+        },
+      ]
+    : [
+        { name: 'Reach', color: '#4d7aff', values: [Math.round(reach * 0.28), Math.round(reach * 0.42), Math.round(reach * 0.55), Math.round(reach * 0.7), Math.round(reach * 0.64), Math.round(reach * 0.83), Math.round(reach)] },
+        { name: 'Interactions', color: '#8a5cff', values: [Math.round(interactions * 0.18), Math.round(interactions * 0.32), Math.round(interactions * 0.4), Math.round(interactions * 0.5), Math.round(interactions * 0.58), Math.round(interactions * 0.7), Math.round(interactions * 0.85)] },
+        { name: 'Clicks', color: '#00d4ff', values: [Math.round(clicks * 0.14), Math.round(clicks * 0.22), Math.round(clicks * 0.3), Math.round(clicks * 0.42), Math.round(clicks * 0.5), Math.round(clicks * 0.63), Math.round(clicks * 0.79)] },
+      ];
+
+  if (reportChartTitle) {
+    reportChartTitle.textContent = snapshot?.title ? `${snapshot.title} Snapshot` : 'Saved Performance Snapshot';
+  }
 
   chartLegend.innerHTML = series.map((metric) => `
     <span class="legend-item"><span class="legend-swatch" style="background:${metric.color}"></span>${metric.name}</span>
   `).join('');
 
-  const points = 7;
+  const points = Math.max(series[0]?.values?.length || 0, 1);
   const width = 720;
   const height = 320;
   const padding = 28;
-  const xStep = (width - padding * 2) / (points - 1);
-  const normalize = (ratio) => height - padding - ratio * (height - padding * 2);
+  const xStep = points > 1 ? (width - padding * 2) / (points - 1) : 0;
+  const maxValue = Math.max(
+    ...series.flatMap((metric) => metric.values.map((value) => Number(value || 0))),
+    1
+  );
+  const normalize = (value) => height - padding - (Number(value || 0) / maxValue) * (height - padding * 2);
 
   const buildLine = (values) => values.map((value, index) => {
     const x = padding + index * xStep;
@@ -2300,7 +2417,14 @@ function renderPerformanceChart(report) {
     return `${line} L ${lastX.toFixed(1)} ${height - padding} L ${padding} ${height - padding} Z`;
   };
 
-  const xLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((label, index) => {
+  const xAxisLabels = snapshot?.days?.length
+    ? snapshot.days.map((day) => {
+        const match = String(day.dateLabel || '').match(/^([A-Za-z]+)/);
+        return match ? match[1].slice(0, 3) : `D${day.day}`;
+      })
+    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  const xLabels = xAxisLabels.map((label, index) => {
     const x = padding + index * xStep;
     return `<text x="${x}" y="${height - 8}" class="chart-axis-label">${label}</text>`;
   }).join('');
@@ -2329,8 +2453,8 @@ function renderPerformanceChart(report) {
       ${series.map((metric) => metric.values.map((value, index) => {
         const x = padding + index * xStep;
         const y = normalize(value);
-        const actualValue = Math.round((metric.name === 'Reach' ? reach : metric.name === 'Interactions' ? interactions : clicks) * value);
-        const dayLabel = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index];
+        const actualValue = Math.round(Number(value || 0));
+        const dayLabel = metric.labels?.[index] || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index] || `Day ${index + 1}`;
         return `<circle class="report-chart-point" data-label="${metric.name}" data-day="${dayLabel}" data-value="${actualValue}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${metric.color}" stroke="#0b1117" stroke-width="2" />`;
       }).join('')).join('')}
       ${xLabels}

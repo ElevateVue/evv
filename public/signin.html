@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In • EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="signin.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body class="login-shell login-reference-shell">
+  <section class="login-hero login-reference-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content login-reference-content">
+      <div class="login-hero-chip">LET'S TALK</div>
+      <h1>Ready to <span class="gradient-text">Elevate</span><br />Your Brand?</h1>
+      <p class="lead">
+        We combine strategic thinking with creative execution to build brands that stand out
+        and drive measurable results. We are more than marketers. We are growth partners.
+      </p>
+
+      <div class="login-reference-points">
+        <div class="login-reference-point">
+          <span class="login-reference-icon">✉</span>
+          <span>operations@elevate-vue.com</span>
+        </div>
+        <div class="login-reference-point">
+          <span class="login-reference-icon">●</span>
+          <span>Available remotely worldwide</span>
+        </div>
+        <div class="login-reference-point">
+          <span class="login-reference-icon">⚡</span>
+          <span>Response within 24 hours</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="login-panel login-reference-panel">
+    <div class="panel-inner login-card login-reference-card login-minimal-card">
+      <h2 id="loginTitle">Hello!</h2>
+      <p class="muted" id="loginSubtitle">Sign In to Get Started</p>
+      <div class="login-linkline login-minimal-linkline" id="loginLinkline">Need an account? <a href="login.html">Create one</a></div>
+
+      <form id="signinForm" class="stack">
+        <div class="login-field">
+          <label class="sr-only" for="email">Email</label>
+          <div class="login-input-shell login-minimal-input-shell">
+            <span class="login-field-icon" aria-hidden="true">✉</span>
+            <input type="email" id="email" required placeholder="Email Address" />
+          </div>
+        </div>
+
+        <div class="login-field">
+          <label class="sr-only" for="password">Password</label>
+          <div class="login-input-shell login-minimal-input-shell">
+            <span class="login-field-icon" aria-hidden="true">🔒</span>
+            <input type="password" id="password" required placeholder="Password" />
+          </div>
+        </div>
+
+        <button class="btn-primary full login-submit login-reference-submit login-minimal-submit" type="submit">Login</button>
+        <a class="login-forgot-link" href="#">Forgot Password</a>
+      </form>
+    </div>
+  </section>
+  <div class="beams-overlay"></div>
+</body>
+</html>

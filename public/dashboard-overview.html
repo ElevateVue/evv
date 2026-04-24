@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
   <script defer src="footer.js"></script>
 </head>
 <body>
@@ -22,12 +23,11 @@
     </div>
     <nav class="side-nav">
       <div class="nav-label">Navigation</div>
-      <a class="nav-link" href="dashboard.html">Client Hub</a>
-      <a class="nav-link" href="dashboard-overview.html">Dashboard Overview</a>
+      <a class="nav-link" href="featurehub.html">Feature Hub</a>
+      <a class="nav-link" href="dashboard-overview.html">Dashboard</a>
       <a class="nav-link" href="connect.html">Connect</a>
       <a class="nav-link" href="upload.html">Scheduling</a>
       <a class="nav-link" href="report.html">Report</a>
-      <a class="nav-link" href="google.html">Google Data</a>
     </nav>
     <div class="account-card">
       <div class="avatar">S</div>
@@ -47,14 +47,6 @@
         <div class="brand-name">Elevate <span class="brand-sub">vue</span></div>
       </div>
       <div class="spacer"></div>
-      <nav class="top-nav">
-        <a href="dashboard.html" class="top-link">Client Hub</a>
-        <a href="dashboard-overview.html" class="top-link">Dashboard</a>
-        <a href="connect.html" class="top-link">Connect</a>
-        <a href="upload.html" class="top-link">Scheduling</a>
-        <a href="report.html" class="top-link">Report</a>
-        <a href="google.html" class="top-link">Google Data</a>
-      </nav>
       <div class="avatar small">S</div>
     </header>
 
@@ -133,12 +125,12 @@
           <div class="empty-report" id="recentReportsEmpty">No reports generated yet.</div>
         </div>
 
-        <div class="card ai-feedback-card">
+        <div class="card ai-feedback-card" hidden>
           <div class="card-head">
             <h3>AI Feedback</h3>
             <button class="ghost-btn outline small rainbow-border" id="editAIFeedbackBtn">Edit</button>
           </div>
-          <div id="aiFeedbackContent" class="ai-feedback-paragraph">Loading analysis...</div>
+          <div id="aiFeedbackContent" class="ai-feedback-paragraph">Upload analytics data to generate AI feedback.</div>
         </div>
 
         <div class="card feedback-card collapsed">

@@ -1,177 +1,118 @@
 const form = document.getElementById('loginForm');
-const roleInput = document.getElementById('loginRole');
-const roleTabs = Array.from(document.querySelectorAll('.login-role-tab'));
-const loginCard = document.querySelector('.login-card');
-const loginTitle = document.getElementById('loginTitle');
-const loginSubtitle = document.getElementById('loginSubtitle');
-const loginLinkline = document.getElementById('loginLinkline');
-const loginSubmit = document.querySelector('.login-submit');
-const authProviderTitle = document.getElementById('authProviderTitle');
-const providerOne = document.getElementById('providerOne');
-const providerTwo = document.getElementById('providerTwo');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
+const accountTypeInput = document.getElementById('accountType');
+const individualCheckbox = document.getElementById('accountTypeIndividual');
+const companyCheckbox = document.getElementById('accountTypeCompany');
+const companyNameField = document.getElementById('companyNameField');
+const companyNameInput = document.getElementById('companyName');
+const existingAccountLoginLink = document.getElementById('existingAccountLoginLink');
+const accountTypeOptions = Array.from(document.querySelectorAll('[data-account-type-option]'));
 
-const modeCopy = {
-  client: {
-    title: 'Welcome Back',
-    subtitle: 'Sign in to access your dashboard',
-    linkline: 'Already have an account? <a href="/login.html">Log in</a>',
-    submit: 'Log In',
-    providerTitle: 'Auth Providers',
-    providerTwo: 'LinkedIn',
-    emailPlaceholder: 'Email or Username',
-    passwordPlaceholder: 'Enter your password',
-  },
-  admin: {
-    title: 'Admin Access',
-    subtitle: 'Sign in to manage client details and platform access',
-    linkline: 'Already have an account? <a href="/login.html">Log in</a>',
-    submit: 'Log In',
-    providerTitle: 'Auth Providers',
-    providerTwo: 'LinkedIn',
-    emailPlaceholder: 'Email or Username',
-    passwordPlaceholder: 'Enter your password',
-  },
-  signup: {
-    title: 'Create an account',
-    subtitle: 'Create your account to continue into your workspace',
-    linkline: 'Already have an account? <a href="/login.html">Log in</a>',
-    submit: 'Create account',
-    providerTitle: 'Or register with',
-    providerTwo: 'Apple',
-    emailPlaceholder: 'Email',
-    passwordPlaceholder: 'Enter your password',
-  },
-};
+function setAccountType(type) {
+  const isCompany = type === 'company';
 
-function setActiveRole(role) {
-  if (roleInput) {
-    roleInput.value = role === 'signup' ? 'client' : role;
+  if (accountTypeInput) {
+    accountTypeInput.value = isCompany ? 'company' : 'individual';
   }
 
-  if (loginCard) {
-    loginCard.classList.toggle('signup-mode', role === 'signup');
+  if (individualCheckbox) {
+    individualCheckbox.checked = !isCompany;
   }
 
-  if (loginTitle) {
-    loginTitle.textContent = modeCopy[role]?.title || modeCopy.client.title;
+  if (companyCheckbox) {
+    companyCheckbox.checked = isCompany;
   }
 
-  if (loginSubtitle) {
-    loginSubtitle.textContent = modeCopy[role]?.subtitle || modeCopy.client.subtitle;
+  if (companyNameField) {
+    companyNameField.hidden = !isCompany;
   }
 
-  if (loginLinkline) {
-    loginLinkline.innerHTML = modeCopy[role]?.linkline || modeCopy.client.linkline;
+  if (companyNameInput) {
+    companyNameInput.required = isCompany;
+    if (!isCompany) companyNameInput.value = '';
   }
 
-  if (loginSubmit) {
-    loginSubmit.textContent = modeCopy[role]?.submit || modeCopy.client.submit;
-  }
-
-  if (authProviderTitle) {
-    authProviderTitle.textContent = modeCopy[role]?.providerTitle || modeCopy.client.providerTitle;
-  }
-
-  if (providerOne) {
-    providerOne.textContent = 'Google';
-  }
-
-  if (providerTwo) {
-    providerTwo.textContent = modeCopy[role]?.providerTwo || modeCopy.client.providerTwo;
-  }
-
-  if (emailInput) {
-    emailInput.placeholder = modeCopy[role]?.emailPlaceholder || modeCopy.client.emailPlaceholder;
-  }
-
-  if (passwordInput) {
-    passwordInput.placeholder = modeCopy[role]?.passwordPlaceholder || modeCopy.client.passwordPlaceholder;
-  }
-
-  roleTabs.forEach((tab) => {
-    const isActive = tab.dataset.role === role;
-    tab.classList.toggle('active', isActive);
-    tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  accountTypeOptions.forEach((option) => {
+    option.classList.toggle('active', option.dataset.accountTypeOption === type);
   });
 }
 
-roleTabs.forEach((tab) => {
-  tab.addEventListener('click', () => {
-    setActiveRole(tab.dataset.role || 'client');
-  });
+individualCheckbox?.addEventListener('change', () => {
+  setAccountType('individual');
 });
 
-function inferRoleFromEmail(email, selectedRole) {
-  const normalized = String(email || '').trim().toLowerCase();
-  if (selectedRole === 'admin') return 'admin';
-  if (normalized.includes('admin')) return 'admin';
-  return 'client';
-}
+companyCheckbox?.addEventListener('change', () => {
+  setAccountType('company');
+});
+
+existingAccountLoginLink?.addEventListener('click', () => {
+  window.location.href = 'signin.html';
+});
 
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
+
   const firstName = document.getElementById('firstName')?.value.trim() || '';
   const lastName = document.getElementById('lastName')?.value.trim() || '';
-  const signupTerms = document.getElementById('signupTerms');
-  const activeRoleTab = document.querySelector('.login-role-tab.active')?.dataset.role || 'client';
-  const selectedRole = activeRoleTab === 'signup' ? 'client' : activeRoleTab;
-  const resolvedRole = inferRoleFromEmail(email, selectedRole);
+  const email = document.getElementById('email')?.value.trim() || '';
+  const password = document.getElementById('password')?.value || '';
+  const accountType = accountTypeInput?.value || 'individual';
+  const companyName = companyNameInput?.value.trim() || '';
 
-  if (activeRoleTab === 'signup') {
-    if (!firstName || !lastName) {
-      alert('Please enter your first and last name.');
-      return;
-    }
-    if (!signupTerms?.checked) {
-      alert('Please agree to the Terms & Conditions.');
-      return;
-    }
+  if (!firstName || !lastName) {
+    alert('Please enter your first and last name.');
+    return;
+  }
 
-    const createdUser = {
-      firstName,
-      lastName,
-      email,
-      role: 'client',
-      view: 'client',
-    };
+  if (!email || !password) {
+    alert('Please enter your email and create a password.');
+    return;
+  }
 
-    localStorage.setItem('token', `demo-signup-${Date.now()}`);
-    localStorage.setItem('user', JSON.stringify(createdUser));
-    localStorage.setItem('portalRole', 'client');
-    window.location.href = '/dashboard.html';
+  if (accountType === 'company' && !companyName) {
+    alert('Please enter your company name.');
     return;
   }
 
   try {
-    const res = await fetch('/api/login', {
+    const response = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role: resolvedRole }),
+      body: JSON.stringify({
+        email,
+        password,
+        firstName,
+        lastName,
+        accountType,
+        companyName: accountType === 'company' ? companyName : '',
+        role: 'client',
+        view: 'client',
+      }),
     });
-    if (!res.ok) throw new Error('Login failed');
 
-    const data = await res.json();
-    const mergedUser = {
+    if (!response.ok) {
+      throw new Error('Unable to create session');
+    }
+
+    const data = await response.json();
+    const createdUser = {
       ...(data.user || {}),
+      firstName: data.user?.firstName || firstName,
+      lastName: data.user?.lastName || lastName,
       email,
-      firstName,
-      lastName,
-      role: resolvedRole,
-      view: resolvedRole === 'admin' ? 'admin' : 'client',
+      accountType: data.user?.accountType || accountType,
+      companyName: data.user?.companyName || (accountType === 'company' ? companyName : ''),
+      role: data.user?.role || 'client',
+      view: data.user?.view || 'client',
     };
 
     localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(mergedUser));
-    localStorage.setItem('portalRole', resolvedRole);
+    localStorage.setItem('user', JSON.stringify(createdUser));
+    localStorage.setItem('portalRole', 'client');
     document.cookie = `session=${encodeURIComponent(data.token)}; path=/`;
-    window.location.href = '/dashboard.html';
-  } catch (err) {
-    alert('Login failed');
+    window.location.href = '/featurehub.html';
+  } catch (error) {
+    alert('Unable to continue right now. Please try again.');
   }
 });
 
-setActiveRole('client');
+setAccountType('individual');

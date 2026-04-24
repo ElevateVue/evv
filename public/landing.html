@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elevate Vue | Welcome</title>
-  <link rel="stylesheet" href="/style.css" />
-  <script defer src="/footer.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="footer.js"></script>
   <style>
     :root {
       --welcome-bg: #090d15;
@@ -897,12 +897,12 @@
   <div class="welcome-shell" id="top">
     <nav class="welcome-nav">
       <div class="welcome-nav-left">
-        <a href="/landing.html" class="welcome-brand" aria-label="Elevate Vue home">
-          <img src="/logo.png" alt="Elevate Vue" class="brand-badge" />
+        <a href="landing.html" class="welcome-brand" aria-label="Elevate Vue home">
+          <img src="logo.png" alt="Elevate Vue" class="brand-badge" />
           <span>Elevate Vue</span>
         </a>
         <div class="welcome-links">
-          <a href="/landing.html" class="welcome-link active">Home</a>
+          <a href="landing.html" class="welcome-link active">Home</a>
           <a href="#features" class="welcome-link">Features</a>
           <a href="#demo" class="welcome-link">Pricing</a>
           <a href="#features" class="welcome-link">Agency</a>
@@ -924,7 +924,7 @@
               <path d="M9.5 18a2.5 2.5 0 0 0 5 0" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
             </svg>
           </button>
-          <a href="/login.html" class="auth-button login-link" id="loginLink" aria-label="Go to login">Login</a>
+          <a href="signin.html" class="auth-button login-link" id="loginLink" aria-label="Go to login">Login</a>
           <button type="button" class="auth-button profile-link" id="profileLink" aria-label="Open account menu" aria-expanded="false">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.9"></circle>
@@ -933,8 +933,8 @@
             </svg>
           </button>
           <div class="profile-menu hidden" id="profileMenu">
-            <a href="/login.html">Sign In</a>
-            <a href="/login.html">Log In</a>
+            <a href="login.html">Sign In</a>
+            <a href="signin.html" id="profileLogInLink">Log In</a>
           </div>
           <div class="notifications-panel hidden" id="notificationsPanel" aria-live="polite">
             <p class="notifications-title">Notifications</p>
@@ -967,7 +967,7 @@
         </p>
 
         <div class="hero-cta">
-          <a href="/login.html" class="welcome-btn primary">Get Started</a>
+          <a href="login.html" class="welcome-btn primary">Get Started</a>
           <a href="#demo" class="welcome-btn secondary">View Demo</a>
         </div>
       </div>
@@ -1068,7 +1068,7 @@
             <h4>Admin Approval Flow</h4>
             <p>Keep every post reviewed, approved, and ready before it goes live across any connected platform.</p>
           </div>
-          <a href="/login.html" class="welcome-btn secondary">Open Login</a>
+          <a href="signin.html" class="welcome-btn secondary">Open Login</a>
         </article>
 
         <article class="feature-card cyan">
@@ -1094,7 +1094,7 @@
             <h4>Unlock Agency Mode</h4>
             <p>Start with the welcome experience, then jump straight into sign in when you are ready to work.</p>
           </div>
-          <a href="/login.html" class="welcome-btn">Get Started</a>
+          <a href="login.html" class="welcome-btn">Get Started</a>
         </article>
       </div>
 
@@ -1103,8 +1103,8 @@
     <footer class="footer-wrap">
       <div class="footer-panel">
         <div>
-          <a href="/landing.html" class="welcome-brand" aria-label="Elevate Vue home">
-            <img src="/logo.png" alt="EVV" class="brand-badge" />
+          <a href="landing.html" class="welcome-brand" aria-label="Elevate Vue home">
+            <img src="logo.png" alt="EVV" class="brand-badge" />
             <span>Elevate Vue</span>
           </a>
           <p>
@@ -1116,7 +1116,7 @@
           <div class="footer-links">
             <a href="#features">Features</a>
             <a href="#demo">Strategy Hub</a>
-            <a href="/login.html">Sign In</a>
+            <a href="login.html">Sign In</a>
           </div>
         </div>
         <div>
@@ -1124,7 +1124,7 @@
           <div class="footer-links">
             <a href="#features">View Platform</a>
             <a href="#top">Back To Top</a>
-            <a href="/login.html">Get Started</a>
+            <a href="login.html">Get Started</a>
           </div>
         </div>
       </div>
@@ -1141,6 +1141,7 @@
     const loginLink = document.getElementById("loginLink");
     const profileLink = document.getElementById("profileLink");
     const profileMenu = document.getElementById("profileMenu");
+    const profileLogInLink = document.getElementById("profileLogInLink");
 
     document.querySelectorAll('a[href="#top"]').forEach((link) => {
       link.addEventListener("click", (event) => {
@@ -1196,6 +1197,14 @@
       const willOpen = profileMenu?.classList.contains("hidden");
       profileMenu?.classList.toggle("hidden", !willOpen);
       profileLink.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    });
+
+    loginLink?.addEventListener("click", () => {
+      window.location.href = "signin.html";
+    });
+
+    profileLogInLink?.addEventListener("click", () => {
+      window.location.href = "signin.html";
     });
 
     document.addEventListener("click", (event) => {

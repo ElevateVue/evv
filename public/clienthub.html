@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Hub • EVV</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="client-hub-tracker.js"></script>
+  <style>
+    :root {
+      --admin-bg: #0d0d10;
+      --admin-panel: #141418;
+      --admin-card: #1b1b20;
+      --admin-card-alt: #16161b;
+      --admin-line: rgba(255, 255, 255, 0.08);
+      --admin-text: #f4f2f8;
+      --admin-muted: #9d9da8;
+      --admin-soft: #7a7b88;
+      --admin-cyan: #18d7e1;
+      --admin-blue: #5d7cff;
+      --admin-violet: #915dff;
+      --admin-green: #46dcb0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body.client-admin-page {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(93, 124, 255, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(24, 215, 225, 0.08), transparent 22%),
+        linear-gradient(180deg, #0b0b0f 0%, #111116 100%);
+      color: var(--admin-text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .admin-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+    }
+
+    .admin-sidebar {
+      background: rgba(17, 17, 22, 0.98);
+      border-right: 1px solid var(--admin-line);
+      padding: 24px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .admin-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px 8px;
+    }
+
+    .admin-brand strong {
+      color: #8fa0ff;
+      font-size: 22px;
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+    }
+
+    .admin-brand span {
+      color: var(--admin-soft);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .admin-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .admin-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: 14px;
+      color: #9b9ca7;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: .2s ease;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .admin-nav a:hover,
+    .admin-nav a.active {
+      color: #eef5ff;
+      background: linear-gradient(90deg, rgba(24, 215, 225, 0.14), rgba(93, 124, 255, 0.12));
+      border-color: rgba(24, 215, 225, 0.28);
+      box-shadow: inset 3px 0 0 var(--admin-cyan);
+    }
+
+    .admin-sidebar-footer {
+      margin-top: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .admin-sidebar-footer a {
+      color: #858696;
+      text-decoration: none;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+
+    .admin-main {
+      min-width: 0;
+      padding: 20px 24px 32px;
+    }
+
+    .admin-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--admin-line);
+    }
+
+    .admin-topbar-copy {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .admin-topbar-copy strong {
+      font-size: 24px;
+      letter-spacing: -0.05em;
+    }
+
+    .admin-topbar-copy span {
+      color: var(--admin-muted);
+      font-size: 13px;
+    }
+
+    .admin-search {
+      width: min(320px, 100%);
+      min-height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--admin-line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--admin-text);
+      padding: 0 16px;
+      outline: none;
+      font: inherit;
+      font-size: 14px;
+    }
+
+    .admin-search::placeholder {
+      color: #767888;
+    }
+
+    .hero {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 0 22px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 660px;
+      color: var(--admin-muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ghost-btn,
+    .solid-btn {
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 14px;
+      border: 1px solid var(--admin-line);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.04);
+      color: #ececf4;
+    }
+
+    .solid-btn {
+      background: linear-gradient(135deg, #b2beff 0%, #627eff 56%, #355ef9 100%);
+      color: #132768;
+      box-shadow: 0 18px 34px rgba(53, 94, 249, 0.28);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: linear-gradient(180deg, rgba(29, 29, 35, 0.94), rgba(21, 21, 27, 0.98));
+      border: 1px solid var(--admin-line);
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .stat-card span {
+      display: block;
+      color: var(--admin-soft);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .stat-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 26px;
+      letter-spacing: -0.06em;
+    }
+
+    .client-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .client-card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(28, 28, 34, 0.98), rgba(19, 19, 25, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 34px;
+      padding: 26px;
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.22);
+    }
+
+    .client-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 122px;
+      background: linear-gradient(180deg, rgba(44, 44, 52, 0.88), rgba(34, 34, 40, 0.28));
+      pointer-events: none;
+    }
+
+    .client-card-header,
+    .client-card-body,
+    .client-card-footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .client-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .client-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .client-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(18, 18, 22, 0.96), rgba(14, 14, 18, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: #f0f5ff;
+      font-size: 24px;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .client-profile-copy {
+      margin-bottom: 8px;
+    }
+
+    .client-profile-copy h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .client-profile-copy p {
+      margin: 10px 0 0;
+      color: var(--admin-muted);
+      font-size: 12px;
+      line-height: 1.55;
+      max-width: 240px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(24, 215, 225, 0.2);
+      color: #7af3ff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      box-shadow: inset 0 0 0 1px rgba(24, 215, 225, 0.08);
+    }
+
+    .status-pill::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    .status-pill.pending {
+      background: rgba(145, 93, 255, 0.14);
+      color: #d0b9ff;
+    }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .mini-stat {
+      min-height: 132px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 24px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .mini-stat span {
+      display: block;
+      color: var(--admin-soft);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .mini-stat strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 28px;
+      letter-spacing: -0.06em;
+    }
+
+    .client-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--admin-soft);
+      font-size: 12px;
+    }
+
+    .manage-link {
+      color: var(--admin-cyan);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .empty-state {
+      padding: 54px 28px;
+      border-radius: 28px;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--admin-muted);
+      text-align: center;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 10px;
+      color: #f4f3f8;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    @media (max-width: 1260px) {
+      .client-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 940px) {
+      .admin-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-sidebar {
+        padding-bottom: 10px;
+      }
+
+      .hero,
+      .admin-topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .admin-main {
+        padding: 18px 16px 28px;
+      }
+
+      .client-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .client-card-header {
+        flex-direction: column;
+      }
+
+      .client-avatar {
+        width: 68px;
+        height: 68px;
+      }
+    }
+  </style>
+</head>
+<body class="client-admin-page">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <strong>ELEVATE ADMIN</strong>
+        <span>Client intelligence board</span>
+      </div>
+
+      <nav class="admin-nav">
+        <a href="featurehub.html">Feature Hub</a>
+        <a class="active" href="clienthub.html">Client Hub</a>
+        <a href="dashboard-overview.html">Dashboard</a>
+        <a href="connect.html">Connections</a>
+        <a href="upload.html">Scheduling</a>
+        <a href="report.html">Reports</a>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <a href="landing.html">Help Center</a>
+        <a href="login.html">Logout</a>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar-copy">
+          <strong>ElevateVue</strong>
+          <span>Client Management</span>
+        </div>
+        <input class="admin-search" id="clientSearch" type="search" placeholder="Search clients, emails, tools..." />
+      </div>
+
+      <section class="hero">
+        <div>
+          <h1>Client Hub</h1>
+          <p>Every person who logs in gets a saved client card here. The admin view shows who they are, which tools or pages they use, and how much data has been stored for them in this browser.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="ghost-btn" id="refreshHub" type="button">Refresh</button>
+          <button class="solid-btn" id="exportCsv" type="button">Export CSV</button>
+        </div>
+      </section>
+
+      <section class="stats-grid" id="statsGrid"></section>
+      <section class="client-grid" id="clientGrid"></section>
+      <section class="empty-state" id="emptyState" hidden>
+        <strong>No client cards yet</strong>
+        Once someone logs in and opens the platform, their usage card will appear here automatically.
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const HUB_STORAGE_KEY = 'evvClientHubRecords';
+
+    function readJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function getLocalRecords() {
+      return Object.values(readJson(HUB_STORAGE_KEY, {})).sort((a, b) => (b.lastActive || 0) - (a.lastActive || 0));
+    }
+
+    function formatAgo(timestamp) {
+      if (!timestamp) return 'No activity yet';
+      const diffMs = Date.now() - Number(timestamp);
+      const diffMin = Math.max(0, Math.round(diffMs / 60000));
+      if (diffMin < 1) return 'Just now';
+      if (diffMin < 60) return diffMin + 'm ago';
+      const diffHour = Math.round(diffMin / 60);
+      if (diffHour < 24) return diffHour + 'h ago';
+      const diffDay = Math.round(diffHour / 24);
+      return diffDay + 'd ago';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function buildCsv(records) {
+      const rows = [
+        ['Name', 'Email', 'Company', 'Account Type', 'Last Page', 'Tools Used', 'Connections', 'Queued Posts', 'Reports', 'Feedback', 'Saved Items', 'Last Active']
+      ];
+
+      records.forEach((record) => {
+        rows.push([
+          record.name || '',
+          record.email || '',
+          record.companyName || '',
+          record.accountType || '',
+          record.lastPage || '',
+          (record.toolsUsed || []).join(' | '),
+          record.metrics?.connections || 0,
+          record.metrics?.queuedPosts || 0,
+          record.metrics?.reports || 0,
+          record.metrics?.feedback || 0,
+          record.metrics?.totalSavedItems || 0,
+          record.lastActive ? new Date(record.lastActive).toISOString() : ''
+        ]);
+      });
+
+      return rows
+        .map((row) => row.map((item) => `"${String(item).replaceAll('"', '""')}"`).join(','))
+        .join('\n');
+    }
+
+    function renderStats(records) {
+      const statsGrid = document.getElementById('statsGrid');
+      const totals = records.reduce((acc, record) => {
+        acc.clients += 1;
+        acc.tools += record.totalToolsUsed || 0;
+        acc.saved += record.metrics?.totalSavedItems || 0;
+        acc.connections += record.metrics?.connections || 0;
+        return acc;
+      }, { clients: 0, tools: 0, saved: 0, connections: 0 });
+
+      const stats = [
+        { label: 'Active Clients', value: totals.clients },
+        { label: 'Tools In Use', value: totals.tools },
+        { label: 'Saved Data Points', value: totals.saved },
+        { label: 'Connected Accounts', value: totals.connections }
+      ];
+
+      statsGrid.innerHTML = stats.map((stat) => `
+        <article class="stat-card">
+          <span>${escapeHtml(stat.label)}</span>
+          <strong>${escapeHtml(stat.value)}</strong>
+        </article>
+      `).join('');
+    }
+
+    function renderCards(records) {
+      const clientGrid = document.getElementById('clientGrid');
+      const emptyState = document.getElementById('emptyState');
+
+      if (!records.length) {
+        clientGrid.innerHTML = '';
+        emptyState.hidden = false;
+        return;
+      }
+
+      emptyState.hidden = true;
+      clientGrid.innerHTML = records.map((record) => {
+        const companyLine = record.companyName || record.email || 'No company added yet';
+        const statusClass = (record.totalToolsUsed || 0) > 0 ? 'status-pill' : 'status-pill pending';
+        const statusText = (record.totalToolsUsed || 0) > 0 ? 'Active' : 'Pending Review';
+        const secondaryStat = record.metrics?.connections || 0;
+
+        return `
+          <article class="client-card">
+            <div class="client-card-header">
+              <div class="client-profile">
+                <div class="client-avatar">${escapeHtml(record.initials || 'C')}</div>
+              </div>
+              <span class="${statusClass}">${escapeHtml(statusText)}</span>
+            </div>
+
+            <div class="client-card-body">
+              <div class="client-profile-copy">
+                <h3>${escapeHtml(record.name || 'Client')}</h3>
+                <p>${escapeHtml(companyLine)}</p>
+              </div>
+
+              <div class="mini-stats">
+                <div class="mini-stat">
+                  <span>Tools Used</span>
+                  <strong>${escapeHtml(record.totalToolsUsed || 0)}</strong>
+                </div>
+                <div class="mini-stat">
+                  <span>Connected Accounts</span>
+                  <strong>${escapeHtml(secondaryStat)}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="client-card-footer">
+              <span>Last sync: ${escapeHtml(formatAgo(record.lastActive))}</span>
+              <a class="manage-link" href="featurehub.html">Manage &rarr;</a>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderHub(query = '', sourceRecords = null) {
+      const term = query.trim().toLowerCase();
+      const records = (sourceRecords || getLocalRecords()).filter((record) => {
+        if (!term) return true;
+        const haystack = [
+          record.name,
+          record.email,
+          record.companyName,
+          ...(record.toolsUsed || []),
+          ...(record.pagesUsed || [])
+        ].join(' ').toLowerCase();
+        return haystack.includes(term);
+      });
+
+      renderStats(records);
+      renderCards(records);
+    }
+
+    document.getElementById('clientSearch')?.addEventListener('input', (event) => {
+      renderHub(event.target.value);
+    });
+
+    async function fetchServerRecords() {
+      try {
+        const response = await fetch('/api/client-hub', { credentials: 'same-origin' });
+        if (!response.ok) throw new Error('Failed to fetch records');
+        const data = await response.json();
+        const records = Array.isArray(data.clients) ? data.clients : [];
+        const asMap = records.reduce((acc, record) => {
+          if (record?.id) acc[record.id] = record;
+          return acc;
+        }, {});
+        localStorage.setItem(HUB_STORAGE_KEY, JSON.stringify(asMap));
+        return records;
+      } catch {
+        return getLocalRecords();
+      }
+    }
+
+    document.getElementById('refreshHub')?.addEventListener('click', async () => {
+      const searchValue = document.getElementById('clientSearch')?.value || '';
+      const records = await fetchServerRecords();
+      renderHub(searchValue, records);
+    });
+
+    document.getElementById('exportCsv')?.addEventListener('click', () => {
+      const records = getLocalRecords();
+      if (!records.length) {
+        alert('No client data to export yet.');
+        return;
+      }
+
+      const csv = buildCsv(records);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'client-hub-export.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    fetchServerRecords().then((records) => {
+      renderHub('', records);
+    });
+  </script>
+</body>
+</html>

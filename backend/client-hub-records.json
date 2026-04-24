@@ -1,0 +1,85 @@
+{
+  "sabiha.habeeb1972@gmail.com": {
+    "id": "sabiha.habeeb1972@gmail.com",
+    "email": "sabiha.habeeb1972@gmail.com",
+    "name": "Demo User",
+    "firstName": "Demo",
+    "lastName": "User",
+    "companyName": "",
+    "accountType": "individual",
+    "role": "client",
+    "view": "client",
+    "initials": "D",
+    "firstSeen": 1777015956844,
+    "lastActive": 1777017682757,
+    "totalVisits": 24,
+    "lastPage": "Report",
+    "pageUsage": {
+      "featurehub.html": {
+        "name": "Feature Hub",
+        "category": "Overview",
+        "visits": 4,
+        "firstVisited": 1777015956844,
+        "lastVisited": 1777016539246
+      },
+      "clienthub.html": {
+        "name": "Client Hub",
+        "category": "Admin",
+        "visits": 3,
+        "firstVisited": 1777015960888,
+        "lastVisited": 1777016543191
+      },
+      "report.html": {
+        "name": "Report",
+        "category": "Insights",
+        "visits": 8,
+        "firstVisited": 1777015983774,
+        "lastVisited": 1777017682757
+      },
+      "dashboard-overview.html": {
+        "name": "Dashboard",
+        "category": "Analytics",
+        "visits": 8,
+        "firstVisited": 1777016549076,
+        "lastVisited": 1777017652480
+      },
+      "connect.html": {
+        "name": "Connect",
+        "category": "Connections",
+        "visits": 1,
+        "firstVisited": 1777016557315,
+        "lastVisited": 1777016557315
+      }
+    },
+    "pagesUsed": [
+      "Report",
+      "Dashboard",
+      "Connect",
+      "Client Hub",
+      "Feature Hub"
+    ],
+    "toolsUsed": [
+      "Report",
+      "Dashboard",
+      "Connect",
+      "Client Hub",
+      "Feature Hub"
+    ],
+    "totalToolsUsed": 5,
+    "recentTools": [
+      "Report",
+      "Dashboard",
+      "Connect",
+      "Client Hub"
+    ],
+    "metrics": {
+      "connections": 0,
+      "queuedPosts": 0,
+      "reports": 1,
+      "feedback": 0,
+      "hashtagSets": 0,
+      "uploads": 1,
+      "totalSavedItems": 2
+    }
+  }
+}

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
   <script defer src="footer.js"></script>
   <style>
     .google-data-section {
@@ -190,11 +191,11 @@
     <div class="brand"><img src="/logo.png" alt="EVV" class="brand-badge" /><div><div class="brand-name">Elevate</div><div class="brand-sub">vue</div></div><button class="icon-btn" id="closeSidebar">×</button></div>
     <nav class="side-nav">
       <div class="nav-label">Navigation</div>
-      <a class="nav-link" href="dashboard.html">Dashboard</a>
+      <a class="nav-link" href="featurehub.html">Feature Hub</a>
+      <a class="nav-link" href="dashboard-overview.html">Dashboard</a>
       <a class="nav-link" href="connect.html">Connect</a>
       <a class="nav-link" href="upload.html">Scheduling</a>
       <a class="nav-link" href="report.html">Report</a>
-      <a class="nav-link" href="google.html">Google Data</a>
     </nav>
     <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
   </aside>
@@ -203,13 +204,6 @@
       <button class="icon-btn" id="openSidebar">☰</button>
       <div class="brand-inline"><img src="/logo.png" alt="EVV" class="brand-badge" /><div class="brand-name">Elevate <span class="brand-sub">vue</span></div></div>
       <div class="spacer"></div>
-      <nav class="top-nav">
-        <a href="dashboard.html" class="top-link">Dashboard</a>
-        <a href="connect.html" class="top-link">Connect</a>
-        <a href="upload.html" class="top-link">Scheduling</a>
-        <a href="report.html" class="top-link">Report</a>
-        <a href="google.html" class="top-link">Google Data</a>
-      </nav>
       <div class="avatar small">S</div>
     </header>
     <main>
@@ -276,13 +270,12 @@
                 <span class="section-kicker">Performance</span>
               </div>
               <div class="chart-header">
-                <span class="chart-title" id="chartTitle">All Metrics Trend</span>
-                <div class="btn-row" id="btnRow"></div>
+                <span class="chart-title" id="reportChartTitle">Saved Performance Snapshot</span>
               </div>
-              <div class="canvas-wrap">
-                <canvas id="metricChart"></canvas>
+              <div class="hub-chart-wrap">
+                <div id="chartSvgContainer" style="width:100%;"></div>
               </div>
-              <div class="legend" id="legend"></div>
+              <div class="legend" id="chartLegend"></div>
             </div>
           </div>
           <div id="googleDashboard" class="detail-section google-hub-section">

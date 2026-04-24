@@ -30,13 +30,13 @@ function buildFooterMarkup() {
     <div class="evv-footer-shell">
       <div class="evv-footer-main">
         <div class="evv-footer-brand">
-          <a href="/landing.html" class="evv-footer-logo" aria-label="Go to Elevate Vue home">
-            <img src="/logo.png" alt="Elevate Vue" class="brand-badge" />
+          <a href="landing.html" class="evv-footer-logo" aria-label="Go to Elevate Vue home">
+            <img src="logo.png" alt="Elevate Vue" class="brand-badge" />
             <span>ELEVATE VUE</span>
           </a>
           <p>Elevating social voices through strategy, analytics, and editorial precision.</p>
           <div class="evv-footer-socials" aria-label="Footer quick links">
-            <a href="/landing.html" class="evv-footer-social" aria-label="Open home page">
+            <a href="landing.html" class="evv-footer-social" aria-label="Open home page">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 4.2 5 9.7v8.1h4.7v-4.5h4.6v4.5H19V9.7l-7-5.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
               </svg>
@@ -47,7 +47,7 @@ function buildFooterMarkup() {
                 <path d="m5.5 7.5 6.5 5 6.5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </a>
-            <a href="/dashboard.html" class="evv-footer-social" aria-label="Open dashboard">
+            <a href="dashboard.html" class="evv-footer-social" aria-label="Open dashboard">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M6 18 18 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                 <path d="M9 6h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -58,17 +58,16 @@ function buildFooterMarkup() {
 
         <div class="evv-footer-column">
           <h4>Product</h4>
-          <a href="/dashboard.html">Dashboard</a>
-          <a href="/connect.html">Connect</a>
-          <a href="/upload.html">Scheduling</a>
-          <a href="/report.html">AI Reports</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="connect.html">Connect</a>
+          <a href="upload.html">Scheduling</a>
+          <a href="report.html">AI Reports</a>
         </div>
 
         <div class="evv-footer-column">
           <h4>Resources</h4>
-          <a href="/google.html">Google Data</a>
-          <a href="/post-queue.html">Post Queue</a>
-          <a href="/login.html">Sign In</a>
+          <a href="post-queue.html">Post Queue</a>
+          <a href="signin.html">Sign In</a>
           <button type="button" class="evv-footer-linkbtn" data-scroll-top="true">Support Hub</button>
         </div>
 

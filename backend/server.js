@@ -29,6 +29,7 @@ const mimeTypes = {
 
 const staticDir = path.join(__dirname, '..', 'public');
 const sessionsFile = path.join(__dirname, 'sessions.json');
+const clientHubFile = path.join(__dirname, 'client-hub-records.json');
 const loadSessions = () => {
   try {
     const raw = fs.readFileSync(sessionsFile, 'utf8');
@@ -45,8 +46,25 @@ const saveSessions = (sessions) => {
     console.error('Failed to persist sessions:', err);
   }
 };
+const loadClientHubRecords = () => {
+  try {
+    const raw = fs.readFileSync(clientHubFile, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch (err) {
+    return {};
+  }
+};
+const saveClientHubRecords = (records) => {
+  try {
+    fs.writeFileSync(clientHubFile, JSON.stringify(records, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Failed to persist client hub records:', err);
+  }
+};
 
 let sessions = loadSessions();
+let clientHubRecords = loadClientHubRecords();
 let posts = [];
 let metrics = {
   reach: 0,
@@ -667,16 +685,110 @@ const parseCookies = (req) =>
     return acc;
   }, {});
 
-const isAuthenticated = (req) => {
+const getSession = (req) => {
   const cookies = parseCookies(req);
-  if (!cookies.session) return false;
-  return sessions.some((s) => s.token === cookies.session);
+  if (!cookies.session) return null;
+  return sessions.find((s) => s.token === cookies.session) || null;
 };
 
-const PUBLIC_ROUTES = new Set(['/landing.html', '/login.html']);
+const isAuthenticated = (req) => {
+  return Boolean(getSession(req));
+};
+
+function getUserIdentity(user = {}) {
+  const email = String(user?.email || '').trim().toLowerCase();
+  return email;
+}
+
+function listClientHubRecords() {
+  return Object.values(clientHubRecords).sort((a, b) => (b.lastActive || 0) - (a.lastActive || 0));
+}
+
+function sanitizeMetrics(metricsObj = {}) {
+  return {
+    connections: coerceNumber(metricsObj.connections),
+    queuedPosts: coerceNumber(metricsObj.queuedPosts),
+    reports: coerceNumber(metricsObj.reports),
+    feedback: coerceNumber(metricsObj.feedback),
+    hashtagSets: coerceNumber(metricsObj.hashtagSets),
+    uploads: coerceNumber(metricsObj.uploads),
+    totalSavedItems: coerceNumber(metricsObj.totalSavedItems),
+  };
+}
+
+function upsertClientHubRecord(sessionUser, payload = {}) {
+  const identity = getUserIdentity(sessionUser);
+  if (!identity) return null;
+
+  const existing = clientHubRecords[identity] || {};
+  const now = Date.now();
+  const pageFile = String(payload.pageFile || '').trim() || existing.pageFile || '';
+  const pageName = String(payload.pageName || '').trim() || existing.lastPage || 'Workspace';
+  const pageCategory = String(payload.pageCategory || '').trim() || 'Workspace';
+  const currentUsage = existing.pageUsage && typeof existing.pageUsage === 'object' ? existing.pageUsage : {};
+  const usageEntry = currentUsage[pageFile] || {
+    name: pageName,
+    category: pageCategory,
+    visits: 0,
+    firstVisited: now,
+  };
+
+  usageEntry.name = pageName;
+  usageEntry.category = pageCategory;
+  usageEntry.visits += 1;
+  usageEntry.lastVisited = now;
+  currentUsage[pageFile] = usageEntry;
+
+  const usageList = Object.entries(currentUsage)
+    .map(([file, value]) => ({ file, ...(value || {}) }))
+    .sort((a, b) => (b.lastVisited || 0) - (a.lastVisited || 0));
+
+  const firstName = String(payload.firstName || sessionUser.firstName || existing.firstName || '').trim();
+  const lastName = String(payload.lastName || sessionUser.lastName || existing.lastName || '').trim();
+  const fullName =
+    [firstName, lastName].filter(Boolean).join(' ').trim() ||
+    String(payload.name || sessionUser.name || existing.name || '').trim() ||
+    String(payload.companyName || sessionUser.companyName || existing.companyName || '').trim() ||
+    String(sessionUser.email || 'Client').trim();
+  const metrics = sanitizeMetrics(payload.metrics || existing.metrics || {});
+  const role = String(payload.role || sessionUser.role || existing.role || 'client').trim();
+  const view = String(payload.view || sessionUser.view || existing.view || 'client').trim();
+  const accountType = String(payload.accountType || sessionUser.accountType || existing.accountType || 'individual').trim();
+  const companyName = String(payload.companyName || sessionUser.companyName || existing.companyName || '').trim();
+
+  const nextRecord = {
+    id: identity,
+    email: String(sessionUser.email || existing.email || '').trim(),
+    name: fullName,
+    firstName,
+    lastName,
+    companyName,
+    accountType,
+    role,
+    view,
+    initials: String(payload.initials || existing.initials || fullName[0] || sessionUser.email?.[0] || 'C').toUpperCase(),
+    firstSeen: existing.firstSeen || now,
+    lastActive: now,
+    totalVisits: coerceNumber(existing.totalVisits) + 1,
+    lastPage: pageName,
+    pageUsage: currentUsage,
+    pagesUsed: usageList.map((item) => item.name),
+    toolsUsed: usageList.map((item) => item.name),
+    totalToolsUsed: usageList.length,
+    recentTools: usageList.slice(0, 4).map((item) => item.name),
+    metrics,
+  };
+
+  clientHubRecords[identity] = nextRecord;
+  saveClientHubRecords(clientHubRecords);
+  return nextRecord;
+}
+
+const PUBLIC_ROUTES = new Set(['/landing.html', '/login.html', '/signin.html']);
 
 const serveStatic = (req, res) => {
-  const safePath = req.url === '/' ? '/landing.html' : req.url.split('?')[0];
+  let safePath = req.url === '/' ? '/landing.html' : req.url.split('?')[0];
+  if (safePath === '/dashboard.html') safePath = '/featurehub.html';
   const filePath = path.join(staticDir, safePath);
   if (!filePath.startsWith(staticDir)) return false;
   const ext = path.extname(filePath);
@@ -710,10 +822,30 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.url === '/api/login' && req.method === 'POST') {
-    const { email, password } = await parseBody(req);
+    const { email, password, firstName, lastName, accountType, companyName, role, view, name } = await parseBody(req);
     if (!email || !password) return sendJson(res, 400, { message: 'Email and password required' });
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const existingRecord = clientHubRecords[normalizedEmail] || {};
     const token = 'sess-' + crypto.randomBytes(12).toString('hex');
-    const user = { name: 'Demo User', email, createdAt: Date.now() };
+    const resolvedFirstName = String(firstName || existingRecord.firstName || '').trim();
+    const resolvedLastName = String(lastName || existingRecord.lastName || '').trim();
+    const resolvedCompanyName = String(companyName || existingRecord.companyName || '').trim();
+    const resolvedName =
+      [resolvedFirstName, resolvedLastName].filter(Boolean).join(' ').trim() ||
+      String(name || existingRecord.name || '').trim() ||
+      resolvedCompanyName ||
+      'Demo User';
+    const user = {
+      name: resolvedName,
+      email: normalizedEmail,
+      firstName: resolvedFirstName,
+      lastName: resolvedLastName,
+      accountType: String(accountType || existingRecord.accountType || 'individual').trim(),
+      companyName: resolvedCompanyName,
+      role: String(role || existingRecord.role || 'client').trim(),
+      view: String(view || existingRecord.view || 'client').trim(),
+      createdAt: Date.now(),
+    };
     sessions.push({ token, user, createdAt: Date.now() });
     saveSessions(sessions);
     return sendJson(res, 200, { token, user });
@@ -757,6 +889,18 @@ const server = http.createServer(async (req, res) => {
 
   if (parsedUrl.pathname === '/api/health') {
     return sendJson(res, 200, { ok: true, time: new Date().toISOString() });
+  }
+
+  if (parsedUrl.pathname === '/api/client-hub' && req.method === 'GET') {
+    return sendJson(res, 200, { clients: listClientHubRecords() });
+  }
+
+  if (parsedUrl.pathname === '/api/client-hub/track' && req.method === 'POST') {
+    const session = getSession(req);
+    if (!session?.user?.email) return sendJson(res, 401, { message: 'Unauthorized' });
+    const payload = await parseBody(req);
+    const record = upsertClientHubRecord(session.user, payload);
+    return sendJson(res, 200, { ok: true, client: record });
   }
 
   if (parsedUrl.pathname === '/api/google/oauth-url' && req.method === 'GET') {

@@ -3,96 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login • EVV</title>
+  <title>Create Account • EVV</title>
   <link rel="stylesheet" href="style.css" />
   <script defer src="login.js"></script>
   <script defer src="footer.js"></script>
 </head>
-<body class="login-shell">
-  <section class="login-hero">
+<body class="login-shell login-reference-shell">
+  <section class="login-hero login-reference-hero">
     <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <img src="/logo.png" alt="EVV" class="brand-badge xl" />
-      <h1>Master your<br /><span class="gradient-text">Social Growth</span></h1>
-      <p class="muted lead">Connect your platforms, visualize your metrics, and let AI generate actionable growth strategies for you.</p>
-      <div class="hero-pills">
-        <div class="pill-hero"><span class="pill-icon">Time</span><span>Real-time Analytics</span></div>
-        <div class="pill-hero"><span class="pill-icon">Lock</span><span>Secure Connection</span></div>
+    <div class="hero-content login-reference-content">
+      <div class="login-hero-chip">LET'S TALK</div>
+      <h1>Ready to <span class="gradient-text">Elevate</span><br />Your Brand?</h1>
+      <p class="lead">
+        We combine strategic thinking with creative execution to build brands that stand out
+        and drive measurable results. We are more than marketers. We are growth partners.
+      </p>
+
+      <div class="login-reference-points">
+        <div class="login-reference-point">
+          <span class="login-reference-icon">✉</span>
+          <span>operations@elevate-vue.com</span>
+        </div>
+        <div class="login-reference-point">
+          <span class="login-reference-icon">●</span>
+          <span>Available remotely worldwide</span>
+        </div>
+        <div class="login-reference-point">
+          <span class="login-reference-icon">⚡</span>
+          <span>Response within 24 hours</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="login-panel">
-    <div class="panel-inner login-card">
-      <div class="login-brand-stack">
-        <div class="panel-brand login-brand-centered">
-          <img src="/logo.png" alt="EVV" class="brand-badge" />
-          <div class="brand-name">Elevate <span class="brand-sub">vue</span></div>
-        </div>
-        <div class="login-kicker">THE DIGITAL CURATOR</div>
-      </div>
-
-      <div class="login-role-row" role="tablist" aria-label="Login type">
-        <button type="button" class="login-role-tab active" data-role="client" aria-selected="true">Client Login</button>
-        <button type="button" class="login-role-tab" data-role="admin" aria-selected="false">Admin Access</button>
-        <button type="button" class="login-role-tab login-inline-submit" data-role="signup" aria-selected="false">Sign In Page</button>
-      </div>
-
-      <h2 id="loginTitle">Welcome Back</h2>
-      <p class="muted" id="loginSubtitle">Sign in to access your dashboard</p>
-      <div class="login-linkline" id="loginLinkline">Already have an account? <a href="/login.html">Log in</a></div>
+  <section class="login-panel login-reference-panel">
+    <div class="panel-inner login-card login-reference-card signup-mode">
+      <h2 id="loginTitle">Create Your Account</h2>
+      <p class="muted" id="loginSubtitle">Choose whether you are signing in as an individual or a company.</p>
+      <div class="login-linkline" id="loginLinkline">Already have an account? <a href="signin.html" id="existingAccountLoginLink">Log in</a></div>
 
       <form id="loginForm" class="stack">
         <input type="hidden" id="loginRole" value="client" />
-        <div class="signup-name-row">
+        <input type="hidden" id="accountType" value="individual" />
+
+        <div class="signup-name-row force-visible">
           <div class="login-field">
+            <label for="firstName">First Name</label>
             <div class="login-input-shell">
-              <input type="text" id="firstName" placeholder="First name" />
+              <input type="text" id="firstName" placeholder="First name" required />
             </div>
           </div>
           <div class="login-field">
+            <label for="lastName">Last Name</label>
             <div class="login-input-shell">
-              <input type="text" id="lastName" placeholder="Last name" />
+              <input type="text" id="lastName" placeholder="Last name" required />
             </div>
+          </div>
+        </div>
+
+        <div class="account-type-row" aria-label="Account type">
+          <label class="account-type-option active" data-account-type-option="individual">
+            <input type="checkbox" id="accountTypeIndividual" checked />
+            <span>Individual</span>
+          </label>
+          <label class="account-type-option" data-account-type-option="company">
+            <input type="checkbox" id="accountTypeCompany" />
+            <span>Company</span>
+          </label>
+        </div>
+
+        <div class="login-field company-name-field" id="companyNameField" hidden>
+          <label for="companyName">Company Name</label>
+          <div class="login-input-shell">
+            <input type="text" id="companyName" placeholder="Your company name" />
           </div>
         </div>
 
         <div class="login-field">
-          <div class="login-label-row">
-            <label for="email">Account ID</label>
-          </div>
+          <label for="email">Email</label>
           <div class="login-input-shell">
-            <input type="email" id="email" required placeholder="Email or Username" />
+            <input type="email" id="email" required placeholder="your@email.com" />
           </div>
         </div>
 
         <div class="login-field">
-          <div class="login-label-row">
-            <label for="password">Password</label>
-            <a href="/login.html" class="login-forgot">Forgot?</a>
-          </div>
+          <label for="password">Create Password</label>
           <div class="login-input-shell">
-            <input type="password" id="password" required placeholder="Enter your password" />
+            <input type="password" id="password" required placeholder="Create password" />
           </div>
         </div>
 
-        <label class="signup-terms-row">
-          <input type="checkbox" id="signupTerms" />
-          <span>I agree to the <a href="/login.html">Terms &amp; Conditions</a></span>
-        </label>
-
-        <button class="btn-primary full login-submit" type="submit">Log In</button>
-
-        <div class="auth-provider-wrap">
-          <div class="auth-provider-title" id="authProviderTitle">Auth Providers</div>
-          <div class="auth-provider-grid">
-            <a class="auth-provider-btn" id="providerOne" href="/login.html">Google</a>
-            <a class="auth-provider-btn" id="providerTwo" href="/login.html">LinkedIn</a>
-          </div>
-        </div>
-
-        <div class="login-apply">New to the hub? <a href="/login.html">Apply for access</a></div>
-        <p class="tiny muted center">By signing in, you agree to our Terms of Service and Privacy Policy.</p>
+        <button class="btn-primary full login-submit login-reference-submit" type="submit">Create Account</button>
       </form>
     </div>
   </section>
