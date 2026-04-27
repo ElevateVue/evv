@@ -6,6 +6,20 @@
   <title>Dashboard Overview • EVV</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    function loadScript(callback) {
+      var head = document.getElementsByTagName("head")[0];
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://tracker.metricool.com/resources/be.js";
+      script.onreadystatechange = callback;
+      script.onload = callback;
+      head.appendChild(script);
+    }
+    loadScript(function() {
+      beTracker.t({ hash: "ec15d228c3066c0eeea651e88f835fa9" });
+    });
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script defer src="app.js"></script>
   <script defer src="client-hub-tracker.js"></script>

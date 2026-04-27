@@ -527,13 +527,14 @@ main { padding:24px 28px 64px; display:flex; flex-direction:column; gap:32px; fl
 }
 
 .account-list { margin:6px 0; display:flex; flex-direction:column; gap:6px; }
-.account-item { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid rgba(255,255,255,0.08); border-radius:10px; cursor:pointer; background:#0f141f; }
+.account-item { width:100%; display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid rgba(255,255,255,0.08); border-radius:10px; cursor:pointer; background:#0f141f; color:#e9ecf8; text-align:left; appearance:none; }
 .account-item:hover { border-color:rgba(124,106,215,0.6); }
 .account-avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#8d78ff,#4bc9ff); display:grid; place-items:center; font-weight:800; color:#0c111c; overflow:hidden; }
 .account-avatar img { width:100%; height:100%; object-fit:cover; }
 .account-meta { display:flex; flex-direction:column; }
 .account-name { font-weight:700; }
 .account-sub { font-size:12px; color:#9aa3b9; }
+.muted { color:#9aa3b9; }
 
 .empty-card { text-align:center; padding:40px; background:#0f1117; }
 .empty-card { min-height:260px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; border-radius:18px; box-shadow:0 12px 32px rgba(0,0,0,0.28); }

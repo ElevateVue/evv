@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elevate Vue | Welcome</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    function loadScript(callback) {
+      var head = document.getElementsByTagName("head")[0];
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://tracker.metricool.com/resources/be.js";
+      script.onreadystatechange = callback;
+      script.onload = callback;
+      head.appendChild(script);
+    }
+    loadScript(function() {
+      beTracker.t({ hash: "ec15d228c3066c0eeea651e88f835fa9" });
+    });
+  </script>
   <script defer src="footer.js"></script>
   <style>
     :root {
@@ -125,18 +139,29 @@
     }
 
     .welcome-search {
+      position: relative;
+      min-width: 244px;
+    }
+
+    .welcome-search-form {
       display: inline-flex;
       align-items: center;
       gap: 14px;
       min-height: 44px;
-      min-width: 244px;
-      padding: 0 22px;
+      width: min(340px, 100%);
+      padding: 0 18px;
       border-radius: 999px;
       background: #2a272d;
       border: 1px solid rgba(255, 255, 255, 0.05);
-      color: rgba(255, 255, 255, 0.28);
+      color: #f5f7ff;
       font-size: 0.98rem;
       font-weight: 600;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .welcome-search-form:focus-within {
+      border-color: rgba(157, 168, 255, 0.65);
+      box-shadow: 0 0 0 4px rgba(157, 168, 255, 0.12);
     }
 
     .welcome-search-icon {
@@ -146,8 +171,90 @@
       flex-shrink: 0;
     }
 
-    .welcome-search-text {
-      white-space: nowrap;
+    .welcome-search-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #f5f7ff;
+      font: inherit;
+      outline: none;
+    }
+
+    .welcome-search-input::placeholder {
+      color: rgba(255, 255, 255, 0.42);
+    }
+
+    .welcome-search-submit {
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.68);
+      cursor: pointer;
+      padding: 0;
+      font: inherit;
+    }
+
+    .welcome-search-submit:hover {
+      color: #f5f7ff;
+    }
+
+    .welcome-search-results {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      width: min(420px, calc(100vw - 32px));
+      margin: 0;
+      padding: 10px;
+      list-style: none;
+      border-radius: 22px;
+      background: rgba(21, 20, 25, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 26px 50px rgba(0, 0, 0, 0.28);
+      display: grid;
+      gap: 6px;
+      z-index: 30;
+    }
+
+    .welcome-search-results.hidden {
+      display: none;
+    }
+
+    .welcome-search-result {
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .welcome-search-result button {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #f5f7ff;
+      text-align: left;
+      padding: 12px 14px;
+      cursor: pointer;
+      display: grid;
+      gap: 4px;
+    }
+
+    .welcome-search-result button:hover,
+    .welcome-search-result button.active {
+      background: rgba(157, 168, 255, 0.14);
+    }
+
+    .welcome-search-result strong {
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+
+    .welcome-search-result span {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.86rem;
+      line-height: 1.4;
+    }
+
+    .welcome-search-empty {
+      padding: 14px 16px;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.9rem;
     }
 
     .welcome-icon-group {
@@ -829,11 +936,11 @@
 
       .welcome-search {
         min-width: 170px;
-        padding: 0 16px;
       }
 
-      .welcome-search-text {
-        display: none;
+      .welcome-search-form,
+      .welcome-search-results {
+        width: 100%;
       }
 
       .welcome-icon-group {
@@ -910,12 +1017,25 @@
       </div>
 
       <div class="welcome-nav-right">
-        <div class="welcome-search" aria-label="Search strategy">
-          <svg class="welcome-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"></circle>
-            <path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-          </svg>
-          <span class="welcome-search-text">Search strategy</span>
+        <div class="welcome-search">
+          <form class="welcome-search-form" id="siteSearchForm" role="search" autocomplete="off">
+            <svg class="welcome-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"></circle>
+              <path d="M16 16L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+            <input
+              class="welcome-search-input"
+              id="siteSearchInput"
+              type="search"
+              placeholder="Search pages, tools, features..."
+              aria-label="Search the site"
+              aria-autocomplete="list"
+              aria-controls="siteSearchResults"
+              aria-expanded="false"
+            />
+            <button type="submit" class="welcome-search-submit">Go</button>
+          </form>
+          <ul class="welcome-search-results hidden" id="siteSearchResults" role="listbox" aria-label="Search suggestions"></ul>
         </div>
         <div class="welcome-icon-group" aria-label="Header actions">
           <button type="button" class="icon-button" id="notificationToggle" aria-label="Open notifications" aria-expanded="false">
@@ -1142,6 +1262,105 @@
     const profileLink = document.getElementById("profileLink");
     const profileMenu = document.getElementById("profileMenu");
     const profileLogInLink = document.getElementById("profileLogInLink");
+    const siteSearchForm = document.getElementById("siteSearchForm");
+    const siteSearchInput = document.getElementById("siteSearchInput");
+    const siteSearchResults = document.getElementById("siteSearchResults");
+    const fallbackSearchablePages = [
+      {
+        title: "Home",
+        description: "Landing page and top of the Elevate Vue experience.",
+        url: "landing.html#top",
+        keywords: ["landing", "welcome", "elevate vue", "homepage"]
+      },
+      {
+        title: "Features",
+        description: "Feature cards and product highlights on the landing page.",
+        url: "landing.html#features",
+        keywords: ["feature", "platform", "social hub", "brand shield", "ai reports"]
+      },
+      {
+        title: "Pricing",
+        description: "Feature hub preview and pricing section on the landing page.",
+        url: "landing.html#demo",
+        keywords: ["pricing", "demo", "plans", "strategy"]
+      },
+      {
+        title: "Login",
+        description: "Sign in to the platform.",
+        url: "login.html",
+        keywords: ["login", "sign in", "account"]
+      },
+      {
+        title: "Sign In",
+        description: "Open the account login page.",
+        url: "signin.html",
+        keywords: ["signin", "log in", "authentication"]
+      },
+      {
+        title: "Analytics",
+        description: "GA4 and Google Search Console analytics dashboard.",
+        url: "analytics.html",
+        keywords: ["analytics", "ga4", "google", "search console", "metrics"]
+      },
+      {
+        title: "Dashboard Overview",
+        description: "Overview dashboard with feedback and AI suggestions.",
+        url: "dashboard-overview.html",
+        keywords: ["dashboard", "overview", "ai suggestions", "feedback"]
+      },
+      {
+        title: "Feature Hub",
+        description: "Browse product features and workspace tools.",
+        url: "featurehub.html",
+        keywords: ["featurehub", "features", "workspace", "tools"]
+      },
+      {
+        title: "Client Hub",
+        description: "Search clients, records, tools, and related workspace data.",
+        url: "clienthub.html",
+        keywords: ["clients", "client hub", "records", "emails", "tools"]
+      },
+      {
+        title: "Connect",
+        description: "Connect accounts and external services.",
+        url: "connect.html",
+        keywords: ["connect", "integrations", "accounts", "services"]
+      },
+      {
+        title: "Upload",
+        description: "Upload account files and manage imports.",
+        url: "upload.html",
+        keywords: ["upload", "import", "accounts", "files"]
+      },
+      {
+        title: "Report",
+        description: "View reports, summaries, and performance insights.",
+        url: "report.html",
+        keywords: ["report", "reporting", "summary", "insights"]
+      },
+      {
+        title: "Post Queue",
+        description: "Manage scheduled and queued posts.",
+        url: "post-queue.html",
+        keywords: ["posts", "queue", "schedule", "publishing"]
+      }
+    ];
+    const crawlablePages = [
+      "landing.html",
+      "analytics.html",
+      "dashboard-overview.html",
+      "featurehub.html",
+      "clienthub.html",
+      "connect.html",
+      "upload.html",
+      "report.html",
+      "post-queue.html",
+      "login.html",
+      "signin.html"
+    ];
+    let searchablePages = [...fallbackSearchablePages];
+    let searchMatches = [];
+    let activeSearchIndex = -1;
 
     document.querySelectorAll('a[href="#top"]').forEach((link) => {
       link.addEventListener("click", (event) => {
@@ -1183,6 +1402,132 @@
       profileLink?.setAttribute("aria-expanded", "false");
     }
 
+    function closeSearchResults() {
+      siteSearchResults?.classList.add("hidden");
+      siteSearchInput?.setAttribute("aria-expanded", "false");
+      activeSearchIndex = -1;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    async function buildSearchIndex() {
+      try {
+        const responses = await Promise.all(
+          crawlablePages.map(async (pageUrl) => {
+            const response = await fetch(pageUrl);
+            if (!response.ok) throw new Error(`Unable to index ${pageUrl}`);
+            const html = await response.text();
+            const doc = new DOMParser().parseFromString(html, "text/html");
+            const title = doc.querySelector("title")?.textContent?.trim() || pageUrl.replace(".html", "");
+            const headings = Array.from(doc.querySelectorAll("h1, h2, h3, h4"))
+              .map((node) => node.textContent.trim())
+              .filter(Boolean);
+            const summary = headings[0]
+              || doc.querySelector("p")?.textContent?.trim()
+              || `Open ${title}`;
+            const bodyText = doc.body?.textContent?.replace(/\s+/g, " ").trim() || "";
+            const keywords = headings.concat(title, pageUrl.replace(".html", "").replace(/-/g, " "));
+
+            return {
+              title,
+              description: summary,
+              url: pageUrl,
+              keywords,
+              content: bodyText
+            };
+          })
+        );
+
+        searchablePages = [...fallbackSearchablePages, ...responses];
+      } catch (error) {
+        searchablePages = [...fallbackSearchablePages];
+      }
+    }
+
+    function scoreSearchMatch(entry, query) {
+      const haystack = [entry.title, entry.description, ...(entry.keywords || []), entry.content || ""]
+        .join(" ")
+        .toLowerCase();
+      const title = entry.title.toLowerCase();
+      const keywords = (entry.keywords || []).map((keyword) => keyword.toLowerCase());
+
+      if (title === query) return 0;
+      if (title.startsWith(query)) return 1;
+      if (keywords.some((keyword) => keyword.startsWith(query))) return 2;
+      if (title.includes(query)) return 3;
+      if (keywords.some((keyword) => keyword.includes(query))) return 4;
+      if (haystack.includes(query)) return 5;
+      return Number.POSITIVE_INFINITY;
+    }
+
+    function getSearchMatches(query) {
+      const normalizedQuery = query.trim().toLowerCase();
+
+      if (!normalizedQuery) return [];
+
+      return searchablePages
+        .map((entry) => ({ entry, score: scoreSearchMatch(entry, normalizedQuery) }))
+        .filter((item) => Number.isFinite(item.score))
+        .sort((a, b) => a.score - b.score || a.entry.title.localeCompare(b.entry.title))
+        .slice(0, 6)
+        .map((item) => item.entry);
+    }
+
+    function navigateToSearchResult(entry) {
+      if (!entry?.url) return;
+      window.location.href = entry.url;
+    }
+
+    function renderSearchResults(matches, query) {
+      if (!siteSearchResults) return;
+
+      searchMatches = matches;
+      activeSearchIndex = -1;
+
+      if (!query.trim()) {
+        siteSearchResults.innerHTML = "";
+        closeSearchResults();
+        return;
+      }
+
+      if (!matches.length) {
+        siteSearchResults.innerHTML = `<li class="welcome-search-empty" role="option" aria-selected="false">Not found for "${escapeHtml(query.trim())}".</li>`;
+        siteSearchResults.classList.remove("hidden");
+        siteSearchInput?.setAttribute("aria-expanded", "true");
+        return;
+      }
+
+      siteSearchResults.innerHTML = matches
+        .map((entry, index) => `
+          <li class="welcome-search-result" role="option" aria-selected="false">
+            <button type="button" data-search-index="${index}">
+              <strong>${entry.title}</strong>
+              <span>${entry.description}</span>
+            </button>
+          </li>
+        `)
+        .join("");
+
+      siteSearchResults.classList.remove("hidden");
+      siteSearchInput?.setAttribute("aria-expanded", "true");
+    }
+
+    function highlightActiveSearchResult() {
+      const buttons = siteSearchResults?.querySelectorAll("button[data-search-index]") || [];
+      buttons.forEach((button, index) => {
+        const isActive = index === activeSearchIndex;
+        button.classList.toggle("active", isActive);
+        button.parentElement?.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+    }
+
     notificationToggle?.addEventListener("click", (event) => {
       event.stopPropagation();
       closeProfileMenu();
@@ -1207,14 +1552,64 @@
       window.location.href = "signin.html";
     });
 
+    siteSearchInput?.addEventListener("input", () => {
+      renderSearchResults(getSearchMatches(siteSearchInput.value), siteSearchInput.value);
+    });
+
+    siteSearchInput?.addEventListener("focus", () => {
+      if (siteSearchInput.value.trim()) {
+        renderSearchResults(getSearchMatches(siteSearchInput.value), siteSearchInput.value);
+      }
+    });
+
+    siteSearchInput?.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown") {
+        if (!searchMatches.length) return;
+        event.preventDefault();
+        activeSearchIndex = (activeSearchIndex + 1) % searchMatches.length;
+        highlightActiveSearchResult();
+      }
+
+      if (event.key === "ArrowUp") {
+        if (!searchMatches.length) return;
+        event.preventDefault();
+        activeSearchIndex = activeSearchIndex <= 0 ? searchMatches.length - 1 : activeSearchIndex - 1;
+        highlightActiveSearchResult();
+      }
+
+      if (event.key === "Enter" && searchMatches.length && activeSearchIndex >= 0) {
+        event.preventDefault();
+        navigateToSearchResult(searchMatches[activeSearchIndex]);
+      }
+    });
+
+    siteSearchForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const query = siteSearchInput?.value || "";
+      const matches = getSearchMatches(query);
+      renderSearchResults(matches, query);
+
+      if (matches.length) {
+        navigateToSearchResult(matches[0]);
+      }
+    });
+
+    siteSearchResults?.addEventListener("click", (event) => {
+      const target = event.target.closest("button[data-search-index]");
+      if (!target) return;
+      const index = Number(target.dataset.searchIndex);
+      navigateToSearchResult(searchMatches[index]);
+    });
+
     document.addEventListener("click", (event) => {
-      if (!notificationsPanel || !notificationToggle) return;
-      if (!profileMenu || !profileLink) return;
-      if (!notificationsPanel.contains(event.target) && !notificationToggle.contains(event.target)) {
+      if (notificationsPanel && notificationToggle && !notificationsPanel.contains(event.target) && !notificationToggle.contains(event.target)) {
         closeNotifications();
       }
-      if (!profileMenu.contains(event.target) && !profileLink.contains(event.target)) {
+      if (profileMenu && profileLink && !profileMenu.contains(event.target) && !profileLink.contains(event.target)) {
         closeProfileMenu();
+      }
+      if (siteSearchForm && siteSearchResults && !siteSearchForm.contains(event.target) && !siteSearchResults.contains(event.target)) {
+        closeSearchResults();
       }
     });
 
@@ -1222,10 +1617,12 @@
       if (event.key === "Escape") {
         closeNotifications();
         closeProfileMenu();
+        closeSearchResults();
       }
     });
 
     syncHeaderAuthState();
+    buildSearchIndex();
   </script>
 </body>
 </html>

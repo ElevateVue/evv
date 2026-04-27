@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -30,6 +31,7 @@ const mimeTypes = {
 const staticDir = path.join(__dirname, '..', 'public');
 const sessionsFile = path.join(__dirname, 'sessions.json');
 const clientHubFile = path.join(__dirname, 'client-hub-records.json');
+const newsletterSubscribersFile = path.join(__dirname, 'newsletter-subscribers.json');
 const loadSessions = () => {
   try {
     const raw = fs.readFileSync(sessionsFile, 'utf8');
@@ -62,9 +64,26 @@ const saveClientHubRecords = (records) => {
     console.error('Failed to persist client hub records:', err);
   }
 };
+const loadNewsletterSubscribers = () => {
+  try {
+    const raw = fs.readFileSync(newsletterSubscribersFile, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch (err) {
+    return {};
+  }
+};
+const saveNewsletterSubscribers = (records) => {
+  try {
+    fs.writeFileSync(newsletterSubscribersFile, JSON.stringify(records, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Failed to persist newsletter subscribers:', err);
+  }
+};
 
 let sessions = loadSessions();
 let clientHubRecords = loadClientHubRecords();
+let newsletterSubscribers = loadNewsletterSubscribers();
 let posts = [];
 let metrics = {
   reach: 0,
@@ -83,8 +102,17 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const GEMINI_API_KEY =
   process.env.GEMINI_API_KEY ||
   process.env.GOOGLE_API_KEY ||
-  'AIzaSyDXwYj32Ylt72cR_iNOyzGZpk1TsgERx_I';
+  '';
 const GEMINI_UPLOAD_MODEL = process.env.GEMINI_UPLOAD_MODEL || 'gemini-2.0-flash';
+const GEMINI_SUGGESTIONS_MODEL = process.env.GEMINI_SUGGESTIONS_MODEL || GEMINI_UPLOAD_MODEL;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
+const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const AI_UPLOAD_PROVIDER = process.env.AI_UPLOAD_PROVIDER || 'gemini';
+const AI_SUGGESTIONS_PROVIDER = process.env.AI_SUGGESTIONS_PROVIDER || 'deepseek';
+const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+const RESEND_NEWSLETTER_REPLY_TO = process.env.RESEND_NEWSLETTER_REPLY_TO || '';
 const googleTokenStore = {}; // keyed by session token
 const geminiClient = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 
@@ -280,12 +308,82 @@ function parseFileLocally(fileObj, globalIndexOffset) {
   throw new Error('Unsupported CSV format');
 }
 
-async function normalizeFileWithGemini(fileObj) {
-  if (!geminiClient) return null;
+function isProviderAvailable(provider) {
+  if (provider === 'gemini') return Boolean(geminiClient);
+  if (provider === 'deepseek') return Boolean(DEEPSEEK_API_KEY);
+  return false;
+}
+
+function getProviderSequence(preferredProvider, fallbackProviders = []) {
+  const sequence = [preferredProvider, ...fallbackProviders].filter(Boolean);
+  return sequence.filter((provider, index) => sequence.indexOf(provider) === index);
+}
+
+async function callDeepSeekJson(prompt, input, invalidMessage) {
+  if (!DEEPSEEK_API_KEY) throw new Error('DeepSeek API key not configured');
+
+  const endpoint = new URL('/chat/completions', DEEPSEEK_BASE_URL);
+  const payload = JSON.stringify({
+    model: DEEPSEEK_MODEL,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: prompt },
+      { role: 'user', content: input },
+    ],
+  });
+
+  const responseText = await new Promise((resolve, reject) => {
+    const req = https.request(
+      endpoint,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      },
+      (res) => {
+        let raw = '';
+        res.on('data', (chunk) => {
+          raw += chunk;
+        });
+        res.on('end', () => {
+          if (res.statusCode && res.statusCode >= 400) {
+            return reject(new Error(`DeepSeek request failed with status ${res.statusCode}: ${raw}`));
+          }
+          resolve(raw);
+        });
+      }
+    );
+
+    req.on('error', reject);
+    req.write(payload);
+    req.end();
+  });
+
+  const parsedResponse = JSON.parse(responseText);
+  const text = parsedResponse?.choices?.[0]?.message?.content || '';
+  const jsonText = extractJsonPayload(text);
+  if (!jsonText) throw new Error(invalidMessage);
+  return JSON.parse(jsonText);
+}
+
+async function callGeminiJson(prompt, input, modelName, invalidMessage) {
+  if (!geminiClient) throw new Error('Gemini API key not configured');
+
+  const model = geminiClient.getGenerativeModel({ model: modelName });
+  const result = await model.generateContent(`${prompt}\n\n${input}`);
+  const text = result?.response?.text?.() || '';
+  const jsonText = extractJsonPayload(text);
+  if (!jsonText) throw new Error(invalidMessage);
+  return JSON.parse(jsonText);
+}
+
+async function normalizeFileWithProvider(fileObj, provider) {
   const { filename, csv } = fileObj;
   if (!csv) throw new Error('csv required');
 
-  const model = geminiClient.getGenerativeModel({ model: GEMINI_UPLOAD_MODEL });
   const prompt = [
     'You normalize social media analytics CSV exports into a strict JSON object.',
     'Return JSON only.',
@@ -300,16 +398,21 @@ async function normalizeFileWithGemini(fileObj) {
     '- Keep titles concise but identifiable.',
   ].join('\n');
 
-  const result = await model.generateContent(`${prompt}\n\nFilename: ${filename || 'upload.csv'}\nCSV:\n${csv}`);
-  const text = result?.response?.text?.() || '';
-  const jsonText = extractJsonPayload(text);
-  if (!jsonText) throw new Error('Gemini returned an invalid normalization payload');
+  const input = `Filename: ${filename || 'upload.csv'}\nCSV:\n${csv}`;
+  let parsed;
+  if (provider === 'gemini') {
+    parsed = await callGeminiJson(prompt, input, GEMINI_UPLOAD_MODEL, 'Gemini returned an invalid normalization payload');
+  } else if (provider === 'deepseek') {
+    parsed = await callDeepSeekJson(prompt, input, 'DeepSeek returned an invalid normalization payload');
+  } else {
+    throw new Error(`Unsupported AI provider: ${provider}`);
+  }
 
-  const parsed = JSON.parse(jsonText);
   const rows = Array.isArray(parsed?.rows) ? parsed.rows : [];
-  if (!rows.length) throw new Error('Gemini did not return any normalized rows');
+  if (!rows.length) throw new Error(`${provider} did not return any normalized rows`);
 
   return {
+    provider,
     platform: parsed.platform || platformFromFilename(filename),
     rows: rows.map((row) => ({
       platform: row.platform || parsed.platform || platformFromFilename(filename),
@@ -327,6 +430,99 @@ async function normalizeFileWithGemini(fileObj) {
       transcript: row.transcript || '',
     })),
   };
+}
+
+async function normalizeFileWithAi(fileObj) {
+  const providerSequence = getProviderSequence(AI_UPLOAD_PROVIDER, ['gemini', 'deepseek']);
+  let lastError = null;
+
+  for (const provider of providerSequence) {
+    if (!isProviderAvailable(provider)) continue;
+    try {
+      return await normalizeFileWithProvider(fileObj, provider);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (lastError) throw lastError;
+  return null;
+}
+
+function isValidEmail(email = '') {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
+}
+
+function escapeHtml(value = '') {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function sendResendEmail({ to, subject, html, text, replyTo }) {
+  if (!RESEND_API_KEY) {
+    throw new Error('Resend is not configured. Set RESEND_API_KEY in .env');
+  }
+
+  const payload = {
+    from: RESEND_FROM_EMAIL,
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    html,
+    text,
+  };
+
+  if (replyTo) payload.reply_to = replyTo;
+
+  const body = JSON.stringify(payload);
+
+  const responseText = await new Promise((resolve, reject) => {
+    const req = https.request(
+      'https://api.resend.com/emails',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(body),
+        },
+      },
+      (res) => {
+        let raw = '';
+        res.on('data', (chunk) => {
+          raw += chunk;
+        });
+        res.on('end', () => {
+          if (res.statusCode && res.statusCode >= 400) {
+            return reject(new Error(`Resend request failed with status ${res.statusCode}: ${raw}`));
+          }
+          resolve(raw);
+        });
+      }
+    );
+
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+
+  return responseText ? JSON.parse(responseText) : {};
+}
+
+function upsertNewsletterSubscriber(email) {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const existing = newsletterSubscribers[normalizedEmail] || {};
+  const nextRecord = {
+    email: normalizedEmail,
+    subscribedAt: existing.subscribedAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  newsletterSubscribers[normalizedEmail] = nextRecord;
+  saveNewsletterSubscribers(newsletterSubscribers);
+  return nextRecord;
 }
 
 function getInteractionTotal(engagement = {}) {
@@ -393,7 +589,6 @@ function buildLocalAiSuggestions() {
 
 async function buildAiSuggestionsFromAnalytics({ start, end, platform, metrics: requestMetrics, perPlatform: requestPerPlatform, recentPosts: requestRecentPosts } = {}) {
   if (!posts.length && !requestMetrics) throw new Error('Upload analytics data first');
-  if (!geminiClient) return buildLocalAiSuggestions();
 
   const latestPosts = Array.isArray(requestRecentPosts)
     ? requestRecentPosts
@@ -443,33 +638,47 @@ async function buildAiSuggestionsFromAnalytics({ start, end, platform, metrics: 
     '- Return exactly 5 takeaways and exactly 5 actions.',
   ].join('\n');
 
-  const model = geminiClient.getGenerativeModel({ model: GEMINI_UPLOAD_MODEL });
+  const providerSequence = getProviderSequence(AI_SUGGESTIONS_PROVIDER, ['deepseek', 'gemini']);
   try {
-    const result = await model.generateContent(`${prompt}\n\nAnalytics JSON:\n${JSON.stringify(payload)}`);
-    const text = result?.response?.text?.() || '';
-    const jsonText = extractJsonPayload(text);
-    if (!jsonText) throw new Error('Gemini returned an invalid suggestions payload');
+    for (const provider of providerSequence) {
+      if (!isProviderAvailable(provider)) continue;
 
-    const parsed = JSON.parse(jsonText);
-    const takeaways = Array.isArray(parsed?.takeaways)
-      ? parsed.takeaways.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 5)
-      : [];
-    const actions = Array.isArray(parsed?.actions)
-      ? parsed.actions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 5)
-      : [];
+      const parsed =
+        provider === 'deepseek'
+          ? await callDeepSeekJson(prompt, `Analytics JSON:\n${JSON.stringify(payload)}`, 'DeepSeek returned an invalid suggestions payload')
+          : await callGeminiJson(
+              prompt,
+              `Analytics JSON:\n${JSON.stringify(payload)}`,
+              GEMINI_SUGGESTIONS_MODEL,
+              'Gemini returned an invalid suggestions payload'
+            );
 
-    if (!takeaways.length || !actions.length) throw new Error('Gemini did not return valid takeaways/actions');
+      const takeaways = Array.isArray(parsed?.takeaways)
+        ? parsed.takeaways.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 5)
+        : [];
+      const actions = Array.isArray(parsed?.actions)
+        ? parsed.actions.map((item) => String(item || '').trim()).filter(Boolean).slice(0, 5)
+        : [];
 
-    return {
-      title: String(parsed?.title || 'AI Report').trim(),
-      summary: String(parsed?.summary || '').trim(),
-      takeaways,
-      actions,
-    };
+      if (!takeaways.length || !actions.length) {
+        throw new Error(`${provider} did not return valid takeaways/actions`);
+      }
+
+      return {
+        provider,
+        title: String(parsed?.title || 'AI Report').trim(),
+        summary: String(parsed?.summary || '').trim(),
+        takeaways,
+        actions,
+      };
+    }
+
+    throw new Error('No AI providers are configured for analytics suggestions');
   } catch (error) {
     console.error('AI suggestions fallback:', error.message);
     const fallback = buildLocalAiSuggestions();
     return {
+      provider: 'local',
       title: fallback.title,
       summary: fallback.summary,
       takeaways: [fallback.summary],
@@ -785,6 +994,7 @@ function upsertClientHubRecord(sessionUser, payload = {}) {
 }
 
 const PUBLIC_ROUTES = new Set(['/landing.html', '/login.html', '/signin.html']);
+const PUBLIC_API_ROUTES = new Set(['/api/health', '/api/newsletter/subscribe']);
 
 const serveStatic = (req, res) => {
   let safePath = req.url === '/' ? '/landing.html' : req.url.split('?')[0];
@@ -852,7 +1062,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // All API routes except login and health require a valid session
-  if (req.url.startsWith('/api') && req.url !== '/api/login' && req.url !== '/api/health') {
+  if (req.url.startsWith('/api') && req.url !== '/api/login' && !PUBLIC_API_ROUTES.has(req.url.split('?')[0])) {
     if (!isAuthenticated(req)) return sendJson(res, 401, { message: 'Unauthorized' });
   }
 
@@ -889,6 +1099,94 @@ const server = http.createServer(async (req, res) => {
 
   if (parsedUrl.pathname === '/api/health') {
     return sendJson(res, 200, { ok: true, time: new Date().toISOString() });
+  }
+
+  if (parsedUrl.pathname === '/api/newsletter/subscribe' && req.method === 'POST') {
+    const { email } = await parseBody(req);
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+
+    if (!isValidEmail(normalizedEmail)) {
+      return sendJson(res, 400, { message: 'A valid email address is required.' });
+    }
+
+    try {
+      const subscriber = upsertNewsletterSubscriber(normalizedEmail);
+      await sendResendEmail({
+        to: normalizedEmail,
+        subject: 'You are subscribed to Elevate Vue updates',
+        html: `
+          <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+            <h2 style="margin:0 0 16px">Welcome to Elevate Vue</h2>
+            <p style="margin:0 0 12px">You are now subscribed to our newsletter.</p>
+            <p style="margin:0 0 12px">We will send occasional updates, product news, and workflow tips to <strong>${escapeHtml(normalizedEmail)}</strong>.</p>
+            <p style="margin:0">Thank you for joining us.</p>
+          </div>
+        `,
+        text: [
+          'Welcome to Elevate Vue.',
+          '',
+          `You are now subscribed to our newsletter with ${normalizedEmail}.`,
+          'We will send occasional updates, product news, and workflow tips.',
+        ].join('\n'),
+        replyTo: RESEND_NEWSLETTER_REPLY_TO || undefined,
+      });
+      return sendJson(res, 200, { ok: true, subscriber });
+    } catch (err) {
+      return sendJson(res, 500, { message: 'Failed to subscribe email.', error: err.message });
+    }
+  }
+
+  if (parsedUrl.pathname === '/api/email/approval-request' && req.method === 'POST') {
+    const { adminEmail, title, caption, scheduledAt, accounts, platforms, hashtags } = await parseBody(req);
+    const normalizedEmail = String(adminEmail || '').trim().toLowerCase();
+
+    if (!isValidEmail(normalizedEmail)) {
+      return sendJson(res, 400, { message: 'A valid admin approval email is required.' });
+    }
+
+    const safeTitle = String(title || 'Untitled post').trim();
+    const safeCaption = String(caption || 'No caption provided').trim();
+    const safeScheduledAt = String(scheduledAt || 'Not set').trim();
+    const accountList = Array.isArray(accounts) ? accounts.filter(Boolean) : [];
+    const platformList = Array.isArray(platforms) ? platforms.filter(Boolean) : [];
+    const safeHashtags = String(hashtags || '').trim();
+
+    try {
+      const result = await sendResendEmail({
+        to: normalizedEmail,
+        subject: `Approval request: ${safeTitle}`,
+        html: `
+          <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+            <h2 style="margin:0 0 16px">Post approval request</h2>
+            <p style="margin:0 0 12px">A scheduled post is ready for your review.</p>
+            <table style="border-collapse:collapse;width:100%;max-width:640px">
+              <tr><td style="padding:8px 0;font-weight:700">Title</td><td style="padding:8px 0">${escapeHtml(safeTitle)}</td></tr>
+              <tr><td style="padding:8px 0;font-weight:700">Scheduled for</td><td style="padding:8px 0">${escapeHtml(safeScheduledAt)}</td></tr>
+              <tr><td style="padding:8px 0;font-weight:700">Platforms</td><td style="padding:8px 0">${escapeHtml(platformList.join(', ') || 'Not specified')}</td></tr>
+              <tr><td style="padding:8px 0;font-weight:700">Accounts</td><td style="padding:8px 0">${escapeHtml(accountList.join(', ') || 'Not specified')}</td></tr>
+              <tr><td style="padding:8px 0;font-weight:700">Caption</td><td style="padding:8px 0">${escapeHtml(safeCaption)}</td></tr>
+              <tr><td style="padding:8px 0;font-weight:700">Hashtags</td><td style="padding:8px 0">${escapeHtml(safeHashtags || 'None')}</td></tr>
+            </table>
+            <p style="margin:16px 0 0">Reply to this email once approved.</p>
+          </div>
+        `,
+        text: [
+          'Post approval request',
+          '',
+          `Title: ${safeTitle}`,
+          `Scheduled for: ${safeScheduledAt}`,
+          `Platforms: ${platformList.join(', ') || 'Not specified'}`,
+          `Accounts: ${accountList.join(', ') || 'Not specified'}`,
+          `Caption: ${safeCaption}`,
+          `Hashtags: ${safeHashtags || 'None'}`,
+          '',
+          'Reply to this email once approved.',
+        ].join('\n'),
+      });
+      return sendJson(res, 200, { ok: true, email: result });
+    } catch (err) {
+      return sendJson(res, 500, { message: 'Failed to send approval email.', error: err.message });
+    }
   }
 
   if (parsedUrl.pathname === '/api/client-hub' && req.method === 'GET') {
@@ -1256,6 +1554,7 @@ const server = http.createServer(async (req, res) => {
         let counter = 0;
         const normalizationSummary = {
           gemini: 0,
+          deepseek: 0,
           fallback: 0,
           errors: [],
         };
@@ -1272,16 +1571,17 @@ const server = http.createServer(async (req, res) => {
               message: localError.message,
             });
             try {
-              const normalized = await normalizeFileWithGemini(fileObj);
+              const normalized = await normalizeFileWithAi(fileObj);
               if (normalized?.rows?.length) {
                 parsedPosts = buildPostsFromNormalizedRows(normalized.rows, fileObj.filename, counter);
-                normalizationSummary.gemini += 1;
+                if (normalized.provider === 'gemini') normalizationSummary.gemini += 1;
+                if (normalized.provider === 'deepseek') normalizationSummary.deepseek += 1;
               }
-            } catch (geminiError) {
+            } catch (aiError) {
               normalizationSummary.errors.push({
                 filename: fileObj.filename || 'file.csv',
-                step: 'gemini',
-                message: geminiError.message,
+                step: 'ai',
+                message: aiError.message,
               });
               throw localError;
             }
@@ -1300,8 +1600,13 @@ const server = http.createServer(async (req, res) => {
           metrics,
           files: files.length,
           normalization: {
-            provider: normalizationSummary.gemini ? 'gemini' : 'fallback',
+            provider: normalizationSummary.gemini
+              ? 'gemini'
+              : normalizationSummary.deepseek
+                ? 'deepseek'
+                : 'fallback',
             geminiFiles: normalizationSummary.gemini,
+            deepseekFiles: normalizationSummary.deepseek,
             fallbackFiles: normalizationSummary.fallback,
             warnings: normalizationSummary.errors,
           },

@@ -11,16 +11,16 @@
     "view": "client",
     "initials": "D",
     "firstSeen": 1777015956844,
-    "lastActive": 1777017682757,
-    "totalVisits": 24,
-    "lastPage": "Report",
+    "lastActive": 1777211618706,
+    "totalVisits": 40,
+    "lastPage": "Connect",
     "pageUsage": {
       "featurehub.html": {
         "name": "Feature Hub",
         "category": "Overview",
-        "visits": 4,
+        "visits": 7,
         "firstVisited": 1777015956844,
-        "lastVisited": 1777016539246
+        "lastVisited": 1777211615646
       },
       "clienthub.html": {
         "name": "Client Hub",
@@ -32,54 +32,63 @@
       "report.html": {
         "name": "Report",
         "category": "Insights",
-        "visits": 8,
+        "visits": 9,
         "firstVisited": 1777015983774,
-        "lastVisited": 1777017682757
+        "lastVisited": 1777022486707
       },
       "dashboard-overview.html": {
         "name": "Dashboard",
         "category": "Analytics",
-        "visits": 8,
+        "visits": 9,
         "firstVisited": 1777016549076,
-        "lastVisited": 1777017652480
+        "lastVisited": 1777022593565
       },
       "connect.html": {
         "name": "Connect",
         "category": "Connections",
-        "visits": 1,
+        "visits": 8,
         "firstVisited": 1777016557315,
-        "lastVisited": 1777016557315
+        "lastVisited": 1777211618706
+      },
+      "upload.html": {
+        "name": "Scheduling",
+        "category": "Publishing",
+        "visits": 4,
+        "firstVisited": 1777022602454,
+        "lastVisited": 1777211590887
       }
     },
     "pagesUsed": [
-      "Report",
-      "Dashboard",
       "Connect",
-      "Client Hub",
-      "Feature Hub"
-    ],
-    "toolsUsed": [
-      "Report",
+      "Feature Hub",
+      "Scheduling",
       "Dashboard",
-      "Connect",
-      "Client Hub",
-      "Feature Hub"
-    ],
-    "totalToolsUsed": 5,
-    "recentTools": [
       "Report",
-      "Dashboard",
-      "Connect",
       "Client Hub"
     ],
+    "toolsUsed": [
+      "Connect",
+      "Feature Hub",
+      "Scheduling",
+      "Dashboard",
+      "Report",
+      "Client Hub"
+    ],
+    "totalToolsUsed": 6,
+    "recentTools": [
+      "Connect",
+      "Feature Hub",
+      "Scheduling",
+      "Dashboard"
+    ],
     "metrics": {
-      "connections": 0,
+      "connections": 1,
       "queuedPosts": 0,
-      "reports": 1,
+      "reports": 2,
       "feedback": 0,
       "hashtagSets": 0,
       "uploads": 1,
-      "totalSavedItems": 2
+      "totalSavedItems": 4
     }
   }
 }

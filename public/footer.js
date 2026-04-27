@@ -106,7 +106,7 @@ function bindFooterInteractions(footer) {
 
   hydrateFooterSubscriber(emailInput, status);
 
-  form?.addEventListener('submit', (event) => {
+  form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!emailInput?.reportValidity()) return;
 
@@ -115,12 +115,29 @@ function bindFooterInteractions(footer) {
       subscribedAt: new Date().toISOString(),
     };
 
-    localStorage.setItem('evvFooterSubscriber', JSON.stringify(payload));
-    if (status) {
-      status.textContent = `Subscribed with ${payload.email}`;
-      status.classList.add('success');
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.message || 'Unable to subscribe right now.');
+      }
+
+      localStorage.setItem('evvFooterSubscriber', JSON.stringify(payload));
+      if (status) {
+        status.textContent = `Subscribed with ${payload.email}`;
+        status.classList.add('success');
+      }
+      form.reset();
+    } catch (error) {
+      if (status) {
+        status.textContent = error.message || 'Unable to subscribe right now.';
+        status.classList.remove('success');
+      }
     }
-    form.reset();
   });
 
   footer.querySelectorAll('[data-scroll-top="true"]').forEach((button) => {

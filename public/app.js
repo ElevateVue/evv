@@ -313,6 +313,7 @@ function initializeAiModal() {
   function openAiModal() {
     setDateBounds();
     setCalendarVisibility(false);
+    syncAiPlatformFromLatestUpload();
     if (aiModal) {
       aiModal.classList.add('show');
       aiModal.style.display = 'block';
@@ -377,6 +378,10 @@ function initializeAiModal() {
     dt.items.add(file);
     aiLogo.files = dt.files;
     aiLogoLabel.textContent = file.name;
+    const detectedPlatform = detectPlatformFromFilename(file.name);
+    if (aiPlatform && detectedPlatform) {
+      aiPlatform.value = detectedPlatform;
+    }
     if (reportDropZone) {
       reportDropZone.querySelector('.drop-label').textContent = `Ready to generate: ${file.name}`;
       reportDropZone.querySelector('.drop-sub').textContent = 'Click to open AI options or drop another file.';
@@ -821,13 +826,41 @@ const modalForm = document.getElementById('modalForm');
 const modalPlatform = document.getElementById('modalPlatform');
 const modalClose = document.getElementById('modalClose');
 const modalBackdrop = document.getElementById('modalBackdrop');
-const connectionList = JSON.parse(localStorage.getItem('connections') || '[]');
+function readConnections() {
+  try {
+    return JSON.parse(localStorage.getItem('connections') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function writeConnections(list) {
+  localStorage.setItem('connections', JSON.stringify(list));
+}
+
+function getConnectionButton(platform) {
+  return document.querySelector(`.connect-btn[data-platform="${platform}"], .connect-trigger[data-platform="${platform}"]`);
+}
+
+function getConnectionDisplayName(connection = {}) {
+  return connection.userId || connection.username || connection.email || connection.platform || 'Connected account';
+}
 
 function openModal(platform) {
+  const savedConnection = readConnections().find((connection) => connection.platform === platform);
   modalPlatform.textContent = platform;
   modal?.classList.add('show');
   modalBackdrop?.classList.add('show');
-  modalForm.dataset.platform = platform;
+  if (modalForm) {
+    modalForm.dataset.platform = platform;
+    modalForm.reset();
+  }
+  const modalUser = document.getElementById('modalUser');
+  const modalUserId = document.getElementById('modalUserId');
+  if (savedConnection) {
+    if (modalUser) modalUser.value = savedConnection.username || '';
+    if (modalUserId) modalUserId.value = savedConnection.userId || '';
+  }
 }
 function closeModal() {
   modal?.classList.remove('show');
@@ -839,17 +872,164 @@ modalBackdrop?.addEventListener('click', closeModal);
 modalForm?.addEventListener('submit', (e) => {
   e.preventDefault();
   const platform = modalForm.dataset.platform;
-  const username = document.getElementById('modalUser').value;
-  const password = document.getElementById('modalPass').value;
-  connectionList.push({ platform, username, savedAt: Date.now() });
-  localStorage.setItem('connections', JSON.stringify(connectionList));
+  const username = document.getElementById('modalUser')?.value.trim() || '';
+  const userId = document.getElementById('modalUserId')?.value.trim() || '';
+  if (!platform || !username) {
+    alert('Enter an account username or email.');
+    return;
+  }
+  const nextConnection = {
+    platform,
+    username,
+    userId,
+    savedAt: Date.now(),
+  };
+  const nextConnections = readConnections().filter((connection) => connection.platform !== platform);
+  nextConnections.push(nextConnection);
+  writeConnections(nextConnections);
   closeModal();
-  alert(`${platform} login saved locally.`);
+  alert(`${platform} account saved for scheduling.`);
   renderConnections();
+  renderAvailableAccounts();
 });
 
-document.querySelectorAll('.connect-trigger').forEach((btn) => {
-  btn.addEventListener('click', () => openModal(btn.dataset.platform));
+const META_APP_ID = '4217728121773033';
+const META_API_VERSION = 'v25.0';
+let facebookSdkReadyPromise = null;
+
+function loadFacebookSdk() {
+  if (window.FB) {
+    return Promise.resolve(window.FB);
+  }
+  if (facebookSdkReadyPromise) {
+    return facebookSdkReadyPromise;
+  }
+
+  facebookSdkReadyPromise = new Promise((resolve, reject) => {
+    window.fbAsyncInit = function() {
+      window.FB.init({
+        appId: META_APP_ID,
+        cookie: true,
+        xfbml: true,
+        version: META_API_VERSION,
+      });
+
+      if (window.FB.AppEvents?.logPageView) {
+        window.FB.AppEvents.logPageView();
+      }
+      resolve(window.FB);
+    };
+
+    if (document.getElementById('facebook-jssdk')) {
+      return;
+    }
+
+    const firstScript = document.getElementsByTagName('script')[0];
+    const script = document.createElement('script');
+    script.id = 'facebook-jssdk';
+    script.src = 'https://connect.facebook.net/en_US/sdk.js';
+    script.onerror = () => reject(new Error('Failed to load the Facebook SDK.'));
+    firstScript?.parentNode?.insertBefore(script, firstScript);
+  });
+
+  return facebookSdkReadyPromise;
+}
+
+function fbApi(path, params = {}) {
+  return new Promise((resolve, reject) => {
+    if (!window.FB) {
+      reject(new Error('Facebook SDK is not loaded.'));
+      return;
+    }
+    window.FB.api(path, 'get', params, (response) => {
+      if (!response || response.error) {
+        reject(new Error(response?.error?.message || `Facebook API request failed for ${path}`));
+        return;
+      }
+      resolve(response);
+    });
+  });
+}
+
+async function startFacebookConnection() {
+  try {
+    const FB = await loadFacebookSdk();
+    FB.login(async (loginResponse) => {
+      if (!loginResponse?.authResponse) {
+        alert('Facebook connection was cancelled or not approved.');
+        return;
+      }
+
+      try {
+        const profile = await fbApi('/me', { fields: 'id,name' });
+        const pageResponse = await fbApi('/me/accounts', {
+          fields: 'id,name,instagram_business_account{id,username,name}',
+        });
+
+        const existingConnections = readConnections().filter((connection) => {
+          return !(connection.authProvider === 'meta' && (connection.platform === 'Facebook' || connection.platform === 'Instagram'));
+        });
+
+        const nextConnections = [...existingConnections];
+        const pages = Array.isArray(pageResponse?.data) ? pageResponse.data : [];
+
+        if (pages.length) {
+          pages.forEach((page) => {
+            nextConnections.push({
+              platform: 'Facebook',
+              username: page.name || profile.name || 'Facebook Page',
+              userId: page.id || profile.id || '',
+              authProvider: 'meta',
+              savedAt: Date.now(),
+            });
+
+            const instagramAccount = page.instagram_business_account;
+            if (instagramAccount?.id) {
+              nextConnections.push({
+                platform: 'Instagram',
+                username: instagramAccount.username || instagramAccount.name || page.name || 'Instagram Business',
+                userId: instagramAccount.id,
+                authProvider: 'meta',
+                savedAt: Date.now(),
+              });
+            }
+          });
+        } else {
+          nextConnections.push({
+            platform: 'Facebook',
+            username: profile.name || 'Facebook User',
+            userId: profile.id || '',
+            authProvider: 'meta',
+            savedAt: Date.now(),
+          });
+        }
+
+        writeConnections(nextConnections);
+        renderConnections();
+        renderAvailableAccounts();
+        alert('Facebook connection saved. Any available Facebook Pages and linked Instagram business accounts are now available for scheduling.');
+      } catch (error) {
+        console.error('Meta connection error', error);
+        alert(`Facebook connected, but account details could not be loaded: ${error.message}`);
+      }
+    }, {
+      scope: 'public_profile,pages_show_list,instagram_basic',
+      return_scopes: true,
+    });
+  } catch (error) {
+    console.error('Facebook SDK load error', error);
+    alert(`Unable to start Facebook connection: ${error.message}`);
+  }
+}
+
+document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.platform === 'Facebook') {
+      startFacebookConnection();
+      return;
+    }
+    openModal(btn.dataset.platform);
+  });
 });
 
 function renderConnections() {
@@ -865,6 +1045,32 @@ function renderConnections() {
         btn.disabled = true;
         btn.style.opacity = '0.7';
       }
+    }
+  });
+  const statConnected = document.getElementById('statConnected');
+  statConnected && (statConnected.textContent = list.length);
+}
+
+function renderConnections() {
+  const list = readConnections();
+  document.querySelectorAll('.connect-user').forEach((el) => {
+    const platform = el.dataset.platform;
+    const found = list.find((connection) => connection.platform === platform);
+    const btn = getConnectionButton(platform);
+    if (found) {
+      el.innerHTML = `<span class="connected-badge">Connected</span> <span>${getConnectionDisplayName(found)}</span>`;
+      if (btn) {
+        btn.textContent = 'Edit Connection';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+      return;
+    }
+    el.innerHTML = '<span class="muted">Not connected</span>';
+    if (btn) {
+      btn.textContent = '+ Connect';
+      btn.disabled = false;
+      btn.style.opacity = '1';
     }
   });
   const statConnected = document.getElementById('statConnected');
@@ -1813,6 +2019,38 @@ let selectedEnd = null;
 let calendarMonth = new Date();
 let calendarOpen = false;
 
+function detectPlatformFromFilename(filename = '') {
+  const value = String(filename || '').toLowerCase();
+  if (!value) return '';
+  if (value.includes('instagram') || value.includes('insta') || value.includes('ig_') || value.startsWith('ig')) return 'Instagram';
+  if (value.includes('facebook') || value.includes('meta') || value.includes('fb_') || value.startsWith('fb')) return 'Facebook';
+  if (value.includes('linkedin') || value.includes('link_') || value.startsWith('linkedin')) return 'LinkedIn';
+  if (value.includes('tiktok') || value.includes('tik tok')) return 'TikTok';
+  return '';
+}
+
+async function syncAiPlatformFromLatestUpload() {
+  if (!aiPlatform) return;
+
+  let detectedPlatform = detectPlatformFromFilename(localStorage.getItem('lastUploadName') || '');
+
+  if (!detectedPlatform) {
+    try {
+      const response = await fetch('/api/metrics');
+      if (response.ok) {
+        const data = await response.json();
+        detectedPlatform = detectPlatformFromFilename(data.lastUploadName || '');
+      }
+    } catch (error) {
+      console.warn('Unable to detect platform from latest upload name', error);
+    }
+  }
+
+  if (detectedPlatform) {
+    aiPlatform.value = detectedPlatform;
+  }
+}
+
 function normalizeDate(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
@@ -2527,6 +2765,7 @@ renderAIFeedback();
 const postFile = document.getElementById('postFile');
 const postFileLabel = document.getElementById('postFileLabel');
 const accountSearch = document.getElementById('accountSearch');
+const accountList = document.getElementById('accountList');
 const accountChips = document.getElementById('accountChips');
 const postDescription = document.getElementById('postDescription');
 const postCaption = document.getElementById('postCaption');
@@ -2631,11 +2870,28 @@ function renderPostQueue() {
   });
 }
 
-function openApprovalRequestEmail(email, title, caption, scheduledAt) {
-  if (!email) return;
-  const subject = `Approval request: ${title}`;
-  const body = `Hi team,%0D%0A%0D%0APlease approve this scheduled post:%0D%0A- Title: ${title}%0D%0A- When: ${scheduledAt}%0D%0A- Caption: ${caption}%0D%0A%0D%0AThanks!`;
-  window.open(`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${body}`, '_blank');
+async function sendApprovalRequestEmail(queueItem) {
+  const response = await fetch('/api/email/approval-request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({
+      adminEmail: queueItem.adminEmail,
+      title: queueItem.title,
+      caption: queueItem.caption,
+      scheduledAt: queueItem.scheduledAt,
+      accounts: queueItem.accounts,
+      platforms: queueItem.platforms,
+      hashtags: queueItem.hashtags,
+    }),
+  });
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.message || 'Failed to send approval request.');
+  }
+
+  return result;
 }
 
 renderPostQueue();
@@ -2709,6 +2965,7 @@ function addAccountEntry() {
   if (!name) return alert('Enter an account name before adding.');
   addAccountChip(name);
   if (accountSearch) accountSearch.value = '';
+  renderAvailableAccounts();
 }
 
 accountSearch?.addEventListener('keydown', (e) => {
@@ -2719,6 +2976,51 @@ accountSearch?.addEventListener('keydown', (e) => {
 });
 
 addAccountBtn?.addEventListener('click', () => addAccountEntry());
+
+accountSearch?.addEventListener('input', () => {
+  renderAvailableAccounts();
+});
+
+function renderAvailableAccounts() {
+  if (!accountList) return;
+
+  const allConnections = readConnections();
+  const selectedPlatforms = new Set(getSelectedPlatforms());
+  const query = accountSearch?.value.trim().toLowerCase() || '';
+  const matchingConnections = allConnections.filter((connection) => {
+    const matchesPlatform = !selectedPlatforms.size || selectedPlatforms.has(connection.platform);
+    const haystack = `${connection.platform} ${connection.username || ''} ${connection.userId || ''}`.toLowerCase();
+    const matchesQuery = !query || haystack.includes(query);
+    return matchesPlatform && matchesQuery;
+  });
+
+  accountList.innerHTML = '';
+
+  if (!allConnections.length) {
+    accountList.innerHTML = '<span class="hint">No connected accounts yet. Save one from the Connect page first.</span>';
+    return;
+  }
+
+  if (!matchingConnections.length) {
+    accountList.innerHTML = '<span class="hint">No saved accounts match the selected platform or search.</span>';
+    return;
+  }
+
+  matchingConnections.forEach((connection) => {
+    const accountButton = document.createElement('button');
+    accountButton.type = 'button';
+    accountButton.className = 'account-item';
+    accountButton.innerHTML = `
+      <span class="account-avatar">${(connection.platform || '?').slice(0, 1)}</span>
+      <span class="account-meta">
+        <span class="account-name">${getConnectionDisplayName(connection)}</span>
+        <span class="account-sub">${connection.platform}</span>
+      </span>
+    `;
+    accountButton.addEventListener('click', () => addAccountChip(getConnectionDisplayName(connection)));
+    accountList.appendChild(accountButton);
+  });
+}
 
 function getSelectedPlatforms() {
   return Array.from(platformPills || [])
@@ -2942,12 +3244,14 @@ platformPills?.forEach((pill) => {
   pill.addEventListener('click', () => {
     pill.classList.toggle('active');
     updatePreviewPlatforms();
+    renderAvailableAccounts();
   });
 });
 
 updatePreviewPlatforms();
+renderAvailableAccounts();
 
-scheduleForm?.addEventListener('submit', (e) => {
+scheduleForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const accounts = Array.from(accountChips?.children || []).map((c) => c.dataset.name);
   const selectedPlatforms = getSelectedPlatforms();
@@ -2970,21 +3274,25 @@ scheduleForm?.addEventListener('submit', (e) => {
     hashtags: postHashtags?.value.trim() || 'No hashtags provided',
     adminEmail: approvalEmail.value.trim(),
   });
-  postQueue.unshift(queueItem);
-  if (postQueue.length > 20) postQueue = postQueue.slice(0, 20);
-  persistPostQueue();
+  try {
+    await sendApprovalRequestEmail(queueItem);
+    postQueue.unshift(queueItem);
+    if (postQueue.length > 20) postQueue = postQueue.slice(0, 20);
+    persistPostQueue();
 
-  openApprovalRequestEmail(queueItem.adminEmail, queueItem.title, queueItem.caption, queueItem.scheduledAt);
-  alert(`Approval request sent to ${queueItem.adminEmail}. Your post has been added to the queue.`);
+    alert(`Approval request sent to ${queueItem.adminEmail}. Your post has been added to the queue.`);
 
-  scheduleForm.reset();
-  platformPills?.forEach((pill) => pill.classList.remove('active'));
-  updatePreviewPlatforms();
-  accountChips.innerHTML = '';
-  if (postFile) postFile.value = '';
-  if (postFileLabel) postFileLabel.textContent = 'Click to upload image, video, or PDF';
-  renderPreviewFile(null);
-  if (previewCaption) previewCaption.textContent = 'No caption yet...';
-  if (previewHashtags) previewHashtags.textContent = 'No hashtags yet...';
-  if (postQueue.length) window.location.href = 'post-queue.html';
+    scheduleForm.reset();
+    platformPills?.forEach((pill) => pill.classList.remove('active'));
+    updatePreviewPlatforms();
+    accountChips.innerHTML = '';
+    if (postFile) postFile.value = '';
+    if (postFileLabel) postFileLabel.textContent = 'Click to upload image, video, or PDF';
+    renderPreviewFile(null);
+    if (previewCaption) previewCaption.textContent = 'No caption yet...';
+    if (previewHashtags) previewHashtags.textContent = 'No hashtags yet...';
+    if (postQueue.length) window.location.href = 'post-queue.html';
+  } catch (error) {
+    alert(error.message || 'Unable to send the approval request right now.');
+  }
 });

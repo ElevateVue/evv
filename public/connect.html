@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Connect • EVV</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    function loadScript(callback) {
+      var head = document.getElementsByTagName("head")[0];
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://tracker.metricool.com/resources/be.js";
+      script.onreadystatechange = callback;
+      script.onload = callback;
+      head.appendChild(script);
+    }
+    loadScript(function() {
+      beTracker.t({ hash: "ec15d228c3066c0eeea651e88f835fa9" });
+    });
+  </script>
   <script defer src="app.js"></script>
   <script defer src="client-hub-tracker.js"></script>
   <script defer src="footer.js"></script>
@@ -65,8 +79,9 @@
       <label>Username / Email</label><input id="modalUser" required />
       <label>User ID (optional)</label><input id="modalUserId" placeholder="@handle or profile id" />
       <label>Profile Picture (optional)</label><input id="modalAvatar" type="file" accept="image/*" />
-      <label>Password</label><input id="modalPass" type="password" required />
-      <button class="btn-outline full" type="submit">Save</button>
+      <label>Password</label><input id="modalPass" type="password" placeholder="Not used in this local scheduling flow" />
+      <span class="hint">This saves the account inside EVV for scheduling. Real platform and Metricool publishing requires OAuth/API authorization.</span>
+      <button class="btn-outline full" type="submit">Save Account</button>
     </form>
   </div>
   <div class="beams-overlay"></div>

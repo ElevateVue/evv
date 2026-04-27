@@ -6,6 +6,20 @@
   <title>Client Hub • EVV</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    function loadScript(callback) {
+      var head = document.getElementsByTagName("head")[0];
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "https://tracker.metricool.com/resources/be.js";
+      script.onreadystatechange = callback;
+      script.onload = callback;
+      head.appendChild(script);
+    }
+    loadScript(function() {
+      beTracker.t({ hash: "ec15d228c3066c0eeea651e88f835fa9" });
+    });
+  </script>
   <script defer src="client-hub-tracker.js"></script>
   <style>
     :root {
