@@ -41,9 +41,11 @@ form?.addEventListener('submit', async (e) => {
 
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(loginUser));
-    localStorage.setItem('portalRole', 'client');
+    localStorage.setItem('portalRole', loginUser.role || 'client');
     document.cookie = `session=${encodeURIComponent(data.token)}; path=/`;
-    window.location.href = '/featurehub.html';
+    window.location.href = loginUser.role === 'admin' || loginUser.view === 'admin'
+      ? '/clienthub.html'
+      : '/featurehub.html';
   } catch (error) {
     alert('Login failed. Please try again.');
   }

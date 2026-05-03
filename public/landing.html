@@ -73,7 +73,7 @@
       gap: 24px;
       padding: 4px 32px;
       min-height: 62px;
-      background: rgba(15, 14, 17, 0.92);
+      background: #222431;
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(18px);
     }
@@ -1417,6 +1417,28 @@
         .replace(/'/g, "&#39;");
     }
 
+    function mergeSearchEntries(baseEntries, crawledEntries) {
+      const merged = new Map();
+
+      [...baseEntries, ...crawledEntries].forEach((entry) => {
+        if (!entry?.url) return;
+
+        const existing = merged.get(entry.url);
+        const nextKeywords = [...new Set([...(existing?.keywords || []), ...(entry.keywords || [])])];
+
+        merged.set(entry.url, {
+          ...existing,
+          ...entry,
+          title: existing?.title || entry.title,
+          description: existing?.description || entry.description,
+          keywords: nextKeywords,
+          content: [existing?.content || "", entry.content || ""].join(" ").trim()
+        });
+      });
+
+      return Array.from(merged.values());
+    }
+
     async function buildSearchIndex() {
       try {
         const responses = await Promise.all(
@@ -1445,7 +1467,7 @@
           })
         );
 
-        searchablePages = [...fallbackSearchablePages, ...responses];
+        searchablePages = mergeSearchEntries(fallbackSearchablePages, responses);
       } catch (error) {
         searchablePages = [...fallbackSearchablePages];
       }
@@ -1482,6 +1504,7 @@
 
     function navigateToSearchResult(entry) {
       if (!entry?.url) return;
+      closeSearchResults();
       window.location.href = entry.url;
     }
 

@@ -107,9 +107,11 @@ form?.addEventListener('submit', async (e) => {
 
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(createdUser));
-    localStorage.setItem('portalRole', 'client');
+    localStorage.setItem('portalRole', createdUser.role || 'client');
     document.cookie = `session=${encodeURIComponent(data.token)}; path=/`;
-    window.location.href = '/featurehub.html';
+    window.location.href = createdUser.role === 'admin' || createdUser.view === 'admin'
+      ? '/clienthub.html'
+      : '/featurehub.html';
   } catch (error) {
     alert('Unable to continue right now. Please try again.');
   }

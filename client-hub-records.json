@@ -1,0 +1,119 @@
+{
+  "sabiha.habeeb1972@gmail.com": {
+    "id": "sabiha.habeeb1972@gmail.com",
+    "email": "sabiha.habeeb1972@gmail.com",
+    "name": "Demo User",
+    "firstName": "Demo",
+    "lastName": "User",
+    "companyName": "",
+    "accountType": "individual",
+    "role": "client",
+    "view": "client",
+    "initials": "D",
+    "firstSeen": 1777387666187,
+    "lastActive": 1777829448000,
+    "totalVisits": 7,
+    "lastPage": "Feature Hub",
+    "pageUsage": {
+      "featurehub.html": {
+        "name": "Feature Hub",
+        "category": "Overview",
+        "visits": 4,
+        "firstVisited": 1777387666187,
+        "lastVisited": 1777829448000
+      },
+      "clienthub.html": {
+        "name": "Client Hub",
+        "category": "Admin",
+        "visits": 1,
+        "firstVisited": 1777387672063,
+        "lastVisited": 1777387672063
+      },
+      "dashboard-overview.html": {
+        "name": "Dashboard",
+        "category": "Analytics",
+        "visits": 2,
+        "firstVisited": 1777387674037,
+        "lastVisited": 1777387764653
+      }
+    },
+    "pagesUsed": [
+      "Feature Hub",
+      "Dashboard",
+      "Client Hub"
+    ],
+    "toolsUsed": [
+      "Feature Hub",
+      "Dashboard",
+      "Client Hub"
+    ],
+    "totalToolsUsed": 3,
+    "recentTools": [
+      "Feature Hub",
+      "Dashboard",
+      "Client Hub"
+    ],
+    "metrics": {
+      "connections": 1,
+      "queuedPosts": 0,
+      "reports": 2,
+      "feedback": 0,
+      "hashtagSets": 0,
+      "uploads": 1,
+      "totalSavedItems": 4
+    },
+    "signInCount": 1,
+    "lastSignInAt": 1777829441643,
+    "activity": [
+      {
+        "id": "evt-1777829448000-e43e81",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1777829448000,
+        "meta": {}
+      },
+      {
+        "id": "evt-1777829444965-9fbb93",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1777829444965,
+        "meta": {}
+      },
+      {
+        "id": "evt-1777829442009-f453d7",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1777829442009,
+        "meta": {}
+      },
+      {
+        "id": "evt-1777829441644-ed5414",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1777829441644,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      }
+    ],
+    "activitySummary": {
+      "pageViews": 3,
+      "edits": 0,
+      "actions": 0,
+      "signIns": 1
+    }
+  }
+}

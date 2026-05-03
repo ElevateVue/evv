@@ -232,6 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
     blur: 35
   });
 
+  initializeBrandHomeNavigation();
+
   // Add keyboard shortcut
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && e.key === 'B') {
@@ -269,7 +271,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize other page-specific functionality
   initializePageSpecific();
+
+  hydrateReportsFromServer();
 });
+
+function initializeBrandHomeNavigation() {
+  const brandSelectors = ['.brand', '.brand-inline'];
+
+  document.querySelectorAll(brandSelectors.join(', ')).forEach((brand) => {
+    if (brand.tagName === 'A') return;
+
+    brand.classList.add('brand-clickable');
+
+    const goHome = () => {
+      window.location.href = 'landing.html';
+    };
+
+    brand.addEventListener('click', (event) => {
+      if (event.target.closest('button, a, input, select, textarea')) return;
+      goHome();
+    });
+
+    brand.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      if (event.target.closest('button, a, input, select, textarea')) return;
+      event.preventDefault();
+      goHome();
+    });
+
+    if (!brand.hasAttribute('tabindex')) {
+      brand.setAttribute('tabindex', '0');
+    }
+    brand.setAttribute('role', 'link');
+    brand.setAttribute('aria-label', 'Go to landing page');
+  });
+}
+
+function trackClientActivity(event = {}) {
+  if (typeof window.__trackClientActivity === 'function') {
+    window.__trackClientActivity(event);
+  }
+}
+
+function getScopedStorageKey(baseKey) {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const email = String(user?.email || '').trim().toLowerCase();
+    return email ? `evv:${email}:${baseKey}` : baseKey;
+  } catch {
+    return baseKey;
+  }
+}
+
+function readScopedJson(baseKey, fallback) {
+  try {
+    const raw = localStorage.getItem(getScopedStorageKey(baseKey));
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeScopedJson(baseKey, value) {
+  localStorage.setItem(getScopedStorageKey(baseKey), JSON.stringify(value));
+}
+
+function readScopedString(baseKey, fallback = '') {
+  const value = localStorage.getItem(getScopedStorageKey(baseKey));
+  return value == null ? fallback : value;
+}
+
+function writeScopedString(baseKey, value) {
+  localStorage.setItem(getScopedStorageKey(baseKey), value);
+}
 
 function initializeAiModal() {
   // Get modal elements
@@ -602,7 +676,7 @@ async function loadMetrics() {
     const data = await res.json();
     const m = data.metrics || {};
     perPlatformMetrics = data.perPlatform || {};
-    updateDashboardUploadHero(data.lastUploadName || localStorage.getItem('lastUploadName'));
+    updateDashboardUploadHero(data.lastUploadName || readScopedString('lastUploadName'));
     if (uploadStatus) uploadStatus.textContent = data.lastUploadName ? `Using ${data.lastUploadName}` : '';
     const cards = document.querySelectorAll('.metric-card');
     const map = ['reach', 'interactions', 'clicks', 'reactions', 'views', 'follows', 'engagementRate'];
@@ -703,7 +777,7 @@ function updateDashboardUploadHero(uploadName) {
   dashboardUploadHero.classList.toggle('hidden', Boolean(uploadName));
 }
 
-updateDashboardUploadHero(localStorage.getItem('lastUploadName'));
+updateDashboardUploadHero(readScopedString('lastUploadName'));
 
 function openUploadModal() {
   uploadModal?.classList.add('show');
@@ -729,7 +803,15 @@ dashUploadFile?.addEventListener('change', async () => {
       body: JSON.stringify({ filename: file.name, csv }),
     });
     const payload = await parseUploadResponse(uploadRes);
-    localStorage.setItem('lastUploadName', file.name);
+    writeScopedString('lastUploadName', file.name);
+    trackClientActivity({
+      eventType: 'upload_analytics',
+      eventLabel: 'Uploaded analytics file',
+      eventDetail: file.name,
+      pageName: 'Dashboard',
+      pageCategory: 'Analytics',
+      eventMeta: { files: 1 }
+    });
     updateDashboardUploadHero(file.name);
     alert(buildUploadAlertMessage(payload));
     uploadStatus && (uploadStatus.textContent = buildUploadStatusMessage(payload, file.name));
@@ -806,7 +888,15 @@ uploadModalSubmit?.addEventListener('click', async () => {
     });
     const payload = await parseUploadResponse(res);
     const fileNames = pendingFiles.map((f) => f.name).join(', ');
-    localStorage.setItem('lastUploadName', fileNames);
+    writeScopedString('lastUploadName', fileNames);
+    trackClientActivity({
+      eventType: 'upload_analytics',
+      eventLabel: 'Uploaded analytics batch',
+      eventDetail: fileNames,
+      pageName: 'Dashboard',
+      pageCategory: 'Analytics',
+      eventMeta: { files: pendingFiles.length }
+    });
     updateDashboardUploadHero(fileNames);
     uploadStatus && (uploadStatus.textContent = buildUploadStatusMessage(payload, fileNames));
     alert(buildUploadAlertMessage(payload));
@@ -828,14 +918,14 @@ const modalClose = document.getElementById('modalClose');
 const modalBackdrop = document.getElementById('modalBackdrop');
 function readConnections() {
   try {
-    return JSON.parse(localStorage.getItem('connections') || '[]');
+    return readScopedJson('connections', []);
   } catch {
     return [];
   }
 }
 
 function writeConnections(list) {
-  localStorage.setItem('connections', JSON.stringify(list));
+  writeScopedJson('connections', list);
 }
 
 function getConnectionButton(platform) {
@@ -887,6 +977,14 @@ modalForm?.addEventListener('submit', (e) => {
   const nextConnections = readConnections().filter((connection) => connection.platform !== platform);
   nextConnections.push(nextConnection);
   writeConnections(nextConnections);
+  trackClientActivity({
+    eventType: 'edit_connection',
+    eventLabel: 'Saved connection',
+    eventDetail: `${platform} account updated`,
+    pageName: 'Connect',
+    pageCategory: 'Connections',
+    eventMeta: { platform }
+  });
   closeModal();
   alert(`${platform} account saved for scheduling.`);
   renderConnections();
@@ -1005,6 +1103,14 @@ async function startFacebookConnection() {
         }
 
         writeConnections(nextConnections);
+        trackClientActivity({
+          eventType: 'edit_connection',
+          eventLabel: 'Saved Meta connection',
+          eventDetail: 'Facebook and linked Instagram accounts synced',
+          pageName: 'Connect',
+          pageCategory: 'Connections',
+          eventMeta: { platform: 'Facebook', accounts: nextConnections.length }
+        });
         renderConnections();
         renderAvailableAccounts();
         alert('Facebook connection saved. Any available Facebook Pages and linked Instagram business accounts are now available for scheduling.');
@@ -1033,7 +1139,7 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
 });
 
 function renderConnections() {
-  const list = JSON.parse(localStorage.getItem('connections') || '[]');
+  const list = readScopedJson('connections', []);
   document.querySelectorAll('.connect-user').forEach((el) => {
     const platform = el.dataset.platform;
     const found = list.find((c) => c.platform === platform);
@@ -1341,7 +1447,15 @@ uploadForm?.addEventListener('submit', async (e) => {
     body: JSON.stringify({ filename: file.name, csv }),
   });
   const payload = await parseUploadResponse(response);
-  localStorage.setItem('lastUploadName', file.name);
+  writeScopedString('lastUploadName', file.name);
+  trackClientActivity({
+    eventType: 'upload_analytics',
+    eventLabel: 'Uploaded analytics file',
+    eventDetail: file.name,
+    pageName: 'Upload',
+    pageCategory: 'Publishing',
+    eventMeta: { files: 1 }
+  });
   alert(buildUploadAlertMessage(payload));
   uploadInput.value = '';
   uploadLabel.textContent = 'Drop a CSV here or click Browse';
@@ -1803,7 +1917,7 @@ feedbackTabs.forEach((chip) => {
 
 function renderFeedback() {
   if (!feedbackList || !feedbackStatus) return;
-  const items = JSON.parse(localStorage.getItem('feedback') || '[]');
+  const items = readScopedJson('feedback', []);
   feedbackList.innerHTML = '';
   if (!items.length) {
     feedbackStatus.textContent = 'No feedback yet. Share your suggestions to help improve the dashboard.';
@@ -1818,9 +1932,9 @@ function renderFeedback() {
   feedbackList.querySelectorAll('.delete-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const index = Number(btn.dataset.idx);
-      const current = JSON.parse(localStorage.getItem('feedback') || '[]');
+      const current = readScopedJson('feedback', []);
       current.splice(index, 1);
-      localStorage.setItem('feedback', JSON.stringify(current));
+      writeScopedJson('feedback', current);
       renderFeedback();
     });
   });
@@ -1945,24 +2059,38 @@ feedbackSubmit?.addEventListener('click', async () => {
       if (!response.ok) throw new Error(payload.message || 'Failed to generate AI suggestions');
 
       const generatedText = formatAiSuggestionText(payload);
-      const items = JSON.parse(localStorage.getItem('feedback') || '[]');
+      const items = readScopedJson('feedback', []);
       items.unshift({
         type: feedbackType,
         text: generatedText,
         time: Date.now(),
       });
-      localStorage.setItem('feedback', JSON.stringify(items));
+      writeScopedJson('feedback', items);
+      trackClientActivity({
+        eventType: 'generate_ai_feedback',
+        eventLabel: 'Generated AI suggestions',
+        eventDetail: 'Dashboard AI suggestions created',
+        pageName: 'Dashboard',
+        pageCategory: 'Analytics'
+      });
       renderFeedback();
     } catch (error) {
       const fallback = buildBrowserAiSuggestions();
       const generatedText = formatAiSuggestionText(fallback);
-      const items = JSON.parse(localStorage.getItem('feedback') || '[]');
+      const items = readScopedJson('feedback', []);
       items.unshift({
         type: `${feedbackType} (Local Fallback)`,
         text: generatedText,
         time: Date.now(),
       });
-      localStorage.setItem('feedback', JSON.stringify(items));
+      writeScopedJson('feedback', items);
+      trackClientActivity({
+        eventType: 'generate_ai_feedback',
+        eventLabel: 'Generated fallback AI suggestions',
+        eventDetail: 'Dashboard fallback suggestions created',
+        pageName: 'Dashboard',
+        pageCategory: 'Analytics'
+      });
       renderFeedback();
     } finally {
       feedbackSubmit.disabled = false;
@@ -1973,9 +2101,16 @@ feedbackSubmit?.addEventListener('click', async () => {
 
   const text = feedbackText.value.trim();
   if (!text) return alert('Please write something first.');
-  const items = JSON.parse(localStorage.getItem('feedback') || '[]');
+  const items = readScopedJson('feedback', []);
   items.unshift({ type: feedbackType, text, time: Date.now() });
-  localStorage.setItem('feedback', JSON.stringify(items));
+  writeScopedJson('feedback', items);
+  trackClientActivity({
+    eventType: 'edit_feedback',
+    eventLabel: 'Submitted feedback',
+    eventDetail: feedbackType,
+    pageName: 'Dashboard',
+    pageCategory: 'Analytics'
+  });
   feedbackText.value = '';
   renderFeedback();
 });
@@ -2032,7 +2167,7 @@ function detectPlatformFromFilename(filename = '') {
 async function syncAiPlatformFromLatestUpload() {
   if (!aiPlatform) return;
 
-  let detectedPlatform = detectPlatformFromFilename(localStorage.getItem('lastUploadName') || '');
+  let detectedPlatform = detectPlatformFromFilename(readScopedString('lastUploadName') || '');
 
   if (!detectedPlatform) {
     try {
@@ -2282,14 +2417,50 @@ function showDetail(report) {
 
 function loadReports() {
   try {
-    return JSON.parse(localStorage.getItem('aiReports') || '[]');
+    return readScopedJson('aiReports', []);
   } catch {
     return [];
   }
 }
 
 function saveReports(reports) {
-  localStorage.setItem('aiReports', JSON.stringify(reports));
+  writeScopedJson('aiReports', reports);
+  syncReportsToServer(reports);
+}
+
+async function syncReportsToServer(reports) {
+  try {
+    await fetch('/api/reports/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ reports }),
+    });
+  } catch (error) {
+    console.warn('Unable to sync reports to server', error);
+  }
+}
+
+async function hydrateReportsFromServer() {
+  try {
+    const response = await fetch('/api/reports', { credentials: 'same-origin' });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!Array.isArray(data.reports)) return;
+
+    writeScopedJson('aiReports', data.reports);
+    renderReports();
+    renderDashboardReports();
+    renderAIFeedback();
+
+    const requestedId = new URLSearchParams(window.location.search).get('report');
+    if (requestedId && window.location.pathname.includes('report.html')) {
+      const requestedReport = data.reports.find((report) => report.id === requestedId);
+      if (requestedReport) showDetail(requestedReport);
+    }
+  } catch (error) {
+    console.warn('Unable to hydrate reports from server', error);
+  }
 }
 
 function formatDisplayDate(value) {
@@ -2335,7 +2506,7 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
     { label: 'Avg Engagement Rate', value: aggregated.engagement, sub: '%'},
   ].filter((m) => m.value !== undefined);
 
-  const summary = `AI performance report for ${platform}. Reach: ${formatReportValue(aggregated.reach)}, Interactions: ${formatReportValue(aggregated.interactions)}, Clicks: ${formatReportValue(aggregated.clicks)}.`;
+  let summary = `AI performance report for ${platform}. Reach: ${formatReportValue(aggregated.reach)}, Interactions: ${formatReportValue(aggregated.interactions)}, Clicks: ${formatReportValue(aggregated.clicks)}.`;
 
   const takeaways = [];
   if (aggregated.reach) {
@@ -2368,6 +2539,36 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
     `Review the timing of your best-performing posts and align future publishing to similar windows.`
   ];
 
+  try {
+    const aiResponse = await fetch('/api/feedback/ai-suggestions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        start: startDate,
+        end: endDate,
+        platform,
+        metrics: metricsData.metrics || {},
+        perPlatform: metricsData.perPlatform || {},
+      }),
+    });
+
+    if (aiResponse.ok) {
+      const aiPayload = await aiResponse.json();
+      if (aiPayload.summary) {
+        summary = aiPayload.summary;
+      }
+      if (Array.isArray(aiPayload.takeaways) && aiPayload.takeaways.length) {
+        takeaways.splice(0, takeaways.length, ...aiPayload.takeaways);
+      }
+      if (Array.isArray(aiPayload.actions) && aiPayload.actions.length) {
+        actions.splice(0, actions.length, ...aiPayload.actions);
+      }
+    }
+  } catch (error) {
+    console.warn('Unable to enrich report with AI suggestions', error);
+  }
+
   const report = {
     id: 'r' + Date.now(),
     title: `${platform} Report - ${formatDisplayDate(startDate)} to ${formatDisplayDate(endDate)}`,
@@ -2385,6 +2586,14 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
   const reports = loadReports();
   reports.unshift(report);
   saveReports(reports);
+  trackClientActivity({
+    eventType: 'generate_report',
+    eventLabel: 'Generated report',
+    eventDetail: report.title,
+    pageName: 'Report',
+    pageCategory: 'Insights',
+    eventMeta: { platform }
+  });
   renderReports();
   renderDashboardReports();
   renderAIFeedback();
@@ -2431,6 +2640,13 @@ function renderReports() {
       const id = event.target.dataset.id;
       const filtered = loadReports().filter((report) => report.id !== id);
       saveReports(filtered);
+      trackClientActivity({
+        eventType: 'edit_report',
+        eventLabel: 'Deleted report',
+        eventDetail: id,
+        pageName: 'Report',
+        pageCategory: 'Insights'
+      });
       renderReports();
       renderDashboardReports();
       renderAIFeedback();
@@ -2458,7 +2674,7 @@ function renderDashboardReports() {
         <div class="report-title">${report.title}</div>
         <div class="report-date">${formatDisplayDate(report.start)}</div>
       </div>
-      <button class="btn btn-small" onclick="window.location.href='report.html'">View</button>
+      <button class="btn btn-small" onclick="window.location.href='report.html?report=${encodeURIComponent(report.id)}'">View</button>
     </div>
   `).join('');
 }
@@ -2787,14 +3003,21 @@ let savedHashtagSets = loadSavedHashtagSets();
 
 function loadSavedHashtagSets() {
   try {
-    return JSON.parse(localStorage.getItem('savedHashtagSets') || '[]');
+    return readScopedJson('savedHashtagSets', []);
   } catch {
     return [];
   }
 }
 
 function persistSavedHashtagSets() {
-  localStorage.setItem('savedHashtagSets', JSON.stringify(savedHashtagSets));
+  writeScopedJson('savedHashtagSets', savedHashtagSets);
+  trackClientActivity({
+    eventType: 'edit_hashtags',
+    eventLabel: 'Saved hashtag set',
+    eventDetail: `${savedHashtagSets.length} hashtag set(s) saved`,
+    pageName: 'Scheduling',
+    pageCategory: 'Publishing'
+  });
   renderSavedHashtagSets();
 }
 
@@ -2804,14 +3027,21 @@ let postQueue = loadPostQueue();
 
 function loadPostQueue() {
   try {
-    return JSON.parse(localStorage.getItem('postQueue') || '[]');
+    return readScopedJson('postQueue', []);
   } catch {
     return [];
   }
 }
 
 function persistPostQueue() {
-  localStorage.setItem('postQueue', JSON.stringify(postQueue));
+  writeScopedJson('postQueue', postQueue);
+  trackClientActivity({
+    eventType: 'edit_queue',
+    eventLabel: 'Updated post queue',
+    eventDetail: `${postQueue.length} queued post(s)`,
+    pageName: 'Scheduling',
+    pageCategory: 'Publishing'
+  });
   renderPostQueue();
 }
 

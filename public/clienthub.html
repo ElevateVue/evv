@@ -442,6 +442,134 @@
       letter-spacing: -0.04em;
     }
 
+    .detail-panel {
+      margin-top: 24px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(180deg, rgba(27, 27, 32, 0.98), rgba(17, 17, 23, 0.98));
+      padding: 24px;
+    }
+
+    .detail-panel[hidden] {
+      display: none;
+    }
+
+    .detail-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .detail-head h2 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.05em;
+    }
+
+    .detail-head p {
+      margin: 8px 0 0;
+      color: var(--admin-muted);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 720px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .detail-card {
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 18px;
+    }
+
+    .detail-card h3 {
+      margin: 0 0 14px;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #dfe7ff;
+    }
+
+    .detail-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .detail-meta-item {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .detail-meta-item span {
+      display: block;
+      color: var(--admin-soft);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .detail-meta-item strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 16px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .data-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(24, 215, 225, 0.1);
+      color: #bff7ff;
+      border: 1px solid rgba(24, 215, 225, 0.16);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .activity-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .activity-item {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .activity-item strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .activity-item p {
+      margin: 0;
+      color: var(--admin-muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
     @media (max-width: 1260px) {
       .client-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -485,6 +613,11 @@
       .client-avatar {
         width: 68px;
         height: 68px;
+      }
+
+      .detail-grid,
+      .detail-meta {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -537,6 +670,33 @@
       <section class="empty-state" id="emptyState" hidden>
         <strong>No client cards yet</strong>
         Once someone logs in and opens the platform, their usage card will appear here automatically.
+      </section>
+      <section class="detail-panel" id="detailPanel" hidden>
+        <div class="detail-head">
+          <div>
+            <h2 id="detailName">Client Detail</h2>
+            <p id="detailSubtitle">Select a client card to inspect sign-ins, recent actions, saved data, and overall usage.</p>
+          </div>
+          <button class="ghost-btn" id="closeDetail" type="button">Close</button>
+        </div>
+        <div class="detail-grid">
+          <article class="detail-card">
+            <h3>Identity</h3>
+            <div class="detail-meta" id="detailMeta"></div>
+          </article>
+          <article class="detail-card">
+            <h3>Tools Used</h3>
+            <div class="chip-row" id="detailTools"></div>
+          </article>
+          <article class="detail-card">
+            <h3>Saved Data</h3>
+            <div class="detail-meta" id="detailSaved"></div>
+          </article>
+          <article class="detail-card">
+            <h3>Recent Activity</h3>
+            <div class="activity-list" id="detailActivity"></div>
+          </article>
+        </div>
       </section>
     </main>
   </div>
@@ -612,14 +772,16 @@
         acc.tools += record.totalToolsUsed || 0;
         acc.saved += record.metrics?.totalSavedItems || 0;
         acc.connections += record.metrics?.connections || 0;
+        acc.signIns += record.signInCount || 0;
         return acc;
-      }, { clients: 0, tools: 0, saved: 0, connections: 0 });
+      }, { clients: 0, tools: 0, saved: 0, connections: 0, signIns: 0 });
 
       const stats = [
         { label: 'Active Clients', value: totals.clients },
         { label: 'Tools In Use', value: totals.tools },
         { label: 'Saved Data Points', value: totals.saved },
-        { label: 'Connected Accounts', value: totals.connections }
+        { label: 'Connected Accounts', value: totals.connections },
+        { label: 'Total Sign-Ins', value: totals.signIns }
       ];
 
       statsGrid.innerHTML = stats.map((stat) => `
@@ -668,19 +830,104 @@
                   <strong>${escapeHtml(record.totalToolsUsed || 0)}</strong>
                 </div>
                 <div class="mini-stat">
-                  <span>Connected Accounts</span>
-                  <strong>${escapeHtml(secondaryStat)}</strong>
+                  <span>Sign-Ins</span>
+                  <strong>${escapeHtml(record.signInCount || 0)}</strong>
                 </div>
               </div>
             </div>
 
             <div class="client-card-footer">
               <span>Last sync: ${escapeHtml(formatAgo(record.lastActive))}</span>
-              <a class="manage-link" href="featurehub.html">Manage &rarr;</a>
+              <button class="manage-link detail-trigger" data-id="${escapeHtml(record.id)}" type="button">Open detail &rarr;</button>
             </div>
           </article>
         `;
       }).join('');
+
+      clientGrid.querySelectorAll('.detail-trigger').forEach((button) => {
+        button.addEventListener('click', () => {
+          const record = records.find((item) => item.id === button.dataset.id);
+          if (record) showDetail(record);
+        });
+      });
+    }
+
+    function renderDetailSection(targetId, items, emptyLabel) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      if (!items.length) {
+        target.innerHTML = `<div class="data-chip">${escapeHtml(emptyLabel)}</div>`;
+        return;
+      }
+      target.innerHTML = items.join('');
+    }
+
+    function showDetail(record) {
+      const panel = document.getElementById('detailPanel');
+      if (!panel) return;
+
+      document.getElementById('detailName').textContent = record.name || 'Client Detail';
+      document.getElementById('detailSubtitle').textContent =
+        `${record.email || 'No email'} • last sign-in ${record.lastSignInAt ? formatAgo(record.lastSignInAt) : 'not recorded'} • last active ${formatAgo(record.lastActive)}${record.workspace?.lastUploadName ? ` • last upload ${record.workspace.lastUploadName}` : ''}`;
+
+      const identityItems = [
+        ['Email', record.email || '—'],
+        ['Company', record.companyName || '—'],
+        ['Account Type', record.accountType || '—'],
+        ['Role', record.role || 'client'],
+        ['View', record.view || 'client'],
+        ['Last Page', record.lastPage || '—'],
+        ['Last Sign-In', record.lastSignInAt ? new Date(record.lastSignInAt).toLocaleString() : '—'],
+        ['Total Visits', record.totalVisits || 0]
+      ];
+
+      document.getElementById('detailMeta').innerHTML = identityItems.map(([label, value]) => `
+        <div class="detail-meta-item">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+        </div>
+      `).join('');
+
+      renderDetailSection(
+        'detailTools',
+        (record.toolsUsed || []).map((tool) => `<div class="data-chip">${escapeHtml(tool)}</div>`),
+        'No tools tracked yet'
+      );
+
+      const metrics = record.metrics || {};
+      const savedItems = [
+        ['Connections', metrics.connections || 0],
+        ['Queued Posts', metrics.queuedPosts || 0],
+        ['Reports', record.workspace?.reportCount ?? metrics.reports ?? 0],
+        ['Feedback', metrics.feedback || 0],
+        ['Hashtag Sets', metrics.hashtagSets || 0],
+        ['Uploads', record.workspace?.lastUploadName ? 1 : metrics.uploads || 0],
+        ['Saved Items', metrics.totalSavedItems || 0],
+        ['Edits Tracked', record.activitySummary?.edits || 0],
+        ['CSV Rows Loaded', record.workspace?.postCount || 0]
+      ];
+
+      document.getElementById('detailSaved').innerHTML = savedItems.map(([label, value]) => `
+        <div class="detail-meta-item">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+        </div>
+      `).join('');
+
+      const activity = Array.isArray(record.activity) ? record.activity.slice(0, 12) : [];
+      renderDetailSection(
+        'detailActivity',
+        activity.map((item) => `
+          <article class="activity-item">
+            <strong>${escapeHtml(item.label || item.type || 'Activity')}</strong>
+            <p>${escapeHtml(item.detail || 'No extra detail')}<br>${escapeHtml(item.pageName || 'Workspace')} • ${escapeHtml(new Date(item.timestamp || Date.now()).toLocaleString())}</p>
+          </article>
+        `),
+        'No recent activity recorded'
+      );
+
+      panel.hidden = false;
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function renderHub(query = '', sourceRecords = null) {
@@ -726,6 +973,11 @@
       const searchValue = document.getElementById('clientSearch')?.value || '';
       const records = await fetchServerRecords();
       renderHub(searchValue, records);
+    });
+
+    document.getElementById('closeDetail')?.addEventListener('click', () => {
+      const panel = document.getElementById('detailPanel');
+      if (panel) panel.hidden = true;
     });
 
     document.getElementById('exportCsv')?.addEventListener('click', () => {

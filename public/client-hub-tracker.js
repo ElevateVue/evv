@@ -33,13 +33,42 @@
     return Array.isArray(value) ? value : [];
   }
 
+  function getScopedStorageKey(baseKey) {
+    const user = readJson('user', null);
+    const email = String(user?.email || '').trim().toLowerCase();
+    return email ? `evv:${email}:${baseKey}` : baseKey;
+  }
+
+  function readScopedJson(baseKey, fallback) {
+    return readJson(getScopedStorageKey(baseKey), fallback);
+  }
+
+  function readScopedString(baseKey, fallback = '') {
+    try {
+      const raw = localStorage.getItem(getScopedStorageKey(baseKey));
+      return raw == null ? fallback : raw;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function getPageContext() {
+    const pageFile = window.location.pathname.split('/').pop() || 'featurehub.html';
+    const pageMeta = PAGE_MAP[pageFile] || {
+      name: document.title.replace(/\s*[\u2022-].*$/, '').trim() || pageFile,
+      category: 'Workspace'
+    };
+
+    return { pageFile, pageMeta };
+  }
+
   function getSavedMetrics() {
-    const queueItems = toArray(readJson('postQueue', []));
-    const feedbackItems = toArray(readJson('feedback', []));
-    const reports = toArray(readJson('aiReports', []));
-    const hashtagSets = toArray(readJson('savedHashtagSets', []));
-    const connections = toArray(readJson('connections', []));
-    const uploads = localStorage.getItem('lastUploadName') ? 1 : 0;
+    const queueItems = toArray(readScopedJson('postQueue', []));
+    const feedbackItems = toArray(readScopedJson('feedback', []));
+    const reports = toArray(readScopedJson('aiReports', []));
+    const hashtagSets = toArray(readScopedJson('savedHashtagSets', []));
+    const connections = toArray(readScopedJson('connections', []));
+    const uploads = readScopedString('lastUploadName') ? 1 : 0;
 
     return {
       connections: connections.length,
@@ -108,11 +137,7 @@
   const user = readJson('user', null);
   if (!user?.email) return;
 
-  const pageFile = window.location.pathname.split('/').pop() || 'featurehub.html';
-  const pageMeta = PAGE_MAP[pageFile] || {
-    name: document.title.replace(/\s*[•-].*$/, '').trim() || pageFile,
-    category: 'Workspace'
-  };
+  const { pageFile, pageMeta } = getPageContext();
   const firstName = user.firstName || (user.name ? String(user.name).split(' ')[0] : '');
   const lastName = user.lastName || (user.name ? String(user.name).split(' ').slice(1).join(' ') : '');
   const payload = {
@@ -140,4 +165,27 @@
   }).catch(() => {
     // Local fallback is already updated, so no extra work is needed here.
   });
+
+  window.__trackClientActivity = function trackClientActivity(event = {}) {
+    const context = getPageContext();
+    const activityPayload = {
+      pageFile: event.pageFile || context.pageFile,
+      pageName: event.pageName || context.pageMeta.name,
+      pageCategory: event.pageCategory || context.pageMeta.category,
+      eventType: event.eventType || 'activity',
+      eventLabel: event.eventLabel || event.label || 'Activity',
+      eventDetail: event.eventDetail || event.detail || '',
+      eventMeta: event.eventMeta || {},
+      metrics: getSavedMetrics()
+    };
+
+    fetch('/api/client-hub/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(activityPayload)
+    }).catch(() => {
+      // Ignore tracking failures.
+    });
+  };
 })();
