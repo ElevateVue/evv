@@ -6,6 +6,18 @@ const companyNameField = document.getElementById('companyNameField');
 const companyNameInput = document.getElementById('companyName');
 const existingAccountLoginLink = document.getElementById('existingAccountLoginLink');
 const accountTypeOptions = Array.from(document.querySelectorAll('[data-account-type-option]'));
+const passwordInput = document.getElementById('password');
+const passwordToggle = document.getElementById('passwordToggle');
+
+function togglePasswordVisibility() {
+  if (!passwordInput || !passwordToggle) return;
+  const isVisible = passwordInput.type === 'text';
+  passwordInput.type = isVisible ? 'password' : 'text';
+  passwordToggle.textContent = isVisible ? '👁' : '🙈';
+  passwordToggle.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
+}
+
+passwordToggle?.addEventListener('click', togglePasswordVisibility);
 
 function setAccountType(type) {
   const isCompany = type === 'company';
@@ -111,10 +123,11 @@ form?.addEventListener('submit', async (e) => {
     document.cookie = `session=${encodeURIComponent(data.token)}; path=/`;
     window.location.href = createdUser.role === 'admin' || createdUser.view === 'admin'
       ? '/clienthub.html'
-      : '/featurehub.html';
+      : '/onboarding.html';
   } catch (error) {
     alert('Unable to continue right now. Please try again.');
   }
 });
 
 setAccountType('individual');
+

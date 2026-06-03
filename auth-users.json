@@ -1,0 +1,28 @@
+{
+  "test@example.com": {
+    "email": "test@example.com",
+    "password": "123456",
+    "firstName": "Test",
+    "lastName": "User",
+    "name": "Test User",
+    "accountType": "individual",
+    "companyName": "",
+    "role": "client",
+    "view": "client",
+    "createdAt": 1779576245403,
+    "lastSignedInAt": 1779576245403
+  },
+  "sabiha.habeeb1972@gmail.com": {
+    "email": "sabiha.habeeb1972@gmail.com",
+    "password": "Kimsabiha1972",
+    "firstName": "",
+    "lastName": "",
+    "name": "sabiha.habeeb1972",
+    "accountType": "individual",
+    "companyName": "",
+    "role": "client",
+    "view": "client",
+    "createdAt": 1779576339336,
+    "lastSignedInAt": 1779576339336
+  }
+}

@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drop Ideas - Content Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+  <script defer src="content-lab.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div><div class="brand-name">Orbit</div><div class="brand-sub">by Elevate Vue</div></div><button class="icon-btn" id="closeSidebar" aria-label="Close menu">&times;</button></div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card"><div class="avatar">C</div><div><div class="name">Content Lab</div><div class="email">Create better campaigns</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">&#9776;</button>
+      <div class="brand-inline"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div></div>
+      <div class="spacer"></div>
+      <div class="avatar small">C</div>
+    </header>
+    <main>
+      <section class="content-tool-shell">
+        <header class="content-tool-head">
+          <div>
+            <h1>Drop Ideas</h1>
+            <p>Brainstorm campaign ideas for a platform and business goal.</p>
+          </div>
+          <nav class="content-tabs" aria-label="Content tools">            <a href="content-calendar.html">Calendar</a>
+            <a href="ghost-writer.html">Ghost Writer</a>
+            <a href="hook-library.html">Hooks</a>
+            <a class="active" href="drop-ideas.html">Ideas</a>
+          </nav>
+        </header>
+        <section class="content-tool-panel">
+          <div class="content-form-grid compact">
+            <input id="diIndustry" class="brand-field" placeholder="Industry / topic" />
+            <select id="diPlatform" class="brand-select"><option>Instagram</option><option>LinkedIn</option><option>TikTok</option></select>
+            <select id="diGoal" class="brand-select"><option>More Engagement</option><option>Grow Followers</option><option>Generate Leads</option><option>Drive Sales</option><option>Brand Awareness</option></select>
+            <div class="content-ai-actions inline">
+              <button id="diGenerateBtn" class="brand-btn" type="button">Generate 10 Ideas</button>
+              <button id="diSaveBtn" class="copy-btn" type="button">Save</button>
+              <button id="diCopyBtn" class="copy-btn" type="button">Copy</button>
+            </div>
+          </div>
+          <div class="content-card-grid ideasGrid" id="ideasGrid"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <div class="modal content-modal" id="ideaModal"><div class="content-modal-card"><h3 id="ideaTitle"></h3><p id="ideaDesc"></p><div class="content-modal-actions"><button id="copyIdeaBtn" class="brand-btn" type="button">Copy</button><button id="closeIdeaBtn" class="copy-btn" type="button">Close</button></div></div></div>
+  <div class="beams-overlay"></div>
+</body>
+</html>
+

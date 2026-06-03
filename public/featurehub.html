@@ -6,6 +6,7 @@
   <title>FeatureHub • EVV</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
   <script>
     function loadScript(callback) {
       var head = document.getElementsByTagName("head")[0];
@@ -202,7 +203,7 @@
     }
 
     .client-hub-content {
-      padding: 38px 32px 48px;
+      padding: 24px 28px 34px;
     }
 
     .client-hub-head {
@@ -210,7 +211,7 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 20px;
-      margin-bottom: 34px;
+      margin-bottom: 22px;
     }
 
     .status-row {
@@ -244,7 +245,7 @@
 
     .client-hub-head h1 {
       margin: 0;
-      font-size: clamp(42px, 5vw, 58px);
+      font-size: clamp(34px, 4vw, 48px);
       line-height: 0.94;
       letter-spacing: -0.06em;
     }
@@ -258,7 +259,7 @@
     }
 
     .new-post-btn {
-      margin-top: 48px;
+      margin-top: 18px;
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -276,20 +277,20 @@
     .hub-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 24px;
+      gap: 16px;
     }
 
     .hub-card {
-      min-height: 210px;
-      border-radius: 28px;
+      min-height: 158px;
+      border-radius: 20px;
       background: linear-gradient(180deg, #252526, #212123);
       border: 1px solid rgba(255, 255, 255, 0.04);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-      padding: 26px 24px;
+      padding: 20px 18px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      gap: 18px;
+      gap: 12px;
       text-decoration: none;
       color: inherit;
       transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
@@ -614,27 +615,40 @@
       <path d="m6 6 12 12"></path>
       <path d="M18 6 6 18"></path>
     </symbol>
+    <symbol id="icon-admin" viewBox="0 0 24 24">
+      <path d="M12 1l3 6h6l-5 4 2 7-6-4-6 4 2-7-5-4h6z"></path>
+    </symbol>
   </svg>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div><div class="brand-name">Orbit</div><div class="brand-sub">by Elevate Vue</div></div></div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card"><div class="avatar">F</div><div><div class="name">Feature Hub</div><div class="email">Choose a workspace</div></div></div>
+  </aside>
 
   <div class="client-hub-shell">
     <aside class="client-rail">
       <div class="client-rail-logo" aria-hidden="true"><svg class="hub-icon-svg"><use href="#icon-spark"></use></svg></div>
       <nav class="client-rail-nav">
         <a class="client-rail-link active" href="dashboard.html" aria-label="Dashboard"><svg class="hub-icon-svg"><use href="#icon-dashboard"></use></svg></a>
+        <a class="client-rail-link" href="strategy.html" aria-label="Strategy"><svg class="hub-icon-svg"><use href="#icon-spark"></use></svg></a>
+        <a class="client-rail-link" href="brand.html" aria-label="Brand"><svg class="hub-icon-svg"><use href="#icon-spark"></use></svg></a>
+        <a class="client-rail-link" href="ad-copy-grader.html" aria-label="Campaign Center"><svg class="hub-icon-svg"><use href="#icon-grid"></use></svg></a>
         <a class="client-rail-link" href="clienthub.html" aria-label="Client Hub"><svg class="hub-icon-svg"><use href="#icon-arch"></use></svg></a>
         <a class="client-rail-link" href="connect.html" aria-label="Connections"><svg class="hub-icon-svg"><use href="#icon-connect"></use></svg></a>
         <a class="client-rail-link" href="upload.html" aria-label="Scheduling"><svg class="hub-icon-svg"><use href="#icon-grid"></use></svg></a>
         <a class="client-rail-link" href="report.html" aria-label="Reports"><svg class="hub-icon-svg"><use href="#icon-arrow-up-right"></use></svg></a>
       </nav>
       <div class="client-rail-spacer"></div>
-      <a class="client-rail-link" href="login.html" aria-label="Settings"><svg class="hub-icon-svg"><use href="#icon-gear"></use></svg></a>
+      <a class="client-rail-link" href="admin-signin.html" aria-label="Admin"><svg class="hub-icon-svg"><use href="#icon-admin"></use></svg></a>
+      <a class="client-rail-link" href="login.html" aria-label="Settings"><svg class="hub-icon-svg"><use href="#icon-help"></use></svg></a>
       <a class="client-rail-link" href="landing.html" aria-label="Help"><svg class="hub-icon-svg"><use href="#icon-help"></use></svg></a>
     </aside>
 
     <div class="client-hub-main">
       <header class="client-hub-topbar">
         <div class="client-top-left">
-          <button class="client-mobile-toggle" id="mobileNavToggle" type="button" aria-label="Open navigation" aria-controls="mobileNav" aria-expanded="false">
+          <button class="client-mobile-toggle" id="openSidebar" type="button" aria-label="Open navigation" aria-expanded="false">
             <svg class="hub-icon-svg"><use href="#icon-menu"></use></svg>
           </button>
         </div>
@@ -650,7 +664,7 @@
       <aside class="client-mobile-nav" id="mobileNav" hidden aria-label="Mobile navigation">
         <div class="mobile-nav-head">
           <div class="mobile-brand">
-            <div class="mobile-brand-mark" aria-hidden="true"><img src="logo.png" alt="" /></div>
+            <div class="mobile-brand-mark" aria-hidden="true"><img src="orbit-logo.svg" alt="" /></div>
             <div class="mobile-brand-text">
               <strong>Elevate</strong>
               <span>vue</span>
@@ -664,6 +678,9 @@
         <nav class="mobile-nav-links">
           <a class="active" href="dashboard.html">Dashboard</a>
           <a href="clienthub.html">Client Hub</a>
+          <a href="strategy.html">Strategy</a>
+          <a href="brand.html">Brand</a>
+          <a href="ad-copy-grader.html">Campaign Center</a>
           <a href="connect.html">Connect</a>
           <a href="upload.html">Scheduling</a>
           <a href="report.html">Report</a>
@@ -702,6 +719,15 @@
             <div class="hub-meta">Connected now</div>
           </a>
 
+          <a class="hub-card available accent-purple" href="strategy.html">
+            <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-spark"></use></svg></div>
+            <div>
+              <h3>Strategy</h3>
+              <p>Generate brand scorecards, ICPs, and positioning plans with a single strategic workspace.</p>
+            </div>
+            <div class="hub-meta">Strategy</div>
+          </a>
+
           <a class="hub-card available accent-purple" href="upload.html">
             <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-grid"></use></svg></div>
             <div>
@@ -720,31 +746,31 @@
             <div class="hub-meta">Connected now</div>
           </a>
 
-          <article class="hub-card soon accent-purple">
+          <a class="hub-card available accent-purple" href="brand.html">
             <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-spark"></use></svg></div>
             <div>
               <h3>Brand Hub</h3>
-              <p>The source of truth for assets, guidelines, and visual identity standards.</p>
+              <p>Build a brand voice guide and generate sharp tagline options from one focused workspace.</p>
             </div>
-            <div class="hub-meta">Coming later</div>
-          </article>
+            <div class="hub-meta">Brand tools</div>
+          </a>
 
-          <article class="hub-card soon">
+          <a class="hub-card available accent-purple" href="content-lab.html">
             <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-help"></use></svg></div>
             <div>
               <h3>Content Lab</h3>
-              <p>Sandbox for creative experimentation, drafting, and collaborative storytelling.</p>
+              <p>Plan, create, and generate social posts, hooks, captions, and content ideas in one hub.</p>
             </div>
-            <div class="hub-meta">Coming later</div>
-          </article>
+            <div class="hub-meta">Open Content Lab</div>
+          </a>
 
-          <a class="hub-card available accent-cyan" href="post-queue.html">
+          <a class="hub-card available accent-cyan" href="ad-copy-grader.html">
             <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-plus-ring"></use></svg></div>
             <div>
               <h3>Campaign Center</h3>
-              <p>Macro-management of multi-channel initiatives, budgets, and seasonal targets.</p>
+              <p>Grade ad copy and build polished creative briefs for paid and organic campaigns.</p>
             </div>
-            <div class="hub-meta">Connected now</div>
+            <div class="hub-meta">Campaign tools</div>
           </a>
 
           <a class="hub-card available" href="clienthub.html">
@@ -802,3 +828,4 @@
   </script>
 </body>
 </html>
+

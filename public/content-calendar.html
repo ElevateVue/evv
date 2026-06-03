@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Calendar - Content Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+  <script defer src="content-lab.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div><div class="brand-name">Orbit</div><div class="brand-sub">by Elevate Vue</div></div><button class="icon-btn" id="closeSidebar" aria-label="Close menu">&times;</button></div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card"><div class="avatar">C</div><div><div class="name">Content Lab</div><div class="email">Create better campaigns</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">&#9776;</button>
+      <div class="brand-inline"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div></div>
+      <div class="spacer"></div>
+      <div class="avatar small">C</div>
+    </header>
+    <main>
+      <section class="content-tool-shell">
+        <header class="content-tool-head">
+          <div>
+            <h1>Content Calendar</h1>
+            <p>Schedule and color-code posts across the month with caption generation.</p>
+          </div>
+          <nav class="content-tabs" aria-label="Content tools">            <a class="active" href="content-calendar.html">Calendar</a>
+            <a href="ghost-writer.html">Ghost Writer</a>
+            <a href="hook-library.html">Hooks</a>
+            <a href="drop-ideas.html">Ideas</a>
+          </nav>
+        </header>
+        <section class="content-tool-panel">
+          <div class="content-calendar-head">
+            <div class="content-legend">
+              <span class="legend-pill image">Image</span>
+              <span class="legend-pill video">Video</span>
+              <span class="legend-pill carousel">Carousel</span>
+              <span class="legend-pill story">Story</span>
+              <span class="legend-pill reel">Reel</span>
+              <span class="legend-pill text">Text</span>
+            </div>
+            <button class="brand-btn" id="newPostBtn" type="button">+ New Post</button>
+          </div>
+          <div class="content-calendar-scroll" id="calendarGrid"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <div class="modal content-modal" id="scheduleModal">
+    <div class="content-modal-card">
+      <h3>Schedule Post</h3>
+      <input id="schDate" class="brand-field" placeholder="Date (YYYY-MM-DD)" />
+      <select id="schPlatform" class="brand-select"><option>Instagram</option><option>Facebook</option><option>LinkedIn</option></select>
+      <select id="schType" class="brand-select"><option value="image">Image</option><option value="video">Video</option><option value="carousel">Carousel</option><option value="story">Story</option><option value="reel">Reel</option><option value="text">Text</option></select>
+      <input id="schTitle" class="brand-field" placeholder="Post title" />
+      <input id="schTopic" class="brand-field" placeholder="Topic for caption generator" />
+      <label class="content-upload-field" for="schMedia">
+        <span>Upload image, video, or post file</span>
+        <input id="schMedia" type="file" accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx" />
+      </label>
+      <div class="content-media-preview" id="schMediaPreview">No media selected</div>
+      <textarea id="schCaption" class="brand-textarea" rows="4" placeholder="Caption..."></textarea>
+      <div class="content-modal-actions">
+        <button class="brand-btn" id="generateCaptionBtn" type="button">Generate Caption</button>
+        <button class="copy-btn" id="saveCaptionBtn" type="button">Save</button>
+        <button class="copy-btn" id="copyCaptionBtn" type="button">Copy</button>
+        <button class="brand-btn" id="saveScheduleBtn" type="button">Schedule Post</button>
+        <button class="copy-btn" id="cancelScheduleBtn" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>
+

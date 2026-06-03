@@ -1,12 +1,15 @@
-(function () {
+﻿(function () {
   const PAGE_MAP = {
     'featurehub.html': { name: 'Feature Hub', category: 'Overview' },
     'dashboard-overview.html': { name: 'Dashboard', category: 'Analytics' },
+    'brand.html': { name: 'Brand', category: 'Strategy' },
     'connect.html': { name: 'Connect', category: 'Connections' },
     'upload.html': { name: 'Scheduling', category: 'Publishing' },
     'report.html': { name: 'Report', category: 'Insights' },
     'report-backup.html': { name: 'Report Backup', category: 'Insights' },
-    'post-queue.html': { name: 'Campaign Center', category: 'Publishing' },
+    'post-queue.html': { name: 'Post Queue', category: 'Publishing' },
+    'ad-copy-grader.html': { name: 'Ad Copy Grader', category: 'Campaign Center' },
+    'creative-brief-builder.html': { name: 'Creative Brief Builder', category: 'Campaign Center' },
     'analytics.html': { name: 'Analytics', category: 'Analytics' },
     'clienthub.html': { name: 'Client Hub', category: 'Admin' }
   };
@@ -189,3 +192,4 @@
     });
   };
 })();
+

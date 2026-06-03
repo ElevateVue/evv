@@ -7,6 +7,11 @@ const { google } = require('googleapis');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
 
+const rootEnvPath = path.join(__dirname, '..', 'API.env');
+if (fs.existsSync(rootEnvPath)) {
+  require('dotenv').config({ path: rootEnvPath, override: true });
+}
+
 // Load GA4 service account
 let ga4ServiceAccount = null;
 try {
@@ -308,6 +313,83 @@ function parseFileLocally(fileObj, globalIndexOffset) {
   throw new Error('Unsupported CSV format');
 }
 
+function normalizeCsvComparisonRows(fileObj = {}) {
+  const { filename, csv } = fileObj;
+  const parsed = parseCsvTable(csv || '');
+  const headers = parsed.headers || [];
+  const rows = parsed.rows || [];
+  const keyMap = headers.reduce((acc, header, index) => {
+    acc[normalizeKey(header)] = index;
+    return acc;
+  }, {});
+
+  return rows.map((row, index) => ({
+    id: `cmp-${index + 1}`,
+    platform: getRowValue(row, keyMap, ['platform', 'Platform', 'Network']) || platformFromFilename(filename),
+    title: getRowValue(row, keyMap, ['title', 'Title', 'post title', 'content']) || `Row ${index + 1}`,
+    reach: coerceNumber(getRowValue(row, keyMap, ['reach', 'impressions', 'views', 'reach/impressions'])),
+    interactions: coerceNumber(getRowValue(row, keyMap, ['interactions', 'engagements', 'total interactions', 'total engagements'])),
+    clicks: coerceNumber(getRowValue(row, keyMap, ['clicks', 'link clicks', 'profile visits', 'ctr'])),
+    reactions: coerceNumber(getRowValue(row, keyMap, ['reactions', 'likes', 'love', 'thumbs up'])),
+    follows: coerceNumber(getRowValue(row, keyMap, ['follows', 'followers', 'new followers'])),
+    postedAt: parsePostedAt(getRowValue(row, keyMap, ['postedAt', 'Posted At', 'date', 'Date', 'timestamp'])),
+  }));
+}
+
+function summarizeComparisonPosts(posts = []) {
+  const totals = {
+    totalRows: posts.length,
+    totalReach: 0,
+    totalInteractions: 0,
+    totalClicks: 0,
+    totalReactions: 0,
+    totalFollows: 0,
+    tops: [],
+    byPlatform: {},
+  };
+
+  posts.forEach((post) => {
+    const platform = post.platform || 'Unknown';
+    totals.totalReach += post.reach || 0;
+    totals.totalInteractions += post.interactions || 0;
+    totals.totalClicks += post.clicks || 0;
+    totals.totalReactions += post.reactions || 0;
+    totals.totalFollows += post.follows || 0;
+
+    if (!totals.byPlatform[platform]) {
+      totals.byPlatform[platform] = {
+        count: 0,
+        reach: 0,
+        interactions: 0,
+        clicks: 0,
+        reactions: 0,
+        follows: 0,
+      };
+    }
+
+    totals.byPlatform[platform].count += 1;
+    totals.byPlatform[platform].reach += post.reach || 0;
+    totals.byPlatform[platform].interactions += post.interactions || 0;
+    totals.byPlatform[platform].clicks += post.clicks || 0;
+    totals.byPlatform[platform].reactions += post.reactions || 0;
+    totals.byPlatform[platform].follows += post.follows || 0;
+  });
+
+  totals.tops = posts
+    .slice()
+    .sort((a, b) => (b.reach || 0) - (a.reach || 0))
+    .slice(0, 3)
+    .map((post) => ({ title: post.title, platform: post.platform, reach: post.reach, interactions: post.interactions }));
+
+  totals.averageReach = totals.totalRows ? Number((totals.totalReach / totals.totalRows).toFixed(2)) : 0;
+  totals.averageInteractions = totals.totalRows ? Number((totals.totalInteractions / totals.totalRows).toFixed(2)) : 0;
+  totals.averageClicks = totals.totalRows ? Number((totals.totalClicks / totals.totalRows).toFixed(2)) : 0;
+  totals.averageReactions = totals.totalRows ? Number((totals.totalReactions / totals.totalRows).toFixed(2)) : 0;
+  totals.averageFollows = totals.totalRows ? Number((totals.totalFollows / totals.totalRows).toFixed(2)) : 0;
+
+  return totals;
+}
+
 function isProviderAvailable(provider) {
   if (provider === 'gemini') return Boolean(geminiClient);
   if (provider === 'deepseek') return Boolean(DEEPSEEK_API_KEY);
@@ -317,6 +399,144 @@ function isProviderAvailable(provider) {
 function getProviderSequence(preferredProvider, fallbackProviders = []) {
   const sequence = [preferredProvider, ...fallbackProviders].filter(Boolean);
   return sequence.filter((provider, index) => sequence.indexOf(provider) === index);
+}
+
+function getCampaignProviderSequence() {
+  return getProviderSequence(AI_SUGGESTIONS_PROVIDER, ['gemini', 'deepseek']);
+}
+
+function buildCampaignAiErrorMessage(error, toolName) {
+  const message = String(error?.message || '');
+  if (/No AI provider is configured/i.test(message)) {
+    return 'AI is not configured yet. Add a valid GEMINI_API_KEY or DEEPSEEK_API_KEY in API.env, then restart the server.';
+  }
+  if (/invalid|payload|JSON|generate|empty/i.test(message)) {
+    return `${toolName} could not produce a clean result from the details provided. Add a little more context about what you want generated and try again.`;
+  }
+  return `${toolName} could not generate right now. Gemini may be unavailable or rejecting the request, and no fallback provider completed it. Check API.env and restart the server after changes.`;
+}
+
+function buildContentAiErrorMessage(error, toolName) {
+  const message = String(error?.message || '');
+  if (/No AI provider is configured/i.test(message)) {
+    return 'AI is not configured yet. Add a valid GEMINI_API_KEY or DEEPSEEK_API_KEY in API.env, then restart the server.';
+  }
+  if (/invalid|payload|JSON|generate|empty/i.test(message)) {
+    return `${toolName} needs a little more context before it can generate something useful. Add a clearer topic, audience, goal, or key message and try again.`;
+  }
+  return `${toolName} could not generate right now. The API provider may be unavailable or rejecting the request, so try again after checking API.env and restarting the server.`;
+}
+
+function fallbackAdCopyGrade(platform, adCopy) {
+  const text = cleanAiText(adCopy);
+  const hasQuestion = /\?/.test(text);
+  const hasCta = /\b(book|buy|shop|start|try|join|download|learn|claim|schedule|get)\b/i.test(text);
+  const hasBenefit = /\b(save|grow|faster|better|increase|reduce|clear|easy|proven|free)\b/i.test(text);
+  const lengthScore = text.length > 45 && text.length < 240 ? 8 : 6;
+  const scores = {
+    hookStrength: hasQuestion || text.length < 120 ? 7 : 6,
+    clarity: lengthScore,
+    callToAction: hasCta ? 8 : 5,
+    emotionalPull: hasBenefit ? 7 : 5,
+    platformRelevance: /instagram|tiktok/i.test(platform) && text.length > 180 ? 6 : 7,
+  };
+  return {
+    platform,
+    scores,
+    overallScore: Object.values(scores).reduce((sum, score) => sum + score, 0) * 2,
+    strengths: [
+      'The message is direct enough for a reader to understand the offer quickly.',
+      hasBenefit ? 'It includes a clear benefit that gives the audience a reason to care.' : 'It has room to add a stronger audience benefit.',
+      hasCta ? 'The copy includes an action cue that can move people toward conversion.' : 'The core offer is present and can support a stronger call to action.',
+    ],
+    improvements: [
+      'Lead with the most specific audience pain point or desired outcome.',
+      'Make the call to action more concrete and time-bound.',
+      'Add one proof point, number, or differentiator to increase trust.',
+    ],
+    rewrittenVersions: [
+      `Want ${platform} copy that feels clearer and converts faster? ${text.replace(/\s+/g, ' ').replace(/[.!?]*$/, '')}. Start with one focused next step today.`,
+      `Stop guessing what to post. ${text.replace(/\s+/g, ' ').replace(/[.!?]*$/, '')}. Book a quick demo and see the workflow in action.`,
+    ],
+  };
+}
+
+function fallbackCreativeBrief(inputs = {}) {
+  const campaignName = cleanAiText(inputs.campaignName || 'Campaign');
+  const platforms = cleanAiText(inputs.platforms || 'Selected platforms');
+  const objective = cleanAiText(inputs.objective || 'Drive measurable campaign results');
+  const audience = cleanAiText(inputs.audience || 'Target audience');
+  const tone = cleanAiText(inputs.tone || 'Professional');
+  const keyMessage = cleanAiText(inputs.keyMessage || 'Communicate a clear value proposition');
+  return {
+    brief: {
+      campaignOverview: `${campaignName} is a ${tone.toLowerCase()} campaign for ${platforms}. The campaign focuses on ${objective.toLowerCase()} with the core message: ${keyMessage}. Budget: ${cleanAiText(inputs.budget || 'Not specified')}. Deadline: ${cleanAiText(inputs.deadline || 'Not specified')}.`,
+      objectivesKpis: `Primary objective: ${objective}. Recommended KPIs include reach, click-through rate, saves, qualified leads, conversion rate, and cost per result.`,
+      targetAudienceDeepDive: `The campaign should speak to ${audience}. Focus on their practical pain points, desired outcomes, objections, and the moment that makes them ready to act.`,
+      creativeDirectionMood: `Use a ${tone.toLowerCase()} visual and verbal direction. Keep layouts clean, benefit-led, and easy to scan on mobile.`,
+      contentFormatRecommendations: `Use short-form video, carousel explainers, testimonial proof, static offer posts, and retargeting variants adapted to ${platforms}.`,
+      keyMessagesHooks: `Lead with the strongest outcome, then support it with proof. Example hook: "What changes when ${audience} can ${objective.toLowerCase()} without extra friction?"`,
+      callToActionOptions: 'Book a demo, Start today, Get the guide, See the workflow, Claim your strategy session.',
+      successMetrics: 'Track impressions, engagement rate, CTR, conversion rate, leads generated, cost per lead, and creative fatigue after launch.',
+      conclusion: `${campaignName} should stay focused on one audience, one promise, and one next action. Strong creative consistency will make the campaign easier to test and optimize.`,
+    },
+  };
+}
+
+function fallbackCaption({ topic, title, platform, postType }) {
+  const subject = cleanAiText(topic || title || 'your next update');
+  return {
+    provider: 'local-fallback',
+    caption: `A clear ${postType || 'post'} for ${platform || 'Instagram'}: ${subject}.\n\nKeep the message focused, show the value fast, and end with one simple action your audience can take today.`,
+    hashtags: ['#ContentStrategy', '#SocialMedia', '#Marketing', '#BrandGrowth'],
+  };
+}
+
+function fallbackGhost({ topic, platform, tone, audience, keyPoints }) {
+  const subject = cleanAiText(topic || 'your topic');
+  const safeAudience = cleanAiText(audience || 'your audience');
+  const points = cleanAiText(keyPoints || 'clarity, consistency, action');
+  return {
+    provider: 'local-fallback',
+    content: `${subject}\n\nFor ${safeAudience}, the strongest ${platform || 'content'} starts with a clear promise. A ${String(tone || 'professional').toLowerCase()} tone should explain the problem, show why it matters now, and give the reader a useful next step.\n\nKey points to cover: ${points}.\n\nClose by connecting the idea to a practical outcome the audience can remember and act on.`,
+    differentiation: 'This version differentiates by focusing on a specific audience problem, a clear point of view, and a practical action rather than generic awareness copy.',
+    keyPointsCovered: points.split(',').map((point) => cleanAiText(point)).filter(Boolean),
+  };
+}
+
+function fallbackHooks({ topic, tone, platform, count }) {
+  const subject = cleanAiText(topic || 'your content');
+  const safeCount = Math.min(12, Math.max(4, Number(count) || 8));
+  return {
+    provider: 'local-fallback',
+    hooks: [
+      `The truth about ${subject}`,
+      `Stop making this ${platform || 'content'} mistake`,
+      `What nobody tells you about ${subject}`,
+      `Before you post about ${subject}, read this`,
+      `${subject}: the simple fix`,
+      `Why ${subject} is not working yet`,
+      `A better way to approach ${subject}`,
+      `Use this ${String(tone || 'curiosity').toLowerCase()} angle for ${subject}`,
+      `If ${subject} feels hard, start here`,
+      `Turn ${subject} into action`,
+      `The fastest way to clarify ${subject}`,
+      `Your audience needs this about ${subject}`,
+    ].slice(0, safeCount),
+  };
+}
+
+function fallbackIdeas({ industry, platform, goal, count }) {
+  const safeIndustry = cleanAiText(industry || 'your niche');
+  const safeGoal = cleanAiText(goal || 'engagement');
+  const safeCount = Math.min(20, Math.max(6, Number(count) || 10));
+  return {
+    provider: 'local-fallback',
+    ideas: Array.from({ length: safeCount }, (_, index) => ({
+      title: `${safeIndustry} idea ${index + 1}`,
+      description: `Create a ${platform || 'social'} post that supports ${safeGoal.toLowerCase()} by showing one audience problem, one useful insight, and one clear next step.`,
+    })),
+  };
 }
 
 async function callDeepSeekJson(prompt, input, invalidMessage) {
@@ -372,12 +592,110 @@ async function callDeepSeekJson(prompt, input, invalidMessage) {
 async function callGeminiJson(prompt, input, modelName, invalidMessage) {
   if (!geminiClient) throw new Error('Gemini API key not configured');
 
-  const model = geminiClient.getGenerativeModel({ model: modelName });
-  const result = await model.generateContent(`${prompt}\n\n${input}`);
-  const text = result?.response?.text?.() || '';
-  const jsonText = extractJsonPayload(text);
-  if (!jsonText) throw new Error(invalidMessage);
-  return JSON.parse(jsonText);
+  try {
+    const model = geminiClient.getGenerativeModel({
+      model: modelName,
+      generationConfig: { responseMimeType: 'application/json' },
+    });
+    const result = await model.generateContent(`${prompt}\n\n${input}`);
+    const text = result?.response?.text?.() || '';
+    const jsonText = extractJsonPayload(text);
+    if (!jsonText) throw new Error(invalidMessage);
+    return JSON.parse(jsonText);
+  } catch (error) {
+    const message = error?.message || '';
+    if (/api key|permission|quota|billing|403|401|429/i.test(message)) {
+      throw new Error(`Gemini API issue: ${message}`);
+    }
+    throw error;
+  }
+}
+
+async function callAiJsonSequence(providers, prompt, input, invalidMessage) {
+  const errors = [];
+
+  for (const provider of providers) {
+    if (!isProviderAvailable(provider)) continue;
+
+    try {
+      if (provider === 'gemini') {
+        return await callGeminiJson(prompt, input, GEMINI_SUGGESTIONS_MODEL, invalidMessage);
+      }
+      if (provider === 'deepseek') {
+        return await callDeepSeekJson(prompt, input, invalidMessage);
+      }
+      throw new Error(`Unsupported AI provider: ${provider}`);
+    } catch (error) {
+      errors.push({ provider, message: error.message || 'Unknown error' });
+    }
+  }
+
+  if (!errors.length) {
+    throw new Error('No AI provider is configured or available. Set GEMINI_API_KEY or DEEPSEEK_API_KEY in your environment.');
+  }
+
+  throw new Error(`AI generation failed: ${errors.map((entry) => `${entry.provider}: ${entry.message}`).join(' | ')}`);
+}
+
+function cleanAiText(value = '') {
+  return String(value || '')
+    .replace(/\*\*/g, '')
+    .replace(/[`[\]]/g, '')
+    .replace(/^\s*[-*]\s+/gm, '')
+    .replace(/^\s*#{1,6}\s*/gm, '')
+    .replace(/\s+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+    .replace(/^"|"$/g, '');
+}
+
+function cleanAiList(value) {
+  if (Array.isArray(value)) return value.map(cleanAiText).filter(Boolean).slice(0, 8);
+  const text = cleanAiText(value);
+  return text ? [text] : [];
+}
+
+function clampScore(value, max = 10) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(max, Math.round(numeric)));
+}
+
+function normalizeAdCopyGradeResult(raw = {}, platform = '') {
+  const scores = raw.scores || {};
+  const normalizedScores = {
+    hookStrength: clampScore(scores.hookStrength),
+    clarity: clampScore(scores.clarity),
+    callToAction: clampScore(scores.callToAction),
+    emotionalPull: clampScore(scores.emotionalPull),
+    platformRelevance: clampScore(scores.platformRelevance),
+  };
+  const scoreTotal = Object.values(normalizedScores).reduce((sum, score) => sum + score, 0);
+  return {
+    platform: cleanAiText(raw.platform || platform),
+    scores: normalizedScores,
+    overallScore: clampScore(raw.overallScore || scoreTotal * 2, 100),
+    strengths: cleanAiList(raw.strengths),
+    improvements: cleanAiList(raw.improvements),
+    rewrittenVersions: cleanAiList(raw.rewrittenVersions || raw.rewrittenVersion),
+  };
+}
+
+function normalizeCreativeBriefResult(raw = {}) {
+  const brief = raw.brief || raw;
+  return {
+    brief: {
+      campaignOverview: cleanAiText(brief.campaignOverview),
+      objectivesKpis: cleanAiText(brief.objectivesKpis),
+      targetAudienceDeepDive: cleanAiText(brief.targetAudienceDeepDive),
+      creativeDirectionMood: cleanAiText(brief.creativeDirectionMood),
+      contentFormatRecommendations: cleanAiText(brief.contentFormatRecommendations),
+      keyMessagesHooks: cleanAiText(brief.keyMessagesHooks),
+      callToActionOptions: cleanAiText(brief.callToActionOptions),
+      successMetrics: cleanAiText(brief.successMetrics),
+      conclusion: cleanAiText(brief.conclusion),
+    },
+  };
 }
 
 async function normalizeFileWithProvider(fileObj, provider) {
@@ -994,7 +1312,16 @@ function upsertClientHubRecord(sessionUser, payload = {}) {
 }
 
 const PUBLIC_ROUTES = new Set(['/landing.html', '/login.html', '/signin.html']);
-const PUBLIC_API_ROUTES = new Set(['/api/health', '/api/newsletter/subscribe']);
+const PUBLIC_API_ROUTES = new Set([
+  '/api/health',
+  '/api/newsletter/subscribe',
+  '/api/campaign/ad-copy-grade',
+  '/api/campaign/creative-brief',
+  '/api/generate/caption',
+  '/api/generate/ghost',
+  '/api/generate/hooks',
+  '/api/generate/ideas',
+]);
 
 const serveStatic = (req, res) => {
   let safePath = req.url === '/' ? '/landing.html' : req.url.split('?')[0];
@@ -1030,6 +1357,8 @@ const server = http.createServer(async (req, res) => {
     });
     return res.end();
   }
+
+  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
 
   if (req.url === '/api/login' && req.method === 'POST') {
     const { email, password, firstName, lastName, accountType, companyName, role, view, name } = await parseBody(req);
@@ -1071,19 +1400,182 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.url === '/api/posts' && req.method === 'POST') {
-    const { platform, title, transcript } = await parseBody(req);
+    const { platform, title, transcript, postType, scheduledAt, mediaName, mediaType, mediaData } = await parseBody(req);
     if (!platform || !title) return sendJson(res, 400, { message: 'platform and title required' });
+    const scheduledTs = scheduledAt ? Date.parse(String(scheduledAt)) : null;
     const post = {
       id: 'p' + (posts.length + 1),
       platform,
       title,
       transcript: transcript || '',
+      postType: String(postType || 'image'),
+      mediaName: mediaName || null,
+      mediaType: mediaType || null,
+      mediaData: mediaData || null,
       engagement: { likes: 0, comments: 0, shares: 0 },
-      status: 'scheduled',
-      postedAt: null,
+      status: scheduledTs ? 'scheduled' : 'draft',
+      postedAt: scheduledTs || null,
     };
     posts.unshift(post);
     return sendJson(res, 201, { post });
+  }
+
+  // AI generation endpoints for Content Lab
+  if (parsedUrl.pathname === '/api/generate/caption' && req.method === 'POST') {
+    try {
+      const { topic, title, platform, postType, length } = await parseBody(req);
+      const safeTopic = String(topic || title || 'No topic').trim();
+      const safePlatform = String(platform || 'Instagram').trim();
+      const safePostType = String(postType || 'image').trim();
+      const safeLength = String(length || 'short').trim();
+
+      const prompt = [
+        'You are an expert social media copywriter.',
+        'Generate one high-quality caption optimized for the target platform and post type.',
+        'Return JSON only in this exact shape:',
+        '{"caption":"string","hashtags":["string","string"]}',
+        'Rules:',
+        '- Keep the caption concise and engaging.',
+        '- Use appropriate tone and emojis for the platform (do not overuse).',
+        '- Provide up to 6 relevant hashtags in an array.',
+        '- Do not include any markdown or backticks.',
+      ].join('\n');
+
+      const input = `Topic: ${safeTopic}\nPlatform: ${safePlatform}\nPostType: ${safePostType}\nLength: ${safeLength}`;
+      const providers = ['gemini', 'deepseek'];
+      const raw = await callAiJsonSequence(providers, prompt, input, 'AI returned an invalid caption payload');
+      return sendJson(res, 200, { provider: raw.provider || 'gemini', caption: raw.caption || raw.text || '', hashtags: raw.hashtags || raw.tags || [] });
+    } catch (err) {
+      const fallback = fallbackCaption({});
+      return sendJson(res, 200, { ...fallback, notice: buildContentAiErrorMessage(err, 'Caption Generator') });
+    }
+  }
+
+  if (parsedUrl.pathname === '/api/generate/ghost' && req.method === 'POST') {
+    try {
+      const { topic, platform, tone, length, audience, keyPoints } = await parseBody(req);
+      const safeTopic = String(topic || '').trim();
+      const safePlatform = String(platform || 'LinkedIn').trim();
+      const safeTone = String(tone || 'Professional').trim();
+      const safeLength = String(length || 'medium').trim();
+      const safeAudience = String(audience || '').trim();
+      const safeKeyPoints = Array.isArray(keyPoints) ? keyPoints.join(', ') : String(keyPoints || '').trim();
+
+      const prompt = [
+        'You are a professional long-form writer and marketing strategist.',
+        'Write a complete piece based on the inputs. Highlight how this piece differentiates from competitors and cover the requested key points.',
+        'Return JSON only in this exact shape:',
+        '{"content":"string","differentiation":"string","keyPointsCovered":["string"]}',
+        'Rules:',
+        '- Produce clear headings and well-structured paragraphs.',
+        '- Mention competitor-differentiation in the differentiation field.',
+        '- Ensure keyPointsCovered is an array listing the key points covered.',
+      ].join('\n');
+
+      const input = `Topic: ${safeTopic}\nPlatform: ${safePlatform}\nTone: ${safeTone}\nLength: ${safeLength}\nAudience: ${safeAudience}\nKeyPoints: ${safeKeyPoints}`;
+      const providers = ['gemini', 'deepseek'];
+      const raw = await callAiJsonSequence(providers, prompt, input, 'AI returned an invalid ghost-writing payload');
+      return sendJson(res, 200, { provider: raw.provider || 'gemini', content: raw.content || raw.article || '', differentiation: raw.differentiation || '', keyPointsCovered: raw.keyPointsCovered || raw.keyPoints || [] });
+    } catch (err) {
+      const fallback = fallbackGhost({});
+      return sendJson(res, 200, { ...fallback, notice: buildContentAiErrorMessage(err, 'Ghost Writer') });
+    }
+  }
+
+  if (parsedUrl.pathname === '/api/generate/hooks' && req.method === 'POST') {
+    try {
+      const { topic, tone, platform, count } = await parseBody(req);
+      const safeTopic = String(topic || '').trim();
+      const safeTone = String(tone || 'Curiosity').trim();
+      const safePlatform = String(platform || 'Instagram').trim();
+      const safeCount = Math.min(12, Math.max(4, Number(count) || 8));
+
+      const prompt = [
+        'You are a creative marketing copywriter who writes short social hooks.',
+        `Generate ${safeCount} unique short hooks optimized for the platform and tone.`,
+        'Return JSON only in this exact shape:',
+        '{"hooks":["string","string"]}',
+        'Rules:',
+        '- Keep each hook under 12 words.',
+        '- Make hooks punchy, curiosity-driven or emotional depending on tone.',
+      ].join('\n');
+
+      const input = `Topic: ${safeTopic}\nTone: ${safeTone}\nPlatform: ${safePlatform}\nCount: ${safeCount}`;
+      const providers = ['gemini', 'deepseek'];
+      const raw = await callAiJsonSequence(providers, prompt, input, 'AI returned an invalid hooks payload');
+      return sendJson(res, 200, { provider: raw.provider || 'gemini', hooks: raw.hooks || raw.list || [] });
+    } catch (err) {
+      const fallback = fallbackHooks({});
+      return sendJson(res, 200, { ...fallback, notice: buildContentAiErrorMessage(err, 'Hook Library') });
+    }
+  }
+
+  if (parsedUrl.pathname === '/api/generate/ideas' && req.method === 'POST') {
+    try {
+      const { industry, platform, goal, count } = await parseBody(req);
+      const safeIndustry = String(industry || '').trim();
+      const safePlatform = String(platform || 'Instagram').trim();
+      const safeGoal = String(goal || 'More Engagement').trim();
+      const safeCount = Math.min(20, Math.max(6, Number(count) || 10));
+
+      const prompt = [
+        'You are a senior social media strategist generating actionable content ideas.',
+        `Produce ${safeCount} creative content ideas tailored to the industry, platform, and goal.`,
+        'Return JSON only in this exact shape:',
+        '{"ideas":[{"title":"string","description":"string"}]}',
+        'Rules:',
+        '- Each idea should be concise and include a short execution note in description.',
+      ].join('\n');
+
+      const input = `Industry: ${safeIndustry}\nPlatform: ${safePlatform}\nGoal: ${safeGoal}\nCount: ${safeCount}`;
+      const providers = ['gemini', 'deepseek'];
+      const raw = await callAiJsonSequence(providers, prompt, input, 'AI returned an invalid ideas payload');
+      return sendJson(res, 200, { provider: raw.provider || 'gemini', ideas: raw.ideas || raw.list || [] });
+    } catch (err) {
+      const fallback = fallbackIdeas({});
+      return sendJson(res, 200, { ...fallback, notice: buildContentAiErrorMessage(err, 'Drop Ideas') });
+    }
+  }
+
+  if (parsedUrl.pathname === '/api/compare-metrics' && req.method === 'POST') {
+    try {
+      const { platform, fileOne, fileTwo } = await parseBody(req);
+      if (!platform || !fileOne || !fileTwo) {
+        return sendJson(res, 400, { message: 'Platform and both CSV files are required.' });
+      }
+
+      const fileOneRows = normalizeCsvComparisonRows({ filename: `${platform}-one.csv`, csv: fileOne });
+      const fileTwoRows = normalizeCsvComparisonRows({ filename: `${platform}-two.csv`, csv: fileTwo });
+
+      const fileOneSummary = summarizeComparisonPosts(fileOneRows);
+      const fileTwoSummary = summarizeComparisonPosts(fileTwoRows);
+
+      const prompt = [
+        'You are an analytics consultant skilled at comparing social media reporting exports.',
+        'Compare the two CSV summaries and explain the main differences, strengths, weaknesses, and recommendations for the next campaign.',
+        'Return JSON only in this exact shape:',
+        '{"strengths":["string"],"weaknesses":["string"],"recommendations":["string"]}',
+        'Rules:',
+        '- Focus on the platform and file comparison context.',
+        '- Mention which file is stronger on reach, engagement, clicks, and audience growth.',
+        '- Provide at least 3 strengths and 3 weaknesses, plus 3 practical recommendations.',
+        '- Do not include markdown, backticks, or extra wrappers in the values.',
+      ].join('\n');
+
+      const input = `Platform: ${platform}\nFile One Summary: ${JSON.stringify(fileOneSummary)}\nFile Two Summary: ${JSON.stringify(fileTwoSummary)}`;
+      const providers = ['deepseek', 'gemini'];
+      const raw = await callAiJsonSequence(providers, prompt, input, 'AI returned an invalid comparison payload');
+
+      return sendJson(res, 200, {
+        fileOneSummary,
+        fileTwoSummary,
+        strengths: raw.strengths || raw.strongPoints || raw.strength || [],
+        weaknesses: raw.weaknesses || raw.weakness || raw.weakPoints || [],
+        recommendations: raw.recommendations || raw.nextSteps || raw.actionItems || [],
+      });
+    } catch (err) {
+      return sendJson(res, 500, { message: err.message || 'Failed to compare metrics' });
+    }
   }
 
   if (req.url.startsWith('/api/posts/') && req.url.endsWith('/publish') && req.method === 'POST') {
@@ -1094,8 +1586,6 @@ const server = http.createServer(async (req, res) => {
     post.postedAt = Date.now();
     return sendJson(res, 200, { post });
   }
-
-  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
 
   if (parsedUrl.pathname === '/api/health') {
     return sendJson(res, 200, { ok: true, time: new Date().toISOString() });
@@ -1186,6 +1676,97 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { ok: true, email: result });
     } catch (err) {
       return sendJson(res, 500, { message: 'Failed to send approval email.', error: err.message });
+    }
+  }
+
+  if (parsedUrl.pathname === '/api/campaign/ad-copy-grade' && req.method === 'POST') {
+    const { platform, adCopy } = await parseBody(req);
+    const safePlatform = cleanAiText(platform || '');
+    const safeAdCopy = String(adCopy || '').trim();
+
+    if (!safePlatform) return sendJson(res, 400, { message: 'Please choose an ad platform.' });
+    if (!safeAdCopy) return sendJson(res, 400, { message: 'Please paste ad copy to grade.' });
+
+    const prompt = [
+      'You are an expert paid media copy strategist.',
+      'Grade the ad copy for the selected platform and return JSON only.',
+      'Use this exact JSON shape:',
+      '{"platform":"string","scores":{"hookStrength":0,"clarity":0,"callToAction":0,"emotionalPull":0,"platformRelevance":0},"overallScore":0,"strengths":["string"],"improvements":["string"],"rewrittenVersions":["string"]}',
+      'Rules:',
+      '- Each category score must be an integer from 1 to 10.',
+      '- overallScore must be an integer from 1 to 100.',
+      '- Provide 3 to 5 strengths and 3 to 5 improvements.',
+      '- Provide 1 to 3 rewritten ad copy versions that are ready to use.',
+      '- Do not use markdown, asterisks, square brackets, unnecessary quotation marks, or decorative labels inside text values.',
+      '- Make the rewrite fit the selected platform norms.',
+    ].join('\n');
+
+    const input = `Platform: ${safePlatform}\nAd Copy:\n${safeAdCopy}`;
+
+    try {
+      const providerSequence = getCampaignProviderSequence();
+      const raw = await callAiJsonSequence(providerSequence, prompt, input, 'AI returned an invalid ad copy grading payload');
+      return sendJson(res, 200, { ok: true, result: normalizeAdCopyGradeResult(raw, safePlatform) });
+    } catch (err) {
+      return sendJson(res, 200, {
+        ok: true,
+        result: fallbackAdCopyGrade(safePlatform, safeAdCopy),
+        notice: buildCampaignAiErrorMessage(err, 'Ad Copy Grader'),
+      });
+    }
+  }
+
+  if (parsedUrl.pathname === '/api/campaign/creative-brief' && req.method === 'POST') {
+    const { inputs = {} } = await parseBody(req);
+    const safeInputs = {
+      campaignName: cleanAiText(inputs.campaignName || ''),
+      platforms: cleanAiText(inputs.platforms || ''),
+      objective: cleanAiText(inputs.objective || ''),
+      audience: cleanAiText(inputs.audience || ''),
+      tone: cleanAiText(inputs.tone || 'Professional'),
+      budget: cleanAiText(inputs.budget || 'Not specified'),
+      deadline: cleanAiText(inputs.deadline || 'Not specified'),
+      keyMessage: cleanAiText(inputs.keyMessage || ''),
+    };
+
+    if (!safeInputs.campaignName || !safeInputs.objective || !safeInputs.audience || !safeInputs.keyMessage) {
+      return sendJson(res, 400, { message: 'Campaign name, objective, target audience, and key message are required.' });
+    }
+
+    const prompt = [
+      'You are an expert creative strategist for paid and organic campaigns.',
+      'Build a professional creative brief and return JSON only.',
+      'Use this exact JSON shape:',
+      '{"brief":{"campaignOverview":"string","objectivesKpis":"string","targetAudienceDeepDive":"string","creativeDirectionMood":"string","contentFormatRecommendations":"string","keyMessagesHooks":"string","callToActionOptions":"string","successMetrics":"string","conclusion":"string"}}',
+      'Rules:',
+      '- Write complete polished sections, not markdown.',
+      '- Do not use asterisks, square brackets, unnecessary quotation marks, or placeholder labels.',
+      '- Include campaign name, platforms, budget, and deadline inside campaignOverview.',
+      '- Include practical KPIs, audience motivations, mood, content formats, hooks, CTA options, and success metrics.',
+      '- Keep each section concise but useful for a marketing team.',
+    ].join('\n');
+
+    const input = [
+      `Campaign Name: ${safeInputs.campaignName}`,
+      `Platforms: ${safeInputs.platforms}`,
+      `Objective: ${safeInputs.objective}`,
+      `Target Audience: ${safeInputs.audience}`,
+      `Tone: ${safeInputs.tone}`,
+      `Budget: ${safeInputs.budget}`,
+      `Deadline: ${safeInputs.deadline}`,
+      `Key Message: ${safeInputs.keyMessage}`,
+    ].join('\n');
+
+    try {
+      const providerSequence = getCampaignProviderSequence();
+      const raw = await callAiJsonSequence(providerSequence, prompt, input, 'AI returned an invalid creative brief payload');
+      return sendJson(res, 200, { ok: true, result: normalizeCreativeBriefResult(raw) });
+    } catch (err) {
+      return sendJson(res, 200, {
+        ok: true,
+        result: fallbackCreativeBrief(safeInputs),
+        notice: buildCampaignAiErrorMessage(err, 'Creative Brief Builder'),
+      });
     }
   }
 

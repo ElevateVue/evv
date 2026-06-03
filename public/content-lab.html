@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Lab - EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div><div class="brand-name">Orbit</div><div class="brand-sub">by Elevate Vue</div></div><button class="icon-btn" id="closeSidebar" aria-label="Close menu">&times;</button></div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card"><div class="avatar">C</div><div><div class="name">Content Lab</div><div class="email">Create better campaigns</div></div></div>
+  </aside>
+
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">&#9776;</button>
+      <div class="brand-inline"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div></div>
+      <div class="spacer"></div>
+      <div class="avatar small">C</div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panel-head overview-head">
+          <div class="overview-copy">
+            <h1>Content Lab</h1>
+            <p>Launch the content workflow that connects scheduling, writing, hooks, and idea generation in one place.</p>
+          </div>
+        </div>
+        <div class="hub-grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
+          <a class="hub-card available" href="content-calendar.html">
+            <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-grid"></use></svg></div>
+            <div><h3>Content Calendar</h3><p>Schedule and color-code posts across days with caption generation built into the workflow.</p></div>
+          </a>
+          <a class="hub-card available accent-cyan" href="ghost-writer.html">
+            <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-spark"></use></svg></div>
+            <div><h3>Ghost Writer</h3><p>Generate long-form, platform-optimized content briefs with tone, audience, and key points.</p></div>
+          </a>
+          <a class="hub-card available accent-purple" href="hook-library.html">
+            <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-arrow-up-right"></use></svg></div>
+            <div><h3>Hook Library</h3><p>Create scroll-stopping hooks tailored to niche, tone, and platform.</p></div>
+          </a>
+          <a class="hub-card available" href="drop-ideas.html">
+            <div class="hub-icon"><svg class="hub-icon-svg"><use href="#icon-help"></use></svg></div>
+            <div><h3>Drop Ideas</h3><p>Brainstorm 10 campaign ideas at once for a platform and business goal.</p></div>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

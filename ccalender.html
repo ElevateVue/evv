@@ -1,0 +1,267 @@
+import { useState } from "react";
+import { Plus, ChevronLeft, ChevronRight, Instagram, Linkedin, Facebook, Sparkles, Loader2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+const platformIcons = { instagram: Instagram, linkedin: Linkedin, facebook: Facebook };
+
+// Color coded by POST TYPE
+const postTypeColors = {
+  image:    "bg-blue-500/20 text-blue-300 border-blue-500/30",
+  video:    "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  carousel: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  story:    "bg-pink-500/20 text-pink-300 border-pink-500/30",
+  reel:     "bg-red-500/20 text-red-300 border-red-500/30",
+  text:     "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+};
+
+const statusDots = {
+  draft: "bg-muted-foreground",
+  scheduled: "bg-primary",
+  published: "bg-emerald-400",
+  pending_approval: "bg-amber-400",
+};
+
+const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function getDaysInMonth(year, month) {
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const days = [];
+  for (let i = 0; i < firstDay; i++) days.push(null);
+  for (let i = 1; i <= daysInMonth; i++) days.push(i);
+  return days;
+}
+
+function PostForm({ defaultDate, onClose, onCreate }) {
+  const [form, setForm] = useState({
+    title: "", content: "", platform: "instagram", post_type: "image",
+    status: "scheduled", scheduled_date: defaultDate || "", hashtags: "",
+  });
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  const generateCaption = async () => {
+    if (!aiTopic.trim()) { toast.error("Enter a topic"); return; }
+    setAiLoading(true);
+    const [caption, hashtags] = await Promise.all([
+      base44.integrations.Core.InvokeLLM({ prompt: `Write an engaging ${form.platform} caption about: "${aiTopic}". Max 3 sentences, no hashtags.` }),
+      base44.integrations.Core.InvokeLLM({ prompt: `Generate 10 hashtags for a ${form.platform} post about: "${aiTopic}". Return only hashtags separated by spaces.` }),
+    ]);
+    set("content", caption);
+    set("hashtags", hashtags);
+    set("title", aiTopic);
+    setAiLoading(false);
+    toast.success("Caption generated!");
+  };
+
+  return (
+    <div className="space-y-4 mt-2">
+      {/* AI Generator */}
+      <div className="bg-muted/30 border border-border/50 rounded-xl p-3 space-y-2">
+        <p className="text-xs font-semibold text-primary flex items-center gap-1"><Sparkles className="h-3 w-3" /> AI Caption Generator</p>
+        <div className="flex gap-2">
+          <Input placeholder="Topic to generate from..." value={aiTopic} onChange={e => setAiTopic(e.target.value)} className="bg-muted border-border text-sm flex-1" />
+          <Button size="sm" onClick={generateCaption} disabled={aiLoading} className="gradient-primary text-white border-0 shrink-0">
+            {aiLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+          </Button>
+        </div>
+      </div>
+
+      <Input placeholder="Post title" value={form.title} onChange={e => set("title", e.target.value)} className="bg-muted border-border" />
+      <Textarea placeholder="Write your caption..." value={form.content} onChange={e => set("content", e.target.value)} className="bg-muted border-border min-h-[80px] resize-none" rows={3} />
+      <Input placeholder="#hashtags" value={form.hashtags} onChange={e => set("hashtags", e.target.value)} className="bg-muted border-border text-sm" />
+
+      <div className="grid grid-cols-2 gap-2">
+        <Select value={form.platform} onValueChange={v => set("platform", v)}>
+          <SelectTrigger className="bg-muted border-border text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent className="bg-card border-border">
+            {["instagram","facebook","linkedin","twitter","tiktok"].map(p => <SelectItem key={p} value={p}>{p.charAt(0).toUpperCase()+p.slice(1)}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={form.post_type} onValueChange={v => set("post_type", v)}>
+          <SelectTrigger className="bg-muted border-border text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent className="bg-card border-border">
+            {["image","video","carousel","story","reel","text"].map(t => <SelectItem key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={form.status} onValueChange={v => set("status", v)}>
+          <SelectTrigger className="bg-muted border-border text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent className="bg-card border-border">
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="pending_approval">Pending Approval</SelectItem>
+          </SelectContent>
+        </Select>
+        <Input type="date" value={form.scheduled_date} onChange={e => set("scheduled_date", e.target.value)} className="bg-muted border-border text-sm" />
+      </div>
+
+      <div className="flex gap-2 pt-1">
+        <Button variant="outline" onClick={onClose} className="flex-1 border-border">Cancel</Button>
+        <Button onClick={() => onCreate(form)} disabled={!form.title} className="flex-1 gradient-primary text-white border-0">
+          Schedule Post
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default function ContentCalendar() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const queryClient = useQueryClient();
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const days = getDaysInMonth(year, month);
+  const monthName = currentDate.toLocaleString("default", { month: "long", year: "numeric" });
+
+  const { data: posts = [] } = useQuery({
+    queryKey: ["content-posts"],
+    queryFn: () => base44.entities.ContentPost.list("-created_date", 200),
+  });
+
+  const createPost = useMutation({
+    mutationFn: (data) => base44.entities.ContentPost.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["content-posts"] });
+      setDialogOpen(false);
+      setSelectedDay(null);
+      toast.success("Post scheduled!");
+    },
+  });
+
+  const getPostsForDay = (day) => {
+    if (!day) return [];
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    return posts.filter((p) => p.scheduled_date && p.scheduled_date.startsWith(dateStr));
+  };
+
+  const openForDay = (day) => {
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    setSelectedDay(dateStr);
+    setDialogOpen(true);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-heading font-bold text-foreground">Content Calendar</h1>
+          <p className="text-muted-foreground mt-1">Plan, schedule, and manage your content.</p>
+        </div>
+        <Button onClick={() => { setSelectedDay(""); setDialogOpen(true); }} className="gradient-primary text-white border-0 gap-2">
+          <Plus className="h-4 w-4" /> New Post
+        </Button>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-2">
+        {Object.entries(postTypeColors).map(([type, cls]) => (
+          <span key={type} className={cn("text-[10px] font-semibold px-2.5 py-1 rounded-full border", cls)}>
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </span>
+        ))}
+      </div>
+
+      {/* Calendar */}
+      <div className="glass-card rounded-xl p-5 glow-primary">
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-2 rounded-lg hover:bg-muted transition-colors">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <h2 className="font-heading font-semibold text-lg">{monthName}</h2>
+          <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-2 rounded-lg hover:bg-muted transition-colors">
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {daysOfWeek.map(d => <div key={d} className="text-center text-xs font-medium text-muted-foreground py-2">{d}</div>)}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((day, i) => {
+            const dayPosts = getPostsForDay(day);
+            const isToday = day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
+            return (
+              <div
+                key={i}
+                onClick={() => day && openForDay(day)}
+                className={cn(
+                  "min-h-[80px] lg:min-h-[100px] rounded-lg p-1.5 text-sm transition-colors",
+                  day ? "bg-muted/30 hover:bg-muted/50 cursor-pointer" : "",
+                  isToday && "ring-1 ring-primary/50 bg-primary/5"
+                )}
+              >
+                {day && (
+                  <>
+                    <span className={cn("text-xs font-medium", isToday ? "text-primary font-bold" : "text-muted-foreground")}>{day}</span>
+                    <div className="space-y-0.5 mt-1">
+                      {dayPosts.slice(0, 3).map(post => {
+                        const PIcon = platformIcons[post.platform];
+                        const typeColor = postTypeColors[post.post_type] || postTypeColors.text;
+                        return (
+                          <div key={post.id} onClick={e => { e.stopPropagation(); setSelectedPost(post); }}
+                            className={cn("text-[10px] px-1.5 py-0.5 rounded truncate flex items-center gap-1 border cursor-pointer hover:opacity-80", typeColor)}>
+                            {PIcon && <PIcon className="h-2.5 w-2.5 shrink-0" />}
+                            <span className="truncate">{post.title}</span>
+                          </div>
+                        );
+                      })}
+                      {dayPosts.length > 3 && <span className="text-[10px] text-muted-foreground px-1">+{dayPosts.length - 3} more</span>}
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Schedule Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={v => { if (!v) { setDialogOpen(false); setSelectedDay(null); } }}>
+        <DialogContent className="bg-card border-border max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading">Schedule Post {selectedDay && `— ${selectedDay}`}</DialogTitle>
+          </DialogHeader>
+          <PostForm
+            defaultDate={selectedDay}
+            onClose={() => { setDialogOpen(false); setSelectedDay(null); }}
+            onCreate={(data) => createPost.mutate(data)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Post Detail Dialog */}
+      {selectedPost && (
+        <Dialog open={!!selectedPost} onOpenChange={v => !v && setSelectedPost(null)}>
+          <DialogContent className="bg-card border-border max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="font-heading">{selectedPost.title}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 mt-2">
+              <div className="flex gap-2 flex-wrap">
+                <span className={cn("text-xs px-2 py-0.5 rounded-full border font-medium", postTypeColors[selectedPost.post_type] || postTypeColors.text)}>{selectedPost.post_type}</span>
+                <span className={cn("text-xs px-2 py-0.5 rounded-full flex items-center gap-1", statusDots[selectedPost.status] ? "bg-muted" : "")}><span className={cn("h-1.5 w-1.5 rounded-full", statusDots[selectedPost.status])} />{selectedPost.status?.replace("_", " ")}</span>
+              </div>
+              {selectedPost.content && <p className="text-sm text-foreground/80 leading-relaxed">{selectedPost.content}</p>}
+              {selectedPost.hashtags && <p className="text-xs text-primary">{selectedPost.hashtags}</p>}
+              {selectedPost.scheduled_date && <p className="text-xs text-muted-foreground">📅 {selectedPost.scheduled_date}</p>}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
+  );
+}

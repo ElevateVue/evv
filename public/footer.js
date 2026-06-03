@@ -30,9 +30,9 @@ function buildFooterMarkup() {
     <div class="evv-footer-shell">
       <div class="evv-footer-main">
         <div class="evv-footer-brand">
-          <a href="landing.html" class="evv-footer-logo" aria-label="Go to Elevate Vue home">
-            <img src="logo.png" alt="Elevate Vue" class="brand-badge" />
-            <span>ELEVATE VUE</span>
+          <a href="landing.html" class="evv-footer-logo" aria-label="Go to Orbit home">
+            <img src="orbit-logo.svg" alt="Orbit" class="brand-badge" />
+            <span>ORBIT <em>by Elevate Vue</em></span>
           </a>
           <p>Elevating social voices through strategy, analytics, and editorial precision.</p>
           <div class="evv-footer-socials" aria-label="Footer quick links">
@@ -41,7 +41,7 @@ function buildFooterMarkup() {
                 <path d="M12 4.2 5 9.7v8.1h4.7v-4.5h4.6v4.5H19V9.7l-7-5.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
               </svg>
             </a>
-            <a href="mailto:support@elevatevue.com?subject=Elevate%20Vue%20Support" class="evv-footer-social" aria-label="Email support">
+            <a href="mailto:support@orbit.com?subject=Orbit%20Support" class="evv-footer-social" aria-label="Email support">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <rect x="4" y="6" width="16" height="12" rx="2.4" stroke="currentColor" stroke-width="1.8"/>
                 <path d="m5.5 7.5 6.5 5 6.5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -61,7 +61,7 @@ function buildFooterMarkup() {
           <a href="dashboard.html">Dashboard</a>
           <a href="connect.html">Connect</a>
           <a href="upload.html">Scheduling</a>
-          <a href="report.html">AI Reports</a>
+          <a href="report.html">Reports</a>
         </div>
 
         <div class="evv-footer-column">
@@ -88,7 +88,7 @@ function buildFooterMarkup() {
       </div>
 
       <div class="evv-footer-bottom">
-        <div class="evv-footer-copy">© ${year} Elevate Vue Digital Systems. All rights reserved.</div>
+        <div class="evv-footer-copy">© ${year} Orbit Digital Systems. All rights reserved.</div>
         <div class="evv-footer-legal">
           <button type="button" data-legal="privacy">Privacy Policy</button>
           <button type="button" data-legal="terms">Terms of Strategy</button>
@@ -218,21 +218,21 @@ function openLegalModal(type) {
     privacy: {
       title: 'Privacy Policy',
       body: `
-        <p>Elevate Vue stores only the information needed to support sign-in, saved reports, queued posts, and newsletter preferences in this demo workspace.</p>
+        <p>Orbit stores only the information needed to support sign-in, saved reports, queued posts, and newsletter preferences in this demo workspace.</p>
         <p>No payment details are collected inside this interface, and you can clear locally saved preferences at any time from cookie settings.</p>
       `,
     },
     terms: {
       title: 'Terms of Strategy',
       body: `
-        <p>Platform insights, generated captions, and AI reports are designed to support editorial decisions, not replace final human review.</p>
+        <p>Platform insights, generated captions, and reports are designed to support editorial decisions, not replace final human review.</p>
         <p>Teams should validate campaign, legal, and brand-sensitive content before publishing or sharing exported reports externally.</p>
       `,
     },
     cookies: {
       title: 'Cookie Settings',
       body: `
-        <p>Choose how Elevate Vue saves local preferences on this device. Essential storage keeps sign-in and basic workflow state. Analytics storage also keeps experience preferences like newsletter and cookie choices.</p>
+        <p>Choose how Orbit saves local preferences on this device. Essential storage keeps sign-in and basic workflow state. Analytics storage also keeps experience preferences like newsletter and cookie choices.</p>
       `,
     },
   };
@@ -250,3 +250,4 @@ function closeLegalModal() {
   modal?.classList.add('hidden');
   document.body.classList.remove('evv-modal-open');
 }
+

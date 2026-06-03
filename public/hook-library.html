@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hook Library - Content Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+  <script defer src="content-lab.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div><div class="brand-name">Orbit</div><div class="brand-sub">by Elevate Vue</div></div><button class="icon-btn" id="closeSidebar" aria-label="Close menu">&times;</button></div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card"><div class="avatar">C</div><div><div class="name">Content Lab</div><div class="email">Create better campaigns</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">&#9776;</button>
+      <div class="brand-inline"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div></div>
+      <div class="spacer"></div>
+      <div class="avatar small">C</div>
+    </header>
+    <main>
+      <section class="content-tool-shell">
+        <header class="content-tool-head">
+          <div>
+            <h1>Hook Library</h1>
+            <p>Create scroll-stopping hooks tailored to topic, tone, and platform.</p>
+          </div>
+          <nav class="content-tabs" aria-label="Content tools">            <a href="content-calendar.html">Calendar</a>
+            <a href="ghost-writer.html">Ghost Writer</a>
+            <a class="active" href="hook-library.html">Hooks</a>
+            <a href="drop-ideas.html">Ideas</a>
+          </nav>
+        </header>
+        <section class="content-tool-panel">
+          <div class="content-form-grid compact">
+            <input id="hkTopic" class="brand-field" placeholder="Your topic or niche..." />
+            <select id="hkTone" class="brand-select"><option>Curiosity</option><option>Inspirational</option><option>Educational</option></select>
+            <select id="hkPlatform" class="brand-select"><option>Instagram</option><option>LinkedIn</option><option>Twitter/X</option></select>
+            <div class="content-ai-actions inline">
+              <button id="hkGenerateBtn" class="brand-btn" type="button">Generate</button>
+              <button id="hkSaveBtn" class="copy-btn" type="button">Save</button>
+              <button id="hkCopyBtn" class="copy-btn" type="button">Copy</button>
+            </div>
+          </div>
+          <div class="content-card-grid hooks" id="hooksList"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>
+

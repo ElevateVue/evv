@@ -1,4 +1,16 @@
 const form = document.getElementById('signinForm');
+const passwordInput = document.getElementById('password');
+const passwordToggle = document.getElementById('passwordToggle');
+
+function togglePasswordVisibility() {
+  if (!passwordInput || !passwordToggle) return;
+  const isVisible = passwordInput.type === 'text';
+  passwordInput.type = isVisible ? 'password' : 'text';
+  passwordToggle.textContent = isVisible ? '👁' : '🙈';
+  passwordToggle.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
+}
+
+passwordToggle?.addEventListener('click', togglePasswordVisibility);
 
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -43,6 +55,22 @@ form?.addEventListener('submit', async (e) => {
     localStorage.setItem('user', JSON.stringify(loginUser));
     localStorage.setItem('portalRole', loginUser.role || 'client');
     document.cookie = `session=${encodeURIComponent(data.token)}; path=/`;
+
+    if (loginUser.role !== 'admin' && loginUser.view !== 'admin') {
+      try {
+        const onboardingResponse = await fetch('/api/onboarding');
+        if (onboardingResponse.ok) {
+          const onboardingData = await onboardingResponse.json();
+          if (onboardingData?.onboarding?.started && !onboardingData?.onboarding?.completed) {
+            window.location.href = '/onboarding.html';
+            return;
+          }
+        }
+      } catch (error) {
+        // Sign-in should still succeed if onboarding status cannot be checked.
+      }
+    }
+
     window.location.href = loginUser.role === 'admin' || loginUser.view === 'admin'
       ? '/clienthub.html'
       : '/featurehub.html';
@@ -50,3 +78,4 @@ form?.addEventListener('submit', async (e) => {
     alert('Login failed. Please try again.');
   }
 });
+

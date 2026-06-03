@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onboarding - EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="onboarding.js"></script>
+</head>
+<body class="onboarding-page">
+  <main class="onboarding-shell" aria-live="polite">
+    <div class="onboarding-progress" aria-hidden="true">
+      <div class="onboarding-progress__bar" id="progressBar"></div>
+    </div>
+
+    <header class="onboarding-topbar">
+      <a class="onboarding-brand" href="/featurehub.html" aria-label="EVV dashboard">
+        <img src="logo.png" alt="" />
+        <span>EVV</span>
+      </a>
+      <div class="onboarding-percent" id="progressLabel">0%</div>
+    </header>
+
+    <section class="onboarding-stage">
+      <div class="onboarding-question" id="questionWrap">
+        <p class="onboarding-kicker" id="questionSection">About You</p>
+        <h1 id="questionTitle">Let's start with your name.</h1>
+        <p class="onboarding-helper" id="questionHelper"></p>
+        <div class="onboarding-control" id="questionControl"></div>
+      </div>
+    </section>
+
+    <footer class="onboarding-actions">
+      <button class="onboarding-ghost" id="backButton" type="button">Back</button>
+      <span class="onboarding-save" id="saveStatus">Saved</span>
+      <button class="onboarding-next" id="nextButton" type="button">Continue</button>
+    </footer>
+  </main>
+</body>
+</html>

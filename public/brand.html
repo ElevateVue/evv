@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand Tools - EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body.brand-page { background: #080d18; color: #edf3ff; }
+    body.brand-page::before { background: #080d18; }
+    .brand-page main { padding: 0; gap: 0; }
+    .brand-shell { min-height: calc(100vh - 69px); background: linear-gradient(180deg, #080d18 0%, #0c1322 58%, #080d18 100%); }
+    .brand-hero { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 30px 32px 28px; border-bottom: 1px solid rgba(148, 163, 184, 0.15); }
+    .brand-heading { display: flex; align-items: flex-start; gap: 20px; min-width: 0; }
+    .brand-title h1 { margin: 0; font-size: 30px; line-height: 1.05; letter-spacing: 0; }
+    .brand-title p { margin: 6px 0 0; color: #86a9e8; font-size: 17px; }
+    .brand-tabs { display: inline-flex; padding: 5px; border-radius: 8px; background: rgba(15, 23, 42, 0.72); border: 1px solid rgba(148, 163, 184, 0.15); }
+    .brand-tab { min-height: 40px; padding: 0 16px; border-radius: 6px; border: 0; background: transparent; color: #8fa2c4; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .brand-tab.active { background: linear-gradient(135deg, #20a7f2, #7137df); color: #fff; }
+    .brand-tool { display: none; padding: 22px 17px 38px; }
+    .brand-tool.active { display: block; }
+    .tool-panel { background: #090f1b; border: 1px solid rgba(49, 65, 91, 0.78); border-radius: 14px; padding: 22px; box-shadow: 0 18px 45px rgba(0,0,0,0.22); }
+    .tool-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+    .tool-card { min-height: 370px; }
+    .tool-card h2 { margin: 0 0 20px; font-size: 20px; letter-spacing: 0; }
+    .brand-form { display: grid; gap: 13px; }
+    .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .brand-field, .brand-select, .brand-textarea { width: 100%; min-height: 41px; border-radius: 11px; border: 1px solid #23304a; background: #111827; color: #eaf0ff; padding: 0 14px; font: inherit; outline: none; }
+    .brand-select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, #8fa2c4 50%), linear-gradient(135deg, #8fa2c4 50%, transparent 50%); background-position: calc(100% - 22px) 17px, calc(100% - 16px) 17px; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+    .brand-textarea { min-height: 88px; resize: vertical; padding-top: 12px; line-height: 1.45; }
+    .brand-field::placeholder, .brand-textarea::placeholder { color: #8a9ab8; }
+    .brand-field:focus, .brand-select:focus, .brand-textarea:focus { border-color: #1fa7ee; box-shadow: 0 0 0 3px rgba(31, 167, 238, 0.15); }
+    .brand-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: fit-content; min-height: 40px; border: 0; border-radius: 10px; padding: 0 18px; background: linear-gradient(135deg, #22a9f4, #7237df); color: #fff; font-weight: 900; font-family: inherit; cursor: pointer; box-shadow: 0 16px 32px rgba(16, 118, 222, 0.24); }
+    .brand-btn:disabled { opacity: .65; cursor: wait; }
+    .dial-stack { display: grid; gap: 24px; }
+    .dial-row { display: grid; gap: 12px; }
+    .dial-labels { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; color: #8797b6; font-size: 14px; }
+    .dial-labels strong { color: #e8edf9; font-size: 14px; text-align: center; }
+    .dial-labels span:last-child { text-align: right; }
+    .dial-row input[type="range"] { width: 100%; accent-color: #1ea7ed; }
+    .result-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+    .result-card { background: #0b1220; border: 1px solid rgba(49, 65, 91, 0.72); border-radius: 12px; padding: 16px; color: #cfd9ee; line-height: 1.55; }
+    .result-card h3 { margin: 0 0 8px; color: #f2f6ff; font-size: 16px; }
+    .result-card ul { margin: 0; padding-left: 18px; }
+    .tagline-results { display: grid; gap: 12px; margin-top: 18px; }
+    .tagline-item { display: flex; align-items: center; justify-content: space-between; gap: 14px; background: #0b1220; border: 1px solid rgba(49, 65, 91, 0.72); border-radius: 10px; padding: 13px 15px; color: #f0f5ff; }
+    .copy-btn { border: 1px solid rgba(148, 163, 184, 0.28); background: rgba(255,255,255,0.03); color: #9fb3d9; border-radius: 8px; min-height: 32px; padding: 0 10px; cursor: pointer; font: inherit; }
+    .brand-status { min-height: 22px; color: #91a7cf; font-size: 14px; margin-top: 12px; }
+    .brand-status.error { color: #ff9aaa; }
+    @media (max-width: 900px) {
+      .brand-hero { flex-direction: column; align-items: stretch; padding: 24px 18px; }
+      .tool-grid, .form-row, .result-grid { grid-template-columns: 1fr; }
+      .brand-tool { padding-inline: 12px; }
+    }
+  </style>
+  <script defer src="app.js"></script>
+  <script defer src="brand.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body class="brand-page">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" />
+      <div>
+        <div class="brand-name">Orbit</div>
+        <div class="brand-sub">by Elevate Vue</div>
+      </div>
+      <button class="icon-btn" id="closeSidebar" aria-label="Close menu">×</button>
+    </div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card">
+      <div class="avatar">S</div>
+      <div>
+        <div class="name" id="sideUser">Demo User</div>
+        <div class="email">demo@user.com</div>
+      </div>
+    </div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
+      <div class="brand-inline">
+        <img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" />
+        <div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <div class="brand-shell">
+        <header class="brand-hero">
+          <div class="brand-heading">
+            <div class="brand-title">
+              <h1 id="brandPageTitle">Brand Voice Builder</h1>
+              <p id="brandPageSubtitle">Define your brand's tone and personality</p>
+            </div>
+          </div>
+          <div class="brand-tabs" role="tablist">
+            <button class="brand-tab active" type="button" data-tool-tab="voice">Voice Builder</button>
+            <button class="brand-tab" type="button" data-tool-tab="tagline">Tagline Generator</button>
+          </div>
+        </header>
+
+        <section class="brand-tool active" data-tool="voice">
+          <div class="tool-grid">
+            <div class="tool-panel tool-card">
+              <h2>Brand Info</h2>
+              <div class="brand-form">
+                <input class="brand-field" id="voiceBrandName" placeholder="Brand name" autocomplete="organization" />
+                <input class="brand-field" id="voiceIndustry" placeholder="Industry or audience" />
+                <textarea class="brand-textarea" id="voiceSample" placeholder="Paste a sample of copy you love (optional)..."></textarea>
+              </div>
+            </div>
+            <div class="tool-panel tool-card">
+              <h2>Voice Dial</h2>
+              <div class="dial-stack">
+                <label class="dial-row">
+                  <div class="dial-labels"><span>Casual</span><strong>Formality</strong><span>Formal</span></div>
+                  <input id="formalityDial" type="range" min="0" max="100" value="48" />
+                </label>
+                <label class="dial-row">
+                  <div class="dial-labels"><span>Calm</span><strong>Energy</strong><span>Energetic</span></div>
+                  <input id="energyDial" type="range" min="0" max="100" value="75" />
+                </label>
+                <label class="dial-row">
+                  <div class="dial-labels"><span>Serious</span><strong>Humor</strong><span>Playful</span></div>
+                  <input id="humorDial" type="range" min="0" max="100" value="47" />
+                </label>
+                <label class="dial-row">
+                  <div class="dial-labels"><span>Peer-like</span><strong>Authority</strong><span>Authoritative</span></div>
+                  <input id="authorityDial" type="range" min="0" max="100" value="66" />
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="content-ai-actions">
+            <button class="brand-btn" id="buildVoiceBtn" type="button">Spark Build Brand Voice Guide</button>
+            <button class="copy-btn" id="saveVoiceBtn" type="button">Save</button>
+            <button class="copy-btn" id="copyVoiceBtn" type="button">Copy</button>
+          </div>
+          <div class="brand-status" id="voiceStatus"></div>
+          <div class="result-grid" id="voiceResults" hidden></div>
+        </section>
+
+        <section class="brand-tool" data-tool="tagline">
+          <div class="tool-panel">
+            <div class="brand-form">
+              <div class="form-row">
+                <input class="brand-field" id="taglineBrandName" placeholder="Brand Name" autocomplete="organization" />
+                <input class="brand-field" id="taglineIndustry" placeholder="Industry" />
+              </div>
+              <input class="brand-field" id="taglineUsp" placeholder="Your USP / what makes you different" />
+              <select class="brand-select" id="taglineStyle">
+                <option value="Punchy & Short">Punchy & Short</option>
+                <option value="Premium & Elegant">Premium & Elegant</option>
+                <option value="Warm & Human">Warm & Human</option>
+                <option value="Bold & Disruptive">Bold & Disruptive</option>
+                <option value="Clear & Direct">Clear & Direct</option>
+              </select>
+              <div class="content-ai-actions">
+                <button class="brand-btn" id="generateTaglinesBtn" type="button">Spark Generate 10 Taglines</button>
+                <button class="copy-btn" id="saveTaglinesBtn" type="button">Save</button>
+                <button class="copy-btn" id="copyTaglinesBtn" type="button">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="brand-status" id="taglineStatus"></div>
+          <div class="tagline-results" id="taglineResults" hidden></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>
+
+

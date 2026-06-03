@@ -159,6 +159,232 @@ class BeamsBackground {
   }
 }
 
+class WavesBackground {
+  constructor(options = {}) {
+    this.options = {
+      strokeColor: options.strokeColor || 'rgba(255,255,255,0.28)',
+      backgroundColor: options.backgroundColor || '#000000',
+      pointerSize: options.pointerSize || 8,
+      xGap: options.xGap || 12,
+      yGap: options.yGap || 12,
+      ...options
+    };
+    this.container = null;
+    this.svg = null;
+    this.paths = [];
+    this.lines = [];
+    this.raf = null;
+    this.bounds = null;
+    this.mouse = {
+      x: -10,
+      y: 0,
+      lx: 0,
+      ly: 0,
+      sx: 0,
+      sy: 0,
+      v: 0,
+      vs: 0,
+      a: 0,
+      set: false,
+    };
+    this.init();
+  }
+
+  init() {
+    document.getElementById('waves-background')?.remove();
+    document.getElementById('beams-canvas')?.remove();
+
+    this.container = document.createElement('div');
+    this.container.id = 'waves-background';
+    this.container.className = 'waves-background';
+    this.container.style.setProperty('--x', '-0.5rem');
+    this.container.style.setProperty('--y', '50%');
+    this.container.style.backgroundColor = this.options.backgroundColor;
+
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.svg.classList.add('waves-svg');
+    this.svg.setAttribute('aria-hidden', 'true');
+    this.container.appendChild(this.svg);
+
+    const dot = document.createElement('div');
+    dot.className = 'waves-pointer-dot';
+    dot.style.width = `${this.options.pointerSize}px`;
+    dot.style.height = `${this.options.pointerSize}px`;
+    dot.style.background = this.options.strokeColor;
+    this.container.appendChild(dot);
+
+    document.body.insertBefore(this.container, document.body.firstChild);
+    this.setSize();
+    this.setLines();
+    this.bindEvents();
+    this.raf = requestAnimationFrame((time) => this.tick(time));
+  }
+
+  setSize() {
+    if (!this.container || !this.svg) return;
+    this.bounds = this.container.getBoundingClientRect();
+    this.svg.style.width = `${this.bounds.width}px`;
+    this.svg.style.height = `${this.bounds.height}px`;
+  }
+
+  setLines() {
+    if (!this.svg || !this.bounds) return;
+    const { width, height } = this.bounds;
+    this.lines = [];
+    this.paths.forEach((path) => path.remove());
+    this.paths = [];
+
+    const xGap = this.options.xGap;
+    const yGap = this.options.yGap;
+    const totalLines = Math.ceil((width + 200) / xGap);
+    const totalPoints = Math.ceil((height + 30) / yGap);
+    const xStart = (width - xGap * totalLines) / 2;
+    const yStart = (height - yGap * totalPoints) / 2;
+
+    for (let i = 0; i < totalLines; i += 1) {
+      const points = [];
+      for (let j = 0; j < totalPoints; j += 1) {
+        points.push({
+          x: xStart + xGap * i,
+          y: yStart + yGap * j,
+          wave: { x: 0, y: 0 },
+          cursor: { x: 0, y: 0, vx: 0, vy: 0 },
+        });
+      }
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', this.options.strokeColor);
+      path.setAttribute('stroke-width', '1');
+      path.setAttribute('vector-effect', 'non-scaling-stroke');
+      this.svg.appendChild(path);
+      this.paths.push(path);
+      this.lines.push(points);
+    }
+  }
+
+  bindEvents() {
+    this.handleResize = () => {
+      this.setSize();
+      this.setLines();
+    };
+    this.handleMouseMove = (event) => this.updateMousePosition(event.clientX, event.clientY);
+    this.handleTouchMove = (event) => {
+      const touch = event.touches?.[0];
+      if (touch) this.updateMousePosition(touch.clientX, touch.clientY);
+    };
+    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('touchmove', this.handleTouchMove, { passive: true });
+  }
+
+  updateMousePosition(x, y) {
+    if (!this.bounds) return;
+    const mouse = this.mouse;
+    mouse.x = x - this.bounds.left;
+    mouse.y = y - this.bounds.top;
+    if (!mouse.set) {
+      mouse.sx = mouse.x;
+      mouse.sy = mouse.y;
+      mouse.lx = mouse.x;
+      mouse.ly = mouse.y;
+      mouse.set = true;
+    }
+  }
+
+  noise(x, y, time) {
+    return (
+      Math.sin(x * 0.028 + time * 0.0008) +
+      Math.sin(y * 0.021 + time * 0.00045) +
+      Math.sin((x + y) * 0.012 + time * 0.0006)
+    ) / 3;
+  }
+
+  movePoints(time) {
+    const mouse = this.mouse;
+    this.lines.forEach((points) => {
+      points.forEach((point) => {
+        const move = this.noise(point.x, point.y, time) * 8;
+        point.wave.x = Math.cos(move) * 12;
+        point.wave.y = Math.sin(move) * 6;
+
+        const dx = point.x - mouse.sx;
+        const dy = point.y - mouse.sy;
+        const distance = Math.hypot(dx, dy);
+        const limit = Math.max(175, mouse.vs);
+
+        if (distance < limit) {
+          const strength = 1 - distance / limit;
+          const force = Math.cos(distance * 0.001) * strength;
+          point.cursor.vx += Math.cos(mouse.a) * force * limit * mouse.vs * 0.00035;
+          point.cursor.vy += Math.sin(mouse.a) * force * limit * mouse.vs * 0.00035;
+        }
+
+        point.cursor.vx += (0 - point.cursor.x) * 0.01;
+        point.cursor.vy += (0 - point.cursor.y) * 0.01;
+        point.cursor.vx *= 0.95;
+        point.cursor.vy *= 0.95;
+        point.cursor.x += point.cursor.vx;
+        point.cursor.y += point.cursor.vy;
+        point.cursor.x = Math.min(50, Math.max(-50, point.cursor.x));
+        point.cursor.y = Math.min(50, Math.max(-50, point.cursor.y));
+      });
+    });
+  }
+
+  moved(point, withCursorForce = true) {
+    return {
+      x: point.x + point.wave.x + (withCursorForce ? point.cursor.x : 0),
+      y: point.y + point.wave.y + (withCursorForce ? point.cursor.y : 0),
+    };
+  }
+
+  drawLines() {
+    this.lines.forEach((points, index) => {
+      if (points.length < 2 || !this.paths[index]) return;
+      const first = this.moved(points[0], false);
+      let d = `M ${first.x} ${first.y}`;
+      for (let i = 1; i < points.length; i += 1) {
+        const current = this.moved(points[i]);
+        d += `L ${current.x} ${current.y}`;
+      }
+      this.paths[index].setAttribute('d', d);
+    });
+  }
+
+  tick(time) {
+    const mouse = this.mouse;
+    mouse.sx += (mouse.x - mouse.sx) * 0.1;
+    mouse.sy += (mouse.y - mouse.sy) * 0.1;
+    const dx = mouse.x - mouse.lx;
+    const dy = mouse.y - mouse.ly;
+    const distance = Math.hypot(dx, dy);
+    mouse.v = distance;
+    mouse.vs += (distance - mouse.vs) * 0.1;
+    mouse.vs = Math.min(100, mouse.vs);
+    mouse.lx = mouse.x;
+    mouse.ly = mouse.y;
+    mouse.a = Math.atan2(dy, dx);
+
+    if (this.container) {
+      this.container.style.setProperty('--x', `${mouse.sx}px`);
+      this.container.style.setProperty('--y', `${mouse.sy}px`);
+    }
+
+    this.movePoints(time);
+    this.drawLines();
+    this.raf = requestAnimationFrame((nextTime) => this.tick(nextTime));
+  }
+
+  destroy() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('touchmove', this.handleTouchMove);
+    this.container?.remove();
+  }
+}
+
 // Animated Dock Effect Class
 class AnimatedDock {
   constructor(containerSelector, options = {}) {
@@ -226,10 +452,11 @@ class AnimatedDock {
 
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize beams background
-  window.beamsBackground = new BeamsBackground({
-    intensity: 'strong',
-    blur: 35
+  // Initialize animated waves background
+  window.wavesBackground = new WavesBackground({
+    strokeColor: 'rgba(255,255,255,0.28)',
+    backgroundColor: '#000000',
+    pointerSize: 8
   });
 
   initializeBrandHomeNavigation();
@@ -238,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && e.key === 'B') {
       e.preventDefault();
-      const canvas = document.getElementById('beams-canvas');
+      const canvas = document.getElementById('waves-background');
       const overlay = document.querySelector('.beams-overlay');
       if (canvas) canvas.style.display = canvas.style.display === 'none' ? 'block' : 'none';
       if (overlay) overlay.style.display = overlay.style.display === 'none' ? 'block' : 'none';
@@ -255,9 +482,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize sidebar
   const sidebar = document.getElementById('sidebar');
   const openSidebarBtn = document.getElementById('openSidebar');
-  const closeSidebarBtn = document.getElementById('closeSidebar');
-  openSidebarBtn?.addEventListener('click', () => sidebar?.classList.add('open'));
-  closeSidebarBtn?.addEventListener('click', () => sidebar?.classList.remove('open'));
+  openSidebarBtn?.addEventListener('click', () => {
+    if (!sidebar) return;
+    if (window.matchMedia('(max-width: 960px)').matches) {
+      sidebar.classList.toggle('open');
+      return;
+    }
+    sidebar.classList.toggle('collapsed');
+  });
+
+  initializeSidebarNav();
 
   // Activate current nav link
   const current = location.pathname.split('/').pop() || 'featurehub.html';
@@ -266,13 +500,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if ((current === '' && href === 'featurehub.html') || href === current) link.classList.add('active');
   });
 
-  // Initialize AI modal functionality
+  // Initialize report modal functionality
   initializeAiModal();
 
   // Initialize other page-specific functionality
   initializePageSpecific();
 
   hydrateReportsFromServer();
+  initializePageFeedbackBox();
 });
 
 function initializeBrandHomeNavigation() {
@@ -307,6 +542,117 @@ function initializeBrandHomeNavigation() {
   });
 }
 
+function initializeSidebarNav() {
+  const sidebarRoot = document.getElementById('sidebarNavRoot');
+  if (!sidebarRoot) return;
+
+  const icon = (paths) => `<svg class="nav-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">${paths}</svg>`;
+  const icons = {
+    home: icon('<path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5Z"/><path d="M9 21h6"/>'),
+    dashboard: icon('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="4" rx="1.5"/><rect x="13" y="10" width="7" height="10" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/>'),
+    report: icon('<path d="M7 3h7l4 4v14H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/><path d="M9 12h6M9 16h6"/>'),
+    social: icon('<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h.01M12 9h.01M16 9h.01M8 13h.01M12 13h.01M16 13h.01"/>'),
+    strategy: icon('<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M16.5 7.5 20 4M18 4h2v2"/>'),
+    brand: icon('<path d="m12 3 1.6 5.1L19 10l-5.4 1.9L12 17l-1.6-5.1L5 10l5.4-1.9L12 3Z"/><path d="m19 15 .7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z"/>'),
+    campaigns: icon('<path d="M4 14 14 4l6 6-10 10-6-6Z"/><path d="m14 4 1 5 5 1"/><path d="M4 20h4"/>'),
+    content: icon('<path d="M6 4h9l3 3v13H6V4Z"/><path d="M15 4v4h4"/><path d="M9 12h6M9 16h4"/>'),
+  };
+
+  const categories = [
+    {
+      label: 'Feature Hub',
+      icon: icons.home,
+      links: [{ label: 'Feature Hub', href: 'featurehub.html' }],
+    },
+    {
+      label: 'Dashboard',
+      icon: icons.dashboard,
+      links: [{ label: 'Dashboard', href: 'dashboard-overview.html' }],
+    },
+    {
+      label: 'Report',
+      icon: icons.report,
+      links: [
+        { label: 'Report', href: 'report.html' },
+        { label: 'Comparison Metrics', href: 'comparison-metrics.html' },
+      ],
+    },
+    {
+      label: 'Social Media Manager',
+      icon: icons.social,
+      links: [
+        { label: 'Connect', href: 'connect.html' },
+        { label: 'Scheduling', href: 'upload.html' },
+      ],
+    },
+    {
+      label: 'Strategy',
+      icon: icons.strategy,
+      links: [
+        { label: 'Brand Scorecard', href: 'strategy.html' },
+        { label: 'ICP Builder', href: 'strategy.html#icp' },
+        { label: 'Positioning Wizard', href: 'strategy.html#positioning' },
+      ],
+    },
+    {
+      label: 'Brand',
+      icon: icons.brand,
+      links: [
+        { label: 'Brand Voice Builder', href: 'brand.html' },
+        { label: 'Tagline Generator', href: 'brand.html#tagline' },
+      ],
+    },
+    {
+      label: 'Campaigns',
+      icon: icons.campaigns,
+      links: [
+        { label: 'Ads Copy Grader', href: 'ad-copy-grader.html' },
+        { label: 'Creative Brief Builder', href: 'creative-brief-builder.html' },
+      ],
+    },
+    {
+      label: 'Content',
+      icon: icons.content,
+      links: [
+        { label: 'Content Calendar', href: 'content-calendar.html' },
+        { label: 'Ghost Writer', href: 'ghost-writer.html' },
+        { label: 'Hook Library', href: 'hook-library.html' },
+        { label: 'Drop Ideas', href: 'drop-ideas.html' },
+      ],
+    },
+  ];
+
+  sidebarRoot.innerHTML = '<div class="nav-label">Navigation</div>' + categories
+    .map((category) => {
+      if (category.links.length === 1) {
+        const link = category.links[0];
+        return `<a class="nav-link" href="${link.href}" title="${category.label}"><span class="nav-icon" aria-hidden="true">${category.icon}</span><span class="nav-text">${category.label}</span></a>`;
+      }
+      const submenu = category.links
+        .map((link) => `<a class="nav-link" href="${link.href}"><span class="nav-text">${link.label}</span></a>`)
+        .join('');
+      return `
+        <div class="nav-category">
+          <button type="button" class="nav-category-toggle" aria-expanded="false" title="${category.label}"><span class="nav-icon" aria-hidden="true">${category.icon}</span><span class="nav-text">${category.label}</span><span class="nav-chevron">▾</span></button>
+          <div class="nav-submenu">${submenu}</div>
+        </div>
+      `;
+    })
+    .join('');
+
+  const dropdownCategories = categories.filter((category) => category.links.length > 1);
+  sidebarRoot.querySelectorAll('.nav-category-toggle').forEach((button, index) => {
+    button.title = dropdownCategories[index]?.label || '';
+    button.addEventListener('click', () => {
+      const submenu = button.nextElementSibling;
+      if (!submenu) return;
+      const isOpen = submenu.classList.toggle('open');
+      button.classList.toggle('active', isOpen);
+      button.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+}
+
 function trackClientActivity(event = {}) {
   if (typeof window.__trackClientActivity === 'function') {
     window.__trackClientActivity(event);
@@ -321,6 +667,91 @@ function getScopedStorageKey(baseKey) {
   } catch {
     return baseKey;
   }
+}
+
+function initializePageFeedbackBox() {
+  const page = location.pathname.split('/').pop() || 'featurehub.html';
+  const feedbackPages = new Set([
+    'report.html',
+    'comparison-metrics.html',
+    'strategy.html',
+    'brand.html',
+    'ad-copy-grader.html',
+    'creative-brief-builder.html',
+    'content-lab.html',
+    'content-calendar.html',
+    'ghost-writer.html',
+    'hook-library.html',
+    'drop-ideas.html',
+  ]);
+
+  if (!feedbackPages.has(page) || document.querySelector('[data-page-feedback]')) return;
+
+  const main = document.querySelector('.page main, main');
+  if (!main) return;
+
+  const storageKey = `page-feedback:${page}`;
+  const items = readScopedJson(storageKey, []);
+  const card = document.createElement('section');
+  card.className = 'page-feedback-card';
+  card.dataset.pageFeedback = page;
+  card.innerHTML = `
+    <div class="page-feedback-head">
+      <div>
+        <h2>Feedback</h2>
+        <p>Share notes, issues, or ideas for this workspace.</p>
+      </div>
+    </div>
+    <textarea class="page-feedback-input" placeholder="Write your feedback here..."></textarea>
+    <div class="page-feedback-actions">
+      <span class="page-feedback-status"></span>
+      <button class="pill-btn small" type="button">Submit</button>
+    </div>
+    <ul class="page-feedback-list"></ul>
+  `;
+
+  main.appendChild(card);
+
+  const input = card.querySelector('.page-feedback-input');
+  const status = card.querySelector('.page-feedback-status');
+  const button = card.querySelector('button');
+  const list = card.querySelector('.page-feedback-list');
+
+  const render = () => {
+    const currentItems = readScopedJson(storageKey, []);
+    list.innerHTML = '';
+    status.textContent = currentItems.length ? `${currentItems.length} saved` : 'No feedback yet';
+    currentItems.slice(0, 5).forEach((item, index) => {
+      const li = document.createElement('li');
+      const date = new Date(item.time || Date.now()).toLocaleDateString();
+      li.innerHTML = `<span><strong>${date}</strong>${escapeHtml(item.text || '')}</span><button type="button" data-index="${index}">Delete</button>`;
+      list.appendChild(li);
+    });
+  };
+
+  button.addEventListener('click', () => {
+    const text = input.value.trim();
+    if (!text) {
+      status.textContent = 'Write feedback before submitting.';
+      return;
+    }
+    const currentItems = readScopedJson(storageKey, []);
+    currentItems.unshift({ text, time: Date.now() });
+    writeScopedJson(storageKey, currentItems.slice(0, 20));
+    input.value = '';
+    render();
+  });
+
+  list.addEventListener('click', (event) => {
+    const deleteButton = event.target.closest('[data-index]');
+    if (!deleteButton) return;
+    const currentItems = readScopedJson(storageKey, []);
+    currentItems.splice(Number(deleteButton.dataset.index), 1);
+    writeScopedJson(storageKey, currentItems);
+    render();
+  });
+
+  render();
 }
 
 function readScopedJson(baseKey, fallback) {
@@ -458,7 +889,7 @@ function initializeAiModal() {
     }
     if (reportDropZone) {
       reportDropZone.querySelector('.drop-label').textContent = `Ready to generate: ${file.name}`;
-      reportDropZone.querySelector('.drop-sub').textContent = 'Click to open AI options or drop another file.';
+      reportDropZone.querySelector('.drop-sub').textContent = 'Click to open report options or drop another file.';
     }
     openAiModal();
   }
@@ -511,7 +942,7 @@ function initializeAiModal() {
       closeAiModal();
       aiForm.reset();
       setDateBounds();
-      alert('AI Report generated successfully!');
+      alert('Report generated successfully!');
     } catch (error) {
       console.error('Error generating report:', error);
       alert('Error generating report. Please try again.');
@@ -528,7 +959,7 @@ function initializeAiModal() {
   renderCalendar();
   setDateBounds();
 
-  console.log('AI modal initialized');
+  console.log('Report modal initialized');
   window.__openAiModal = openAiModal;
   window.__closeAiModal = closeAiModal;
 }
@@ -634,10 +1065,10 @@ function buildUploadStatusMessage(payload, fallbackName) {
   const fallbackFiles = Number(normalization.fallbackFiles || 0);
 
   if (geminiFiles && !fallbackFiles) {
-    return `Using ${filesLabel} • Gemini normalized ${geminiFiles} file${geminiFiles === 1 ? '' : 's'}`;
+    return `Using ${filesLabel} • normalized ${geminiFiles} file${geminiFiles === 1 ? '' : 's'}`;
   }
   if (geminiFiles && fallbackFiles) {
-    return `Using ${filesLabel} • Gemini ${geminiFiles}, fallback ${fallbackFiles}`;
+    return `Using ${filesLabel} • normalized ${geminiFiles}, fallback ${fallbackFiles}`;
   }
   return `Using ${filesLabel} • Fallback parser`;
 }
@@ -650,9 +1081,9 @@ function buildUploadAlertMessage(payload) {
   let message = `Processed ${payload?.count ?? 0} rows`;
 
   if (geminiFiles && !fallbackFiles) {
-    message += ` with Gemini normalization on ${geminiFiles} file${geminiFiles === 1 ? '' : 's'}.`;
+    message += ` with normalization on ${geminiFiles} file${geminiFiles === 1 ? '' : 's'}.`;
   } else if (geminiFiles && fallbackFiles) {
-    message += `. Gemini handled ${geminiFiles} file${geminiFiles === 1 ? '' : 's'} and fallback parsing handled ${fallbackFiles}.`;
+    message += `. Normalization handled ${geminiFiles} file${geminiFiles === 1 ? '' : 's'} and fallback parsing handled ${fallbackFiles}.`;
   } else {
     message += ' with the fallback parser.';
   }
@@ -750,6 +1181,7 @@ newPostFile?.addEventListener('change', async () => {
     alert('File uploaded and post created');
     await loadPosts();
     await loadMetrics();
+    await renderAIFeedback();
   } catch (err) {
     alert(err.message || 'Upload failed');
   } finally {
@@ -790,7 +1222,7 @@ function closeUploadModal() {
   renderUploadList();
 }
 
-dashUploadBtn?.addEventListener('click', () => dashUploadFile?.click());
+dashUploadBtn?.addEventListener('click', openUploadModal);
 dashboardUploadHeroBtn?.addEventListener('click', openUploadModal);
 dashUploadFile?.addEventListener('change', async () => {
   const file = dashUploadFile.files?.[0];
@@ -818,6 +1250,7 @@ dashUploadFile?.addEventListener('change', async () => {
     updateChartDisplay(activeMetric);
     await loadPosts();
     await loadMetrics();
+    await renderAIFeedback();
   } catch (err) {
     alert(err.message || 'Upload failed');
   } finally {
@@ -905,6 +1338,7 @@ uploadModalSubmit?.addEventListener('click', async () => {
     closeUploadModal();
     await loadPosts();
     await loadMetrics();
+    await renderAIFeedback();
   } catch (err) {
     alert(err.message || 'Upload failed');
   }
@@ -1898,12 +2332,12 @@ let feedbackType = 'Suggestion';
 
 function updateFeedbackComposerState() {
   if (!feedbackText || !feedbackSubmit) return;
-  const isAiMode = feedbackType === 'AI Suggestions';
+  const isAiMode = feedbackType === 'Suggestions';
   feedbackText.placeholder = isAiMode
-    ? 'Click submit to let Gemini read your uploaded analytics and generate suggestions.'
+    ? 'Click submit to read your uploaded analytics and generate suggestions.'
     : 'Write your suggestion here...';
   feedbackText.disabled = isAiMode;
-  feedbackSubmit.textContent = isAiMode ? '🤖 Generate with Gemini' : '🛫 Submit';
+  feedbackSubmit.textContent = isAiMode ? 'Generate Suggestions' : 'Submit';
 }
 
 feedbackTabs.forEach((chip) => {
@@ -2043,20 +2477,20 @@ function hasUploadedAnalytics(metricsPayload = {}, recentPosts = [], uploadName 
 }
 
 feedbackSubmit?.addEventListener('click', async () => {
-  if (feedbackType === 'AI Suggestions') {
+  if (feedbackType === 'Suggestions') {
     try {
       feedbackSubmit.disabled = true;
-      feedbackSubmit.textContent = '🤖 Generating...';
+      feedbackSubmit.textContent = 'Generating...';
       const response = await fetch('/api/feedback/ai-suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           metrics: collectDashboardMetrics(),
-          context: 'Generate a professional metrics-driven AI feedback summary with clear next steps for the client.',
+          context: 'Generate a professional metrics-driven feedback summary with clear next steps for the client.',
         }),
       });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.message || 'Failed to generate AI suggestions');
+      if (!response.ok) throw new Error(payload.message || 'Failed to generate suggestions');
 
       const generatedText = formatAiSuggestionText(payload);
       const items = readScopedJson('feedback', []);
@@ -2068,8 +2502,8 @@ feedbackSubmit?.addEventListener('click', async () => {
       writeScopedJson('feedback', items);
       trackClientActivity({
         eventType: 'generate_ai_feedback',
-        eventLabel: 'Generated AI suggestions',
-        eventDetail: 'Dashboard AI suggestions created',
+        eventLabel: 'Generated suggestions',
+        eventDetail: 'Dashboard suggestions created',
         pageName: 'Dashboard',
         pageCategory: 'Analytics'
       });
@@ -2086,7 +2520,7 @@ feedbackSubmit?.addEventListener('click', async () => {
       writeScopedJson('feedback', items);
       trackClientActivity({
         eventType: 'generate_ai_feedback',
-        eventLabel: 'Generated fallback AI suggestions',
+        eventLabel: 'Generated fallback suggestions',
         eventDetail: 'Dashboard fallback suggestions created',
         pageName: 'Dashboard',
         pageCategory: 'Analytics'
@@ -2128,7 +2562,7 @@ feedbackTitle?.addEventListener('click', toggleFeedbackPanel);
 updateFeedbackComposerState();
 renderFeedback();
 
-// AI report modal (report page)
+// Report modal (report page)
 const aiModal = document.getElementById('aiModal');
 const aiModalBackdrop = document.getElementById('aiModalBackdrop');
 const aiModalClose = document.getElementById('aiModalClose');
@@ -2361,26 +2795,26 @@ function showDetail(report) {
     if (clientLogoSpot) {
       clientLogoSpot.innerHTML = report.platform === 'Instagram'
         ? '<img src="/instagram-logo.svg" alt="Instagram logo" />'
-        : '<img src="/logo.png" alt="Client logo" />';
+        : '<img src="/orbit-logo.svg" alt="Client logo" />';
     }
     if (pdfClientLogoSpot) {
       pdfClientLogoSpot.innerHTML = report.platform === 'Instagram'
         ? '<img src="/instagram-logo.svg" alt="Instagram logo" />'
-        : '<img src="/logo.png" alt="Client logo" />';
+        : '<img src="/orbit-logo.svg" alt="Client logo" />';
     }
     if (pdfClientLogoSpot2) {
       pdfClientLogoSpot2.innerHTML = report.platform === 'Instagram'
         ? '<img src="/instagram-logo.svg" alt="Instagram logo" />'
-        : '<img src="/logo.png" alt="Client logo" />';
+        : '<img src="/orbit-logo.svg" alt="Client logo" />';
     }
     if (elevateLogoSpot) {
-      elevateLogoSpot.innerHTML = '<img src="/logo.png" alt="Elevate vue logo" />';
+      elevateLogoSpot.innerHTML = '<img src="/orbit-logo.svg" alt="Orbit logo" />';
     }
     if (pdfElevateLogoSpot) {
-      pdfElevateLogoSpot.innerHTML = '<img src="/logo.png" alt="Elevate vue logo" />';
+      pdfElevateLogoSpot.innerHTML = '<img src="/orbit-logo.svg" alt="Orbit logo" />';
     }
     if (pdfElevateLogoSpot2) {
-      pdfElevateLogoSpot2.innerHTML = '<img src="/logo.png" alt="Elevate vue logo" />';
+      pdfElevateLogoSpot2.innerHTML = '<img src="/orbit-logo.svg" alt="Orbit logo" />';
     }
 
     if (typeof renderPerformanceChart === 'function') {
@@ -2506,7 +2940,7 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
     { label: 'Avg Engagement Rate', value: aggregated.engagement, sub: '%'},
   ].filter((m) => m.value !== undefined);
 
-  let summary = `AI performance report for ${platform}. Reach: ${formatReportValue(aggregated.reach)}, Interactions: ${formatReportValue(aggregated.interactions)}, Clicks: ${formatReportValue(aggregated.clicks)}.`;
+  let summary = `Performance report for ${platform}. Reach: ${formatReportValue(aggregated.reach)}, Interactions: ${formatReportValue(aggregated.interactions)}, Clicks: ${formatReportValue(aggregated.clicks)}.`;
 
   const takeaways = [];
   if (aggregated.reach) {
@@ -2566,7 +3000,7 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
       }
     }
   } catch (error) {
-    console.warn('Unable to enrich report with AI suggestions', error);
+    console.warn('Unable to enrich report with suggestions', error);
   }
 
   const report = {
@@ -2679,6 +3113,15 @@ function renderDashboardReports() {
   `).join('');
 }
 
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 async function renderAIFeedback() {
   const feedbackCardEl = document.querySelector('.ai-feedback-card');
   const feedbackEl = document.getElementById('aiFeedbackContent');
@@ -2709,19 +3152,19 @@ async function renderAIFeedback() {
       recentPosts = Array.isArray(postsData.posts) ? postsData.posts : [];
     }
   } catch (error) {
-    console.error('Error loading uploaded analytics for AI feedback:', error);
+    console.error('Error loading uploaded analytics for feedback:', error);
   }
 
   if (!hasUploadedAnalytics(metricsPayload, recentPosts, uploadName)) {
     feedbackCardEl.hidden = true;
-    feedbackEl.textContent = 'Upload analytics data to generate AI feedback.';
+    feedbackEl.textContent = 'Upload analytics data to generate feedback.';
     if (editBtn) editBtn.disabled = true;
     return;
   }
 
   feedbackCardEl.hidden = false;
   if (editBtn) editBtn.disabled = false;
-  feedbackEl.textContent = 'Reading uploaded data and generating AI feedback...';
+  feedbackEl.textContent = 'Reading uploaded data and generating feedback...';
 
   const sortedPosts = recentPosts
     .slice()
@@ -2750,7 +3193,7 @@ async function renderAIFeedback() {
         metrics: metricsPayload,
         perPlatform: perPlatformPayload,
         recentPosts: sortedPosts,
-        context: 'Read the uploaded analytics data and generate a professional metrics-driven AI feedback summary for the dashboard, including the key insight and the next best actions.',
+        context: 'Read the uploaded analytics data and generate a professional metrics-driven feedback summary for the dashboard, including the key insight and the next best actions.',
       }),
     });
 
@@ -2763,24 +3206,34 @@ async function renderAIFeedback() {
       const actions = Array.isArray(data.actions)
         ? data.actions.map((item) => String(item || '').trim()).filter(Boolean)
         : [];
-      const feedbackLines = [summary, ''];
-      if (takeaways.length) {
-        feedbackLines.push('<strong>Key takeaways:</strong>');
-        feedbackLines.push(...takeaways.map((item) => `&bull; ${item}`));
+      const escapedSummary = escapeHtml(summary);
+      const escapedTakeaways = takeaways.map((item) => escapeHtml(item));
+      const escapedActions = actions.map((item) => escapeHtml(item));
+
+      let contentHtml = '<div class="ai-feedback-text">';
+      if (escapedSummary) {
+        contentHtml += `<p class="ai-feedback-summary">${escapedSummary}</p>`;
       }
-      if (actions.length) {
-        feedbackLines.push('', '<strong>Recommended next steps:</strong>');
-        feedbackLines.push(...actions.map((item) => `&bull; ${item}`));
+      if (escapedTakeaways.length) {
+        contentHtml += '<strong>Top 5 metric insights</strong>';
+        contentHtml += `<ul>${escapedTakeaways.map((item) => `<li>${item}</li>`).join('')}</ul>`;
       }
-      feedbackEl.innerHTML = `<div class="ai-feedback-text">${feedbackLines.join('<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
+      if (escapedActions.length) {
+        contentHtml += '<strong>Recommended next steps</strong>';
+        contentHtml += `<ul>${escapedActions.map((item) => `<li>${item}</li>`).join('')}</ul>`;
+      }
+      contentHtml += '</div>';
+      feedbackEl.innerHTML = `${contentHtml}<button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
     } else {
       const fallback = buildBrowserAiSuggestions();
-      feedbackEl.innerHTML = `<div class="ai-feedback-text">${formatAiSuggestionText(fallback).replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
+      const safeFallback = escapeHtml(formatAiSuggestionText(fallback));
+      feedbackEl.innerHTML = `<div class="ai-feedback-text">${safeFallback.replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
     }
   } catch (error) {
-    console.error('Error fetching AI feedback:', error);
+    console.error('Error fetching feedback:', error);
     const fallback = buildBrowserAiSuggestions();
-    feedbackEl.innerHTML = `<div class="ai-feedback-text">${formatAiSuggestionText(fallback).replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
+    const safeFallback = escapeHtml(formatAiSuggestionText(fallback));
+    feedbackEl.innerHTML = `<div class="ai-feedback-text">${safeFallback.replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
   }
 }
 
@@ -3125,6 +3578,236 @@ async function sendApprovalRequestEmail(queueItem) {
 }
 
 renderPostQueue();
+
+const adCopyGraderForm = document.getElementById('adCopyGraderForm');
+const adCopyPlatform = document.getElementById('adCopyPlatform');
+const adCopyText = document.getElementById('adCopyText');
+const creativeBriefForm = document.getElementById('creativeBriefForm');
+const campaignResults = document.getElementById('campaignResults');
+
+const briefFields = {
+  campaignName: document.getElementById('briefCampaignName'),
+  platforms: document.getElementById('briefPlatform'),
+  objective: document.getElementById('briefObjective'),
+  audience: document.getElementById('briefAudience'),
+  tone: document.getElementById('briefTone'),
+  budget: document.getElementById('briefBudget'),
+  deadline: document.getElementById('briefDeadline'),
+  keyMessage: document.getElementById('briefMessage'),
+};
+
+const scoreLabels = {
+  hookStrength: 'Hook Strength',
+  clarity: 'Clarity',
+  callToAction: 'Call to Action',
+  emotionalPull: 'Emotional Pull',
+  platformRelevance: 'Platform Relevance',
+};
+
+const briefSectionLabels = {
+  campaignOverview: 'Campaign Overview',
+  objectivesKpis: 'Objectives & KPIs',
+  targetAudienceDeepDive: 'Target Audience Deep Dive',
+  creativeDirectionMood: 'Creative Direction & Mood',
+  contentFormatRecommendations: 'Content Format Recommendations',
+  keyMessagesHooks: 'Key Message & Hooks',
+  callToActionOptions: 'Call to Action Options',
+  successMetrics: 'Success Metrics',
+  conclusion: 'Overall Conclusion',
+};
+
+function scoreTone(score) {
+  const numeric = Number(score) || 0;
+  if (numeric <= 4) return 'low';
+  if (numeric <= 7) return 'mid';
+  return 'high';
+}
+
+function normalizeScore(score) {
+  const numeric = Number(score);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(10, Math.round(numeric)));
+}
+
+function renderCampaignStatus(message, isError = false) {
+  if (!campaignResults) return;
+  campaignResults.hidden = false;
+  campaignResults.innerHTML = `<div class="campaign-result-panel full"><div class="campaign-status ${isError ? 'error' : ''}">${escapeHtml(message)}</div></div>`;
+}
+
+function renderInsightList(items = []) {
+  const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
+  if (!safeItems.length) return '<p class="muted">No notes returned.</p>';
+  return `<ul class="insight-list">${safeItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
+
+function renderAdCopyGrade(result = {}) {
+  if (!campaignResults) return;
+  const scores = result.scores || {};
+  const scoreRows = Object.entries(scoreLabels).map(([key, label]) => {
+    const score = normalizeScore(scores[key]);
+    const tone = scoreTone(score);
+    return `
+      <div class="score-row">
+        <div class="score-label">${label}</div>
+        <div class="score-track"><div class="score-fill ${tone}" style="width:${score * 10}%"></div></div>
+        <div class="score-number ${tone}">${score}/10</div>
+      </div>
+    `;
+  }).join('');
+  const rewritten = Array.isArray(result.rewrittenVersions) ? result.rewrittenVersions : [result.rewrittenVersion].filter(Boolean);
+
+  campaignResults.hidden = false;
+  campaignResults.innerHTML = `
+    <section class="campaign-result-panel">
+      <div class="campaign-result-head">
+        <div>
+          <h2>Score Breakdown</h2>
+          <p>${escapeHtml(result.platform || adCopyPlatform?.value || 'Selected platform')}</p>
+        </div>
+        <div class="overall-score">${Math.max(0, Math.min(100, Math.round(Number(result.overallScore) || 0)))}<span>/100 overall</span></div>
+      </div>
+      <div class="score-list">${scoreRows}</div>
+    </section>
+    <section class="campaign-result-panel">
+      <div class="campaign-result-head"><h3>Strengths</h3></div>
+      ${renderInsightList(result.strengths)}
+    </section>
+    <section class="campaign-result-panel improvements">
+      <div class="campaign-result-head"><h3>Improvements</h3></div>
+      ${renderInsightList(result.improvements)}
+    </section>
+    <section class="campaign-result-panel">
+      <div class="campaign-result-head"><h3>Rewritten Version</h3></div>
+      <p class="rewritten-copy">${escapeHtml(rewritten.join('\n\n') || 'No rewritten copy returned.')}</p>
+    </section>
+  `;
+}
+
+function briefToPlainText(brief = {}) {
+  return Object.entries(briefSectionLabels)
+    .map(([key, label]) => `${label}\n${String(brief[key] || '').trim()}`)
+    .join('\n\n');
+}
+
+function currentBriefText(brief = {}) {
+  const sectionEls = Array.from(document.querySelectorAll('#briefSections .brief-section'));
+  if (!sectionEls.length) return briefToPlainText(brief);
+  return sectionEls.map((section) => {
+    const key = section.dataset.briefKey;
+    const label = briefSectionLabels[key] || section.querySelector('h3')?.textContent || 'Brief Section';
+    const text = section.querySelector('textarea')?.value || section.querySelector('p')?.textContent || '';
+    return `${label}\n${text.trim()}`;
+  }).join('\n\n');
+}
+
+function renderCreativeBrief(result = {}) {
+  if (!campaignResults) return;
+  const brief = result.brief || result;
+  const sections = Object.entries(briefSectionLabels).map(([key, label]) => `
+    <section class="brief-section" data-brief-key="${key}">
+      <h3>${label}</h3>
+      <p>${escapeHtml(brief[key] || 'Not provided')}</p>
+    </section>
+  `).join('');
+
+  campaignResults.hidden = false;
+  campaignResults.innerHTML = `
+    <section class="campaign-result-panel full" id="creativeBriefResult">
+      <div class="campaign-result-head">
+        <div>
+          <h2>Creative Brief</h2>
+          <p>${escapeHtml(briefFields.campaignName?.value || 'Campaign brief')}</p>
+        </div>
+        <div class="brief-actions">
+          <button type="button" class="pill-btn outline small" id="copyBriefBtn">Copy</button>
+          <button type="button" class="pill-btn outline small" id="editBriefBtn">Edit</button>
+        </div>
+      </div>
+      <div id="briefSections">${sections}</div>
+    </section>
+  `;
+
+  document.getElementById('copyBriefBtn')?.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(currentBriefText(brief));
+    const btn = document.getElementById('copyBriefBtn');
+    if (btn) {
+      btn.textContent = 'Copied';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1400);
+    }
+  });
+
+  document.getElementById('editBriefBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('#briefSections .brief-section').forEach((section) => {
+      const text = section.querySelector('p')?.textContent || '';
+      section.querySelector('p')?.replaceWith(Object.assign(document.createElement('textarea'), { value: text }));
+    });
+    const editBtn = document.getElementById('editBriefBtn');
+    if (editBtn) editBtn.textContent = 'Editing';
+  });
+}
+
+adCopyGraderForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const submitBtn = adCopyGraderForm.querySelector('button[type="submit"]');
+  const originalText = submitBtn?.textContent || 'Grade My Ad Copy';
+  try {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Grading...';
+    }
+    renderCampaignStatus('Grading your ad copy...');
+    const response = await fetch('/api/campaign/ad-copy-grade', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        platform: adCopyPlatform?.value,
+        adCopy: adCopyText?.value,
+      }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || 'Failed to grade ad copy.');
+    renderAdCopyGrade(data.result);
+  } catch (error) {
+    renderCampaignStatus(error.message || 'Failed to grade ad copy.', true);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  }
+});
+
+creativeBriefForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const submitBtn = creativeBriefForm.querySelector('button[type="submit"]');
+  const originalText = submitBtn?.textContent || 'Build Creative Brief';
+  const inputs = Object.fromEntries(Object.entries(briefFields).map(([key, field]) => [key, field?.value || '']));
+  try {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Building...';
+    }
+    renderCampaignStatus('Building your creative brief...');
+    const response = await fetch('/api/campaign/creative-brief', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ inputs }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || 'Failed to build creative brief.');
+    renderCreativeBrief(data.result);
+  } catch (error) {
+    renderCampaignStatus(error.message || 'Failed to build creative brief.', true);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  }
+});
 
 function renderSavedHashtagSets() {
   if (!savedHashtagsList) return;
@@ -3526,3 +4209,4 @@ scheduleForm?.addEventListener('submit', async (e) => {
     alert(error.message || 'Unable to send the approval request right now.');
   }
 });
+

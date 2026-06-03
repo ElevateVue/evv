@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elevate Vue | Welcome</title>
+  <title>Orbit | Welcome</title>
   <link rel="stylesheet" href="style.css" />
   <script>
     function loadScript(callback) {
@@ -50,6 +50,38 @@
     .welcome-shell {
       position: relative;
       isolation: isolate;
+      z-index: 1;
+    }
+
+    .welcome-waves {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+      background: #000000;
+    }
+
+    .welcome-waves svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      opacity: 0.72;
+    }
+
+    .welcome-waves-dot {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.28);
+      transform: translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0);
+      box-shadow: 0 0 18px rgba(255,255,255,0.35);
+      will-change: transform;
     }
 
     .welcome-shell::before {
@@ -425,6 +457,68 @@
       color: #ffffff;
       background: linear-gradient(135deg, var(--welcome-cyan), var(--welcome-violet));
       box-shadow: 0 18px 36px rgba(20, 112, 255, 0.26);
+    }
+
+    .welcome-btn.explore-blue {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 58px;
+      padding: 8px 10px 8px 24px;
+      gap: 12px;
+      color: #0b2347;
+      background: rgba(239, 248, 255, 0.95);
+      border: 2px solid rgba(226, 244, 255, 0.92);
+      box-shadow: 0 18px 42px rgba(25, 129, 255, 0.32);
+      backdrop-filter: blur(12px);
+    }
+
+    .welcome-btn.explore-blue::before {
+      content: "";
+      position: absolute;
+      left: -100%;
+      top: 50%;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #1687ff, #19d5ff);
+      transform: translateY(-50%) scale(1);
+      transition: left 0.7s ease, transform 0.7s ease;
+      z-index: -1;
+    }
+
+    .welcome-btn.explore-blue:hover {
+      color: #ffffff;
+      box-shadow: 0 22px 50px rgba(25, 129, 255, 0.42);
+    }
+
+    .welcome-btn.explore-blue:hover::before {
+      left: 0;
+      transform: translateY(-50%) scale(1.55);
+    }
+
+    .welcome-btn.explore-blue svg {
+      width: 34px;
+      height: 34px;
+      padding: 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(11, 35, 71, 0.45);
+      color: #ffffff;
+      background: #0b2347;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      flex: 0 0 auto;
+    }
+
+    .welcome-btn.explore-blue:hover svg {
+      transform: rotate(90deg);
+      background: #ffffff;
+      border-color: transparent;
+      color: #0b2347;
+    }
+
+    .welcome-btn.explore-blue path {
+      fill: currentColor;
     }
 
     .welcome-btn.secondary {
@@ -1001,12 +1095,13 @@
   </style>
 </head>
 <body class="welcome-page">
+  <div class="welcome-waves" id="welcomeWaves" style="--x:-0.5rem;--y:50%;" aria-hidden="true"></div>
   <div class="welcome-shell" id="top">
     <nav class="welcome-nav">
       <div class="welcome-nav-left">
-        <a href="landing.html" class="welcome-brand" aria-label="Elevate Vue home">
-          <img src="logo.png" alt="Elevate Vue" class="brand-badge" />
-          <span>Elevate Vue</span>
+        <a href="landing.html" class="welcome-brand" aria-label="Orbit home">
+          <img src="orbit-logo.svg" alt="Orbit" class="brand-badge" />
+          <span>Orbit <em>by Elevate Vue</em></span>
         </a>
         <div class="welcome-links">
           <a href="landing.html" class="welcome-link active">Home</a>
@@ -1083,11 +1178,16 @@
         <div class="eyebrow">Welcome to Elevate</div>
         <h1 class="hero-title">Elevate Your <span class="gradient-text">Social Voice.</span></h1>
         <p class="hero-lead">
-          AI-powered analytics, scheduling, and strategic brand building designed for the next generation of digital curators.
+          Analytics, scheduling, and strategic brand building designed for the next generation of digital curators.
         </p>
 
         <div class="hero-cta">
-          <a href="login.html" class="welcome-btn primary">Get Started</a>
+          <a href="login.html" class="welcome-btn explore-blue">
+            Get Started
+            <svg viewBox="0 0 16 19" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"></path>
+            </svg>
+          </a>
           <a href="#demo" class="welcome-btn secondary">View Demo</a>
         </div>
       </div>
@@ -1115,7 +1215,7 @@
             <li><span class="summary-check">✓</span><span>Real-time sentiment heatmaps and focused opportunity spotting.</span></li>
             <li><span class="summary-check">✓</span><span>Multi-platform planning for Instagram, Facebook, LinkedIn, TikTok, and more.</span></li>
             <li><span class="summary-check">✓</span><span>Approval-ready workflows and reports built to share with clients or internal teams.</span></li>
-            <li><span class="summary-check">✓</span><span>Actionable AI recommendations that connect directly to the dashboard and reporting flow.</span></li>
+            <li><span class="summary-check">✓</span><span>Actionable recommendations that connect directly to the dashboard and reporting flow.</span></li>
           </ul>
         </div>
 
@@ -1126,7 +1226,7 @@
               <span></span>
               <span></span>
             </div>
-            <span>Elevate Vue — Dashboard</span>
+            <span>Orbit — Dashboard</span>
           </div>
           <div class="summary-divider" aria-hidden="true"></div>
 
@@ -1157,7 +1257,7 @@
           </div>
 
           <div class="summary-ai-card">
-            <div class="summary-ai-label">✨ AI Insight</div>
+            <div class="summary-ai-label">Insight</div>
             <p>Tuesday posts perform 34% better — schedule more content for 9am for optimal reach.</p>
           </div>
         </div>
@@ -1201,9 +1301,9 @@
         </article>
 
         <article class="feature-card violet">
-          <div class="feature-icon">AI</div>
+          <div class="feature-icon">R</div>
           <div>
-            <h4>AI Reports</h4>
+            <h4>Reports</h4>
             <p>Turn uploads into polished reports, complete with summaries, performance highlights, and next actions.</p>
           </div>
           <a href="#demo" class="welcome-btn secondary">View Demo</a>
@@ -1223,9 +1323,9 @@
     <footer class="footer-wrap">
       <div class="footer-panel">
         <div>
-          <a href="landing.html" class="welcome-brand" aria-label="Elevate Vue home">
-            <img src="logo.png" alt="EVV" class="brand-badge" />
-            <span>Elevate Vue</span>
+          <a href="landing.html" class="welcome-brand" aria-label="Orbit home">
+            <img src="orbit-logo.svg" alt="Orbit" class="brand-badge" />
+            <span>Orbit <em>by Elevate Vue</em></span>
           </a>
           <p>
             Elevating social voices through strategy, analytics, and presentation-ready reporting.
@@ -1252,6 +1352,128 @@
   </div>
 
   <script>
+    class WelcomeWaves {
+      constructor() {
+        this.container = document.getElementById('welcomeWaves');
+        if (!this.container) return;
+        this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        this.dot = document.createElement('div');
+        this.dot.className = 'welcome-waves-dot';
+        this.container.append(this.svg, this.dot);
+        this.paths = [];
+        this.lines = [];
+        this.mouse = { x: -10, y: 0, lx: 0, ly: 0, sx: 0, sy: 0, vs: 0, a: 0, set: false };
+        this.setSize();
+        this.setLines();
+        window.addEventListener('resize', () => {
+          this.setSize();
+          this.setLines();
+        });
+        window.addEventListener('mousemove', (event) => this.setMouse(event.clientX, event.clientY));
+        window.addEventListener('touchmove', (event) => {
+          const touch = event.touches?.[0];
+          if (touch) this.setMouse(touch.clientX, touch.clientY);
+        }, { passive: true });
+        requestAnimationFrame((time) => this.tick(time));
+      }
+
+      setSize() {
+        this.bounds = this.container.getBoundingClientRect();
+        this.svg.style.width = `${this.bounds.width}px`;
+        this.svg.style.height = `${this.bounds.height}px`;
+      }
+
+      setLines() {
+        const xGap = 12;
+        const yGap = 12;
+        const { width, height } = this.bounds;
+        this.paths.forEach((path) => path.remove());
+        this.paths = [];
+        this.lines = [];
+        const totalLines = Math.ceil((width + 200) / xGap);
+        const totalPoints = Math.ceil((height + 30) / yGap);
+        const xStart = (width - xGap * totalLines) / 2;
+        const yStart = (height - yGap * totalPoints) / 2;
+        for (let i = 0; i < totalLines; i += 1) {
+          const points = [];
+          for (let j = 0; j < totalPoints; j += 1) {
+            points.push({ x: xStart + xGap * i, y: yStart + yGap * j, wave: { x: 0, y: 0 }, cursor: { x: 0, y: 0, vx: 0, vy: 0 } });
+          }
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke', 'rgba(255,255,255,0.28)');
+          path.setAttribute('stroke-width', '1');
+          this.svg.appendChild(path);
+          this.paths.push(path);
+          this.lines.push(points);
+        }
+      }
+
+      setMouse(x, y) {
+        const mouse = this.mouse;
+        mouse.x = x - this.bounds.left;
+        mouse.y = y - this.bounds.top;
+        if (!mouse.set) {
+          mouse.sx = mouse.x;
+          mouse.sy = mouse.y;
+          mouse.lx = mouse.x;
+          mouse.ly = mouse.y;
+          mouse.set = true;
+        }
+      }
+
+      updatePoint(point, time) {
+        const mouse = this.mouse;
+        const move = ((Math.sin(point.x * 0.028 + time * 0.0008) + Math.sin(point.y * 0.021 + time * 0.00045) + Math.sin((point.x + point.y) * 0.012 + time * 0.0006)) / 3) * 8;
+        point.wave.x = Math.cos(move) * 12;
+        point.wave.y = Math.sin(move) * 6;
+        const dx = point.x - mouse.sx;
+        const dy = point.y - mouse.sy;
+        const distance = Math.hypot(dx, dy);
+        const limit = Math.max(175, mouse.vs);
+        if (distance < limit) {
+          const strength = (1 - distance / limit) * Math.cos(distance * 0.001);
+          point.cursor.vx += Math.cos(mouse.a) * strength * limit * mouse.vs * 0.00035;
+          point.cursor.vy += Math.sin(mouse.a) * strength * limit * mouse.vs * 0.00035;
+        }
+        point.cursor.vx += (0 - point.cursor.x) * 0.01;
+        point.cursor.vy += (0 - point.cursor.y) * 0.01;
+        point.cursor.vx *= 0.95;
+        point.cursor.vy *= 0.95;
+        point.cursor.x = Math.min(50, Math.max(-50, point.cursor.x + point.cursor.vx));
+        point.cursor.y = Math.min(50, Math.max(-50, point.cursor.y + point.cursor.vy));
+      }
+
+      tick(time) {
+        const mouse = this.mouse;
+        mouse.sx += (mouse.x - mouse.sx) * 0.1;
+        mouse.sy += (mouse.y - mouse.sy) * 0.1;
+        const dx = mouse.x - mouse.lx;
+        const dy = mouse.y - mouse.ly;
+        const distance = Math.hypot(dx, dy);
+        mouse.vs += (distance - mouse.vs) * 0.1;
+        mouse.vs = Math.min(100, mouse.vs);
+        mouse.lx = mouse.x;
+        mouse.ly = mouse.y;
+        mouse.a = Math.atan2(dy, dx);
+        this.container.style.setProperty('--x', `${mouse.sx}px`);
+        this.container.style.setProperty('--y', `${mouse.sy}px`);
+        this.lines.forEach((points, index) => {
+          let d = '';
+          points.forEach((point, pointIndex) => {
+            this.updatePoint(point, time);
+            const x = point.x + point.wave.x + (pointIndex ? point.cursor.x : 0);
+            const y = point.y + point.wave.y + (pointIndex ? point.cursor.y : 0);
+            d += `${pointIndex ? 'L' : 'M'} ${x} ${y}`;
+          });
+          this.paths[index]?.setAttribute('d', d);
+        });
+        requestAnimationFrame((nextTime) => this.tick(nextTime));
+      }
+    }
+
+    new WelcomeWaves();
+
     if (!location.hash) {
       history.replaceState(null, "", "#top");
     }
@@ -1268,9 +1490,9 @@
     const fallbackSearchablePages = [
       {
         title: "Home",
-        description: "Landing page and top of the Elevate Vue experience.",
+        description: "Landing page and top of the Orbit experience.",
         url: "landing.html#top",
-        keywords: ["landing", "welcome", "elevate vue", "homepage"]
+        keywords: ["landing", "welcome", "orbit", "homepage"]
       },
       {
         title: "Features",
@@ -1304,7 +1526,7 @@
       },
       {
         title: "Dashboard Overview",
-        description: "Overview dashboard with feedback and AI suggestions.",
+        description: "Overview dashboard with feedback and suggestions.",
         url: "dashboard-overview.html",
         keywords: ["dashboard", "overview", "ai suggestions", "feedback"]
       },
@@ -1649,3 +1871,4 @@
   </script>
 </body>
 </html>
+

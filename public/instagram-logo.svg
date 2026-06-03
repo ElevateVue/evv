@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
     <linearGradient id="instaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#feda75" />
@@ -15,3 +15,4 @@
   <circle cx="84" cy="36" r="8" fill="#222" />
   <circle cx="84" cy="36" r="5" fill="white" />
 </svg>
+

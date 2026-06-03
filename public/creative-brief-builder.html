@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creative Brief Builder - EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div><div class="brand-name">Orbit</div><div class="brand-sub">by Elevate Vue</div></div><button class="icon-btn" id="closeSidebar">x</button></div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
+      <div class="brand-inline"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div></div>
+      <div class="spacer"></div>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <div class="campaign-shell">
+        <header class="campaign-hero">
+          <div class="campaign-heading">
+            <div class="campaign-title">
+              <h1>Creative Brief Builder</h1>
+              <p>Build structured, professional creative briefs.</p>
+            </div>
+          </div>
+          <div class="campaign-tabs" role="tablist">
+            <a class="campaign-tab" href="ad-copy-grader.html">Ad Copy Grader</a>
+            <a class="campaign-tab active" href="creative-brief-builder.html">Creative Brief Builder</a>
+          </div>
+        </header>
+
+        <section class="campaign-tool-page">
+          <article class="campaign-tool-card">
+            <form id="creativeBriefForm" class="campaign-form">
+              <div class="campaign-form-grid">
+                <div class="field compact">
+                  <label for="briefCampaignName">Campaign Name</label>
+                  <input id="briefCampaignName" placeholder="Campaign Name" required />
+                </div>
+                <div class="field compact">
+                  <label for="briefPlatform">Platforms</label>
+                  <select id="briefPlatform" required>
+                    <option>Instagram</option>
+                    <option>Facebook Ads</option>
+                    <option>Google Ads</option>
+                    <option>LinkedIn Ads</option>
+                    <option>TikTok Ads</option>
+                    <option>Multi-platform</option>
+                  </select>
+                </div>
+                <div class="field compact full">
+                  <label for="briefObjective">Campaign Objective</label>
+                  <input id="briefObjective" placeholder="Campaign objective, e.g. drive sign-ups or increase brand awareness" required />
+                </div>
+                <div class="field compact">
+                  <label for="briefAudience">Target Audience</label>
+                  <input id="briefAudience" placeholder="Target Audience" required />
+                </div>
+                <div class="field compact">
+                  <label for="briefTone">Tone</label>
+                  <select id="briefTone" required>
+                    <option>Professional</option>
+                    <option>Friendly</option>
+                    <option>Bold</option>
+                    <option>Luxury</option>
+                    <option>Playful</option>
+                    <option>Educational</option>
+                  </select>
+                </div>
+                <div class="field compact">
+                  <label for="briefBudget">Budget</label>
+                  <input id="briefBudget" placeholder="Budget optional" />
+                </div>
+                <div class="field compact">
+                  <label for="briefDeadline">Deadline</label>
+                  <input id="briefDeadline" type="date" />
+                </div>
+                <div class="field compact full">
+                  <label for="briefMessage">Key Message</label>
+                  <textarea id="briefMessage" placeholder="Key message you want to communicate..." required></textarea>
+                </div>
+              </div>
+              <button class="pill-btn small" type="submit">Build Creative Brief</button>
+            </form>
+          </article>
+
+          <div id="campaignResults" class="campaign-results" hidden></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>
+
+

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strategy • EVV</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body.strategy-page { font-size: 16px; }
+    body.strategy-page * { font-size: inherit; }
+    .strategy-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 18px; }
+    .strategy-header h1 { margin: 0; font-size: 42px; letter-spacing: -0.04em; }
+    .strategy-header p { margin: 6px 0 0; max-width: 780px; color: var(--muted); line-height: 1.6; }
+    .strategy-tabs { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 24px; justify-content: center; }
+    .strategy-tab-button { padding: 16px 26px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: var(--text); cursor: pointer; transition: all 0.2s ease; font-weight: 800; font-size: 18px; letter-spacing: 0.01em; }
+    .strategy-tab-button.active { border-color: transparent; background: linear-gradient(135deg, #7c5dfa, #00d9ff); color: #fff; box-shadow: 0 20px 48px rgba(0,0,0,0.28); }
+    .strategy-section { display: none; margin-top: 28px; }
+    .strategy-section.active { display: block; }
+    #strategy-positioning-form { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    #strategy-positioning-form .field:nth-of-type(3) { grid-column: 1 / -1; }
+    #strategy-positioning-form .field:nth-of-type(5) { grid-column: 1 / -1; }
+    #strategy-positioning-form .strategy-actions { grid-column: 1 / -1; }
+    #strategy-positioning-form .strategy-message { grid-column: 1 / -1; }
+    #strategy-icp-form { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    #strategy-icp-form .field:nth-of-type(3) { grid-column: 1 / -1; }
+    #strategy-icp-form .strategy-actions,
+    #strategy-icp-form .strategy-message { grid-column: 1 / -1; }
+    .strategy-form { display: grid; gap: 18px; }
+    .strategy-form .field { display: grid; gap: 10px; }
+    .strategy-form textarea, .strategy-form input, .strategy-form select { width: 100%; background: #0b0f17; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 16px 18px; color: #e9ecf8; min-height: 54px; box-sizing: border-box; font-family: inherit; }
+    .strategy-form textarea { min-height: 140px; resize: vertical; }
+    .strategy-result { background: #070a11; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 20px; box-shadow: 0 24px 60px rgba(0,0,0,0.25); display: grid; gap: 18px; }
+    .strategy-result h2 { margin: 0; font-size: 24px; }
+    .strategy-result pre { white-space: pre-wrap; word-break: break-word; margin: 0; color: #dce5ff; font-family: inherit; line-height: 1.65; }
+    .strategy-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .strategy-actions .pill-btn.small { min-height: 38px; padding: 8px 13px; border-radius: 12px; font-size: 13px; box-shadow: none; }
+    .strategy-message { color: #7d90b2; font-size: 14px; }
+    .strategy-error { color: #ff9aaa; font-size: 14px; }
+    .strategy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .strategy-grid.full { grid-template-columns: 1fr; }
+    .strategy-section[data-section="positioning"] .strategy-grid { grid-template-columns: 1fr; }
+    .strategy-section[data-section="positioning"] .strategy-result { order: 2; }
+    .strategy-section[data-section="positioning"] .strategy-form-card { order: 1; }
+    .strategy-section[data-section="icp"] .strategy-grid { grid-template-columns: 1fr; }
+    .strategy-section[data-section="icp"] .strategy-result { order: 2; }
+    .strategy-section[data-section="icp"] .strategy-form-card { order: 1; }
+    .strategy-section[data-section="positioning"] .strategy-result-header { align-items: center; gap: 14px; }
+    .strategy-section[data-section="icp"] .strategy-result-header,
+    .strategy-section[data-section="positioning"] .strategy-result-header { align-items: center; gap: 14px; }
+    .strategy-section[data-section="icp"] .strategy-result-header h2,
+    .strategy-section[data-section="positioning"] .strategy-result-header h2 { font-size: 26px; }
+    .scorecard-workspace { display: grid; gap: 18px; }
+    .scorecard-progress-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #8ea0c8; font-size: 13px; }
+    .scorecard-progress-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
+    .scorecard-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #7c5dfa, #00d9ff); transition: width 0.2s ease; }
+    .scorecard-dim-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+    .scorecard-dim-tab { min-height: 46px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: #090d17; color: #dce5ff; cursor: pointer; font-weight: 800; }
+    .scorecard-dim-tab.active { border-color: #7c5dfa; background: rgba(124,93,250,0.18); }
+    .scorecard-dim-tab.complete { border-color: rgba(0,217,255,0.42); }
+    .scorecard-question-card { border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #090d17; padding: 20px; display: grid; gap: 18px; }
+    .scorecard-section-head { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: #070a11; }
+    .scorecard-section-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 10px; background: rgba(124,93,250,0.16); font-size: 20px; }
+    .scorecard-section-head h2 { margin: 0; font-size: 20px; }
+    .scorecard-section-head p { margin: 4px 0 0; color: #8ea0c8; font-size: 13px; }
+    .scorecard-questions { display: grid; gap: 16px; }
+    .scorecard-question { display: grid; gap: 10px; }
+    .scorecard-question-label { color: #dce5ff; font-size: 15px; line-height: 1.45; }
+    .scorecard-options { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    .scorecard-option { min-height: 44px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: #070a11; color: #aebceb; cursor: pointer; font-weight: 800; font-size: 13px; transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease; }
+    .scorecard-option.selected { border-color: #7c5dfa; background: rgba(124,93,250,0.22); color: #fff; }
+    .scorecard-nav { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .scorecard-report-card { border-radius: 14px; border: 1px solid rgba(124,93,250,0.35); background: #090d17; padding: 20px; display: grid; gap: 18px; }
+    .scorecard-report-hero { display: grid; grid-template-columns: 170px 1fr; gap: 22px; align-items: center; }
+    .scorecard-total { width: 140px; height: 140px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--score-color, #ffd23f) var(--score-angle, 0deg), rgba(255,255,255,0.1) 0); position: relative; }
+    .scorecard-total::before { content: ""; position: absolute; inset: 14px; border-radius: inherit; background: #090d17; }
+    .scorecard-total-content { position: relative; text-align: center; }
+    .scorecard-total-score { display: block; font-size: 34px; font-weight: 900; color: var(--score-color, #ffd23f); }
+    .scorecard-total-label { display: block; color: #9aa7ca; font-size: 13px; }
+    .scorecard-report-title { margin: 0 0 8px; font-size: 22px; }
+    .scorecard-report-summary { margin: 0; color: #b7c4e8; line-height: 1.6; }
+    .scorecard-breakdown { display: grid; gap: 12px; }
+    .scorecard-breakdown-row { border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: #070a11; padding: 14px; display: grid; gap: 10px; }
+    .scorecard-breakdown-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .scorecard-breakdown-name { font-weight: 900; color: #eef3ff; }
+    .scorecard-breakdown-score { font-weight: 900; color: var(--status-color, #ffd23f); }
+    .scorecard-status-pill { border: 1px solid currentColor; border-radius: 999px; padding: 4px 8px; font-size: 12px; color: var(--status-color, #ffd23f); background: color-mix(in srgb, var(--status-color, #ffd23f) 12%, transparent); }
+    .scorecard-meter { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; }
+    .scorecard-meter span { display: block; height: 100%; width: 0%; background: var(--status-color, #ffd23f); }
+    .scorecard-insights { margin: 0; padding-left: 18px; color: #c7d1ef; line-height: 1.6; }
+    @media (max-width: 960px) {
+      .scorecard-dim-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .scorecard-options { grid-template-columns: 1fr; }
+      .scorecard-report-hero { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 960px) {
+      .strategy-grid { grid-template-columns: 1fr; }
+      #strategy-positioning-form { grid-template-columns: 1fr; }
+      #strategy-icp-form { grid-template-columns: 1fr; }
+    }
+    .hidden { display: none !important; }
+  </style>
+  <script>
+    function loadScript(callback) {
+      var head = document.getElementsByTagName('head')[0];
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://tracker.metricool.com/resources/be.js';
+      script.onreadystatechange = callback;
+      script.onload = callback;
+      head.appendChild(script);
+    }
+    loadScript(function() {
+      beTracker.t({ hash: 'ec15d228c3066c0eeea651e88f835fa9' });
+    });
+  </script>
+  <script defer src="app.js"></script>
+  <script defer src="strategy.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body class="strategy-page">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" />
+      <div>
+        <div class="brand-name">Orbit</div>
+        <div class="brand-sub">by Elevate Vue</div>
+      </div>
+      <button class="icon-btn" id="closeSidebar" aria-label="Close menu">×</button>
+    </div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card">
+      <div class="avatar">S</r
+      ><div>
+        <div class="name" id="sideUser">Demo User</div>
+        <div class="email">demo@user.com</div>
+      </div>
+      <button class="icon-btn" aria-label="Switch account" style="display:none"></button>
+    </div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
+      <div class="brand-inline">
+        <img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" />
+        <div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <section class="panel">
+        <div class="strategy-header">
+          <div>
+            <h1>Strategy</h1>
+            <p>Create brand scorecards, build ideal customer profiles, and generate positioning copy with strategy tools.</p>
+          </div>
+        </div>
+        <div class="strategy-tabs" role="tablist">
+          <button type="button" class="strategy-tab-button active" data-tab="scorecard">Brand Scorecard</button>
+          <button type="button" class="strategy-tab-button" data-tab="icp">ICP Builder</button>
+          <button type="button" class="strategy-tab-button" data-tab="positioning">Positioning Wizard</button>
+        </div>
+
+        <div class="strategy-section active" data-section="scorecard">
+          <div class="card scorecard-workspace">
+            <div class="card-head">
+              <h2>Brand Scorecard</h2>
+              <div class="strategy-actions">
+                <button class="pill-btn outline" id="scorecardEditBtn" hidden>Retake</button>
+              </div>
+            </div>
+            <div id="scorecardQuiz">
+              <div class="scorecard-progress-top">
+                <span id="scorecardStepLabel">Dimension 1 of 6</span>
+                <span id="scorecardProgressLabel">0% complete</span>
+              </div>
+              <div class="scorecard-progress-bar" aria-hidden="true"><div class="scorecard-progress-fill" id="scorecardProgressFill"></div></div>
+              <div class="scorecard-dim-tabs" id="scorecardDimTabs" aria-label="Brand scorecard sections"></div>
+              <div class="scorecard-question-card">
+                <div class="scorecard-section-head">
+                  <div class="scorecard-section-icon" id="scorecardSectionIcon"></div>
+                  <div>
+                    <h2 id="scorecardSectionTitle"></h2>
+                    <p id="scorecardSectionSubtitle"></p>
+                  </div>
+                </div>
+                <div class="scorecard-questions" id="scorecardQuestions"></div>
+                <div class="scorecard-nav">
+                  <button class="pill-btn outline" id="scorecardBackBtn" type="button">Back</button>
+                  <button class="pill-btn" id="scorecardNextBtn" type="button">Next Section</button>
+                </div>
+              </div>
+            </div>
+            <div class="scorecard-report-card" id="scorecardSavedDisplay" hidden>
+              <div id="scorecardSavedText"></div>
+            </div>
+            <div class="strategy-message" id="scorecardStatus"></div>
+          </div>
+        </div>
+
+        <div class="strategy-section" data-section="icp">
+          <div class="strategy-grid">
+            <div class="card strategy-result" id="icpSavedDisplay" hidden>
+              <div class="strategy-result-header">
+                <h2>Saved ICP</h2>
+                <div class="strategy-actions">
+                  <button class="pill-btn outline small" id="icpCopyBtn">Copy</button>
+                  <button class="pill-btn outline small" id="icpEditBtn">Edit</button>
+                  <button class="pill-btn outline small" id="icpSaveBtn" hidden>Save</button>
+                  <button class="pill-btn danger small" id="icpDeleteBtn" hidden>Delete</button>
+                </div>
+              </div>
+              <pre id="icpSavedText"></pre>
+            </div>
+            <div class="card strategy-form-card">
+              <div class="card-head"><h2>ICP Builder</h2></div>
+              <div class="strategy-form" id="strategy-icp-form">
+                <div class="field">
+                  <label for="icpIndustry">Industry</label>
+                  <input id="icpIndustry" placeholder="e.g. SaaS, e-commerce, marketing" />
+                </div>
+                <div class="field">
+                  <label for="icpAudience">Target audience</label>
+                  <input id="icpAudience" placeholder="e.g. startup founders, marketing managers" />
+                </div>
+                <div class="field">
+                  <label for="icpDetails">Additional context</label>
+                  <textarea id="icpDetails" placeholder="Add any useful details like business size, customer behavior, or preferred channels."></textarea>
+                </div>
+                <div class="strategy-actions">
+                  <button class="pill-btn" id="generateIcpBtn">Generate ICP</button>
+                </div>
+                <div class="strategy-message" id="icpStatus"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="strategy-section" data-section="positioning">
+          <div class="strategy-grid">
+            <div class="card strategy-result" id="positioningSavedDisplay" hidden>
+              <div class="strategy-result-header">
+                <h2>Saved Positioning Wizard</h2>
+                <div class="strategy-actions">
+                  <button class="pill-btn outline small" id="positioningCopyBtn">Copy</button>
+                  <button class="pill-btn outline small" id="positioningEditBtn">Edit</button>
+                  <button class="pill-btn outline small" id="positioningSaveBtn" hidden>Save</button>
+                  <button class="pill-btn danger small" id="positioningDeleteBtn" hidden>Delete</button>
+                </div>
+              </div>
+              <pre id="positioningSavedText"></pre>
+            </div>
+            <div class="card strategy-form-card">
+              <div class="card-head"><h2>Positioning Wizard</h2></div>
+              <div class="strategy-form" id="strategy-positioning-form">
+                <div class="field">
+                  <label for="brandName">Brand name</label>
+                  <input id="brandName" placeholder="Brand name" />
+                </div>
+                <div class="field">
+                  <label for="brandIndustry">Industry</label>
+                  <input id="brandIndustry" placeholder="E-commerce, SaaS, consulting" />
+                </div>
+                <div class="field">
+                  <label for="brandUSP">Unique selling proposition</label>
+                  <textarea id="brandUSP" placeholder="What makes this brand different?"></textarea>
+                </div>
+                <div class="field">
+                  <label for="brandTone">Brand tone</label>
+                  <select id="brandTone">
+                    <option value="Professional">Professional</option>
+                    <option value="Casual">Casual</option>
+                    <option value="Witty">Witty</option>
+                    <option value="Inspirational">Inspirational</option>
+                    <option value="Bold">Bold</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="brandValues">Brand values</label>
+                  <textarea id="brandValues" placeholder="List brand values separated by commas"></textarea>
+                </div>
+                <div class="strategy-actions">
+                  <button class="pill-btn" id="generatePositioningBtn">Generate Positioning</button>
+                </div>
+                <div class="strategy-message" id="positioningStatus"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>
+

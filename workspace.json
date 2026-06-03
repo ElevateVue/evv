@@ -1,0 +1,2684 @@
+{
+  "posts": [
+    {
+      "id": "35e36f8efb5db454",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 1",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 59,
+      "clicks": 0,
+      "views": 59,
+      "followers": 0,
+      "createdAt": 1779577322047,
+      "raw": {
+        "month": "3/27/2026",
+        "follows": "0",
+        "profile visits": "1",
+        "link clicks": "0",
+        "interactions": "0",
+        "reach": "42",
+        "views": "59"
+      }
+    },
+    {
+      "id": "879c248f1c58f63b",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 2",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 824,
+      "clicks": 0,
+      "views": 824,
+      "followers": 1,
+      "createdAt": 1779577322047,
+      "raw": {
+        "month": "3/28/2026",
+        "follows": "1",
+        "profile visits": "1",
+        "link clicks": "0",
+        "interactions": "0",
+        "reach": "89",
+        "views": "824"
+      }
+    },
+    {
+      "id": "b4bf891d6644668a",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 3",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 2001,
+      "clicks": 0,
+      "views": 2001,
+      "followers": 11,
+      "createdAt": 1779577322047,
+      "raw": {
+        "month": "3/29/2026",
+        "follows": "11",
+        "profile visits": "62",
+        "link clicks": "8",
+        "interactions": "77",
+        "reach": "1328",
+        "views": "2001"
+      }
+    },
+    {
+      "id": "386372e6c6f553f7",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 4",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 3642,
+      "clicks": 0,
+      "views": 3642,
+      "followers": 31,
+      "createdAt": 1779577322047,
+      "raw": {
+        "month": "3/30/2026",
+        "follows": "31",
+        "profile visits": "159",
+        "link clicks": "9",
+        "interactions": "72",
+        "reach": "2149",
+        "views": "3642"
+      }
+    },
+    {
+      "id": "71db569e3a666d62",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 5",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 2535,
+      "clicks": 0,
+      "views": 2535,
+      "followers": 12,
+      "createdAt": 1779577322047,
+      "raw": {
+        "month": "3/31/2026",
+        "follows": "12",
+        "profile visits": "41",
+        "link clicks": "17",
+        "interactions": "21",
+        "reach": "1910",
+        "views": "2535"
+      }
+    },
+    {
+      "id": "06106e68f5f308af",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 6",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 2367,
+      "clicks": 0,
+      "views": 2367,
+      "followers": 7,
+      "createdAt": 1779577322047,
+      "raw": {
+        "month": "4/1/2026",
+        "follows": "7",
+        "profile visits": "24",
+        "link clicks": "29",
+        "interactions": "38",
+        "reach": "1772",
+        "views": "2367"
+      }
+    },
+    {
+      "id": "3dfec9b2fa73ca1c",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 7",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1973,
+      "clicks": 0,
+      "views": 1973,
+      "followers": 5,
+      "createdAt": 1779577322047,
+      "raw": {
+        "month": "4/2/2026",
+        "follows": "5",
+        "profile visits": "25",
+        "link clicks": "26",
+        "interactions": "25",
+        "reach": "1558",
+        "views": "1973"
+      }
+    },
+    {
+      "id": "4a617bb798329361",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 8",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1369,
+      "clicks": 0,
+      "views": 1369,
+      "followers": 3,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/3/2026",
+        "follows": "3",
+        "profile visits": "11",
+        "link clicks": "16",
+        "interactions": "24",
+        "reach": "928",
+        "views": "1369"
+      }
+    },
+    {
+      "id": "13ec806e180ea549",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 9",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1145,
+      "clicks": 0,
+      "views": 1145,
+      "followers": 1,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/4/2026",
+        "follows": "1",
+        "profile visits": "14",
+        "link clicks": "0",
+        "interactions": "21",
+        "reach": "544",
+        "views": "1145"
+      }
+    },
+    {
+      "id": "eeda306da62a8b98",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 10",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1077,
+      "clicks": 0,
+      "views": 1077,
+      "followers": 7,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/5/2026",
+        "follows": "7",
+        "profile visits": "14",
+        "link clicks": "0",
+        "interactions": "17",
+        "reach": "324",
+        "views": "1077"
+      }
+    },
+    {
+      "id": "1c8aeaace7153f93",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 11",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 198,
+      "clicks": 0,
+      "views": 198,
+      "followers": 3,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/6/2026",
+        "follows": "3",
+        "profile visits": "4",
+        "link clicks": "0",
+        "interactions": "2",
+        "reach": "95",
+        "views": "198"
+      }
+    },
+    {
+      "id": "126c67d799c12106",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 12",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 140,
+      "clicks": 0,
+      "views": 140,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/7/2026",
+        "follows": "0",
+        "profile visits": "7",
+        "link clicks": "0",
+        "interactions": "2",
+        "reach": "56",
+        "views": "140"
+      }
+    },
+    {
+      "id": "5f6b8ebc764c68d7",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 13",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 485,
+      "clicks": 0,
+      "views": 485,
+      "followers": 1,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/8/2026",
+        "follows": "1",
+        "profile visits": "13",
+        "link clicks": "0",
+        "interactions": "12",
+        "reach": "194",
+        "views": "485"
+      }
+    },
+    {
+      "id": "c9923a1ed00f4e3a",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 14",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 245,
+      "clicks": 0,
+      "views": 245,
+      "followers": 1,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/9/2026",
+        "follows": "1",
+        "profile visits": "5",
+        "link clicks": "0",
+        "interactions": "5",
+        "reach": "127",
+        "views": "245"
+      }
+    },
+    {
+      "id": "15992f98cc1e93d6",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 15",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 96,
+      "clicks": 0,
+      "views": 96,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/10/2026",
+        "follows": "0",
+        "profile visits": "4",
+        "link clicks": "0",
+        "interactions": "1",
+        "reach": "53",
+        "views": "96"
+      }
+    },
+    {
+      "id": "a6a119453cb9019a",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 16",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 141,
+      "clicks": 0,
+      "views": 141,
+      "followers": 1,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/11/2026",
+        "follows": "1",
+        "profile visits": "5",
+        "link clicks": "0",
+        "interactions": "5",
+        "reach": "74",
+        "views": "141"
+      }
+    },
+    {
+      "id": "9785058c428f23d6",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 17",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 122,
+      "clicks": 0,
+      "views": 122,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/12/2026",
+        "follows": "0",
+        "profile visits": "5",
+        "link clicks": "0",
+        "interactions": "0",
+        "reach": "38",
+        "views": "122"
+      }
+    },
+    {
+      "id": "cb792dfbab4bfa66",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 18",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 123,
+      "clicks": 0,
+      "views": 123,
+      "followers": 1,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/13/2026",
+        "follows": "1",
+        "profile visits": "2",
+        "link clicks": "0",
+        "interactions": "6",
+        "reach": "49",
+        "views": "123"
+      }
+    },
+    {
+      "id": "456686f55ac2ae96",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 19",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 62,
+      "clicks": 0,
+      "views": 62,
+      "followers": 1,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/14/2026",
+        "follows": "1",
+        "profile visits": "3",
+        "link clicks": "0",
+        "interactions": "2",
+        "reach": "24",
+        "views": "62"
+      }
+    },
+    {
+      "id": "7c512a33b5ad89a6",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 20",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 308,
+      "clicks": 0,
+      "views": 308,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/15/2026",
+        "follows": "0",
+        "profile visits": "9",
+        "link clicks": "0",
+        "interactions": "8",
+        "reach": "182",
+        "views": "308"
+      }
+    },
+    {
+      "id": "dd18e088f0a6537b",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 21",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 268,
+      "clicks": 0,
+      "views": 268,
+      "followers": 1,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/16/2026",
+        "follows": "1",
+        "profile visits": "2",
+        "link clicks": "0",
+        "interactions": "13",
+        "reach": "172",
+        "views": "268"
+      }
+    },
+    {
+      "id": "160fea1c45dc7d18",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 22",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 137,
+      "clicks": 0,
+      "views": 137,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/17/2026",
+        "follows": "0",
+        "profile visits": "2",
+        "link clicks": "0",
+        "interactions": "6",
+        "reach": "89",
+        "views": "137"
+      }
+    },
+    {
+      "id": "dddfa0708555c9c4",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 23",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 287,
+      "clicks": 0,
+      "views": 287,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/18/2026",
+        "follows": "0",
+        "profile visits": "6",
+        "link clicks": "0",
+        "interactions": "13",
+        "reach": "144",
+        "views": "287"
+      }
+    },
+    {
+      "id": "a9fde9d02379e7c0",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 24",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 713,
+      "clicks": 0,
+      "views": 713,
+      "followers": 4,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/19/2026",
+        "follows": "4",
+        "profile visits": "23",
+        "link clicks": "77",
+        "interactions": "10",
+        "reach": "5475",
+        "views": "713"
+      }
+    },
+    {
+      "id": "6f26ad09f54b98a3",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 25",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 454,
+      "clicks": 0,
+      "views": 454,
+      "followers": 2,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/20/2026",
+        "follows": "2",
+        "profile visits": "13",
+        "link clicks": "221",
+        "interactions": "19",
+        "reach": "2616",
+        "views": "454"
+      }
+    },
+    {
+      "id": "596e4c7cc883aece",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 26",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 292,
+      "clicks": 0,
+      "views": 292,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/21/2026",
+        "follows": "0",
+        "profile visits": "3",
+        "link clicks": "89",
+        "interactions": "8",
+        "reach": "794",
+        "views": "292"
+      }
+    },
+    {
+      "id": "af79549fb546a3b6",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 27",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 490,
+      "clicks": 0,
+      "views": 490,
+      "followers": 3,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/22/2026",
+        "follows": "3",
+        "profile visits": "9",
+        "link clicks": "0",
+        "interactions": "14",
+        "reach": "151",
+        "views": "490"
+      }
+    },
+    {
+      "id": "81bdb0ae70261a3d",
+      "platform": "Instagram",
+      "source": "Instagram Analytics Template - For the Tool.csv",
+      "title": "Post 28",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 155,
+      "clicks": 0,
+      "views": 155,
+      "followers": 0,
+      "createdAt": 1779577322048,
+      "raw": {
+        "month": "4/23/2026",
+        "follows": "0",
+        "profile visits": "2",
+        "link clicks": "0",
+        "interactions": "1",
+        "reach": "59",
+        "views": "155"
+      }
+    },
+    {
+      "id": "86168a42ddd15f38",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 1",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 4,
+      "clicks": 0,
+      "views": 4,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "01/01/2026",
+        "impressions": "4",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "3"
+      }
+    },
+    {
+      "id": "dd5730d793b840ae",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 2",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 5,
+      "clicks": 6,
+      "views": 5,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "02/01/2026",
+        "impressions": "5",
+        "clicks": "6",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "1.2",
+        "unique": "4"
+      }
+    },
+    {
+      "id": "fa746cdd6df8c830",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 3",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 3,
+      "clicks": 0,
+      "views": 3,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "03/01/2026",
+        "impressions": "3",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "54"
+      }
+    },
+    {
+      "id": "9f4e5a7b230ad693",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 4",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 2,
+      "clicks": 0,
+      "views": 2,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "04/01/2026",
+        "impressions": "2",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "5"
+      }
+    },
+    {
+      "id": "a858cade9be2a650",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 5",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 11,
+      "clicks": 0,
+      "views": 11,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "05/01/2026",
+        "impressions": "11",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "7",
+        "engagements": "0",
+        "unique": "4"
+      }
+    },
+    {
+      "id": "bddcbc1e04328bb6",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 6",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 10,
+      "clicks": 3,
+      "views": 10,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "06/01/2026",
+        "impressions": "10",
+        "clicks": "3",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.3",
+        "unique": "5"
+      }
+    },
+    {
+      "id": "90ca61a4eef43aec",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 7",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 2,
+      "clicks": 0,
+      "views": 2,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "07/01/2026",
+        "impressions": "2",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "7"
+      }
+    },
+    {
+      "id": "9246facbbdb3815e",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 8",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 3,
+      "clicks": 0,
+      "views": 3,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "08/01/2026",
+        "impressions": "3",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "5"
+      }
+    },
+    {
+      "id": "e44de8e08c9c8d9d",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 9",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 1,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 1,
+        "total": 2
+      },
+      "reach": 52,
+      "clicks": 3,
+      "views": 52,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "09/01/2026",
+        "impressions": "52",
+        "clicks": "3",
+        "reactions": "1",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.019230769",
+        "unique": "34"
+      }
+    },
+    {
+      "id": "d9f160b19bd19ddb",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 10",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 15,
+      "clicks": 1,
+      "views": 15,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "10/01/2026",
+        "impressions": "15",
+        "clicks": "1",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.066666667",
+        "unique": "98"
+      }
+    },
+    {
+      "id": "9180c02b7b5127d1",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 11",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 1,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 1,
+        "total": 2
+      },
+      "reach": 5,
+      "clicks": 8,
+      "views": 5,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "11/01/2026",
+        "impressions": "5",
+        "clicks": "8",
+        "reactions": "1",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.2",
+        "unique": "89"
+      }
+    },
+    {
+      "id": "2deeef82b46447cc",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 12",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 1,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 1,
+        "total": 2
+      },
+      "reach": 6,
+      "clicks": 6,
+      "views": 6,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "12/01/2026",
+        "impressions": "6",
+        "clicks": "6",
+        "reactions": "1",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.636363636",
+        "unique": "80"
+      }
+    },
+    {
+      "id": "b933129c8aaba257",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 13",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 8,
+      "clicks": 3,
+      "views": 8,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "13/01/2026",
+        "impressions": "8",
+        "clicks": "3",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.375",
+        "unique": "56"
+      }
+    },
+    {
+      "id": "c073861c3b0b1151",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 14",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 4,
+        "shares": 0,
+        "reactions": 0,
+        "total": 4
+      },
+      "reach": 10,
+      "clicks": 0,
+      "views": 10,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "14/01/2026",
+        "impressions": "10",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "4",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "0"
+      }
+    },
+    {
+      "id": "bec1488b3de95ff3",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 15",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 22,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 22,
+        "total": 44
+      },
+      "reach": 1,
+      "clicks": 0,
+      "views": 1,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "15/01/2026",
+        "impressions": "1",
+        "clicks": "0",
+        "reactions": "22",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.69",
+        "unique": "0"
+      }
+    },
+    {
+      "id": "32d0f48d2c94255b",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 16",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 6,
+      "clicks": 6,
+      "views": 6,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "16/01/2026",
+        "impressions": "6",
+        "clicks": "6",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "1",
+        "unique": "0"
+      }
+    },
+    {
+      "id": "7685c5b4f974ff06",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 17",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 2,
+      "clicks": 0,
+      "views": 2,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "17/01/2026",
+        "impressions": "2",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "8"
+      }
+    },
+    {
+      "id": "7ed336a902ba53f4",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 18",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 6,
+      "clicks": 0,
+      "views": 6,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "18/01/2026",
+        "impressions": "6",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "0"
+      }
+    },
+    {
+      "id": "2852ed4939dbff95",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 19",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 1,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 1,
+        "total": 2
+      },
+      "reach": 27,
+      "clicks": 4,
+      "views": 27,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "19/01/2026",
+        "impressions": "27",
+        "clicks": "4",
+        "reactions": "1",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.185185185",
+        "unique": "54"
+      }
+    },
+    {
+      "id": "98b7fcceb1086efd",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 20",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 15,
+      "clicks": 0,
+      "views": 15,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "20/01/2026",
+        "impressions": "15",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "87"
+      }
+    },
+    {
+      "id": "20e9a0c736c7aab7",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 21",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 2,
+      "clicks": 0,
+      "views": 2,
+      "followers": 0,
+      "createdAt": 1779577322051,
+      "raw": {
+        "month": "21/01/2026",
+        "impressions": "2",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "67"
+      }
+    },
+    {
+      "id": "39846ed969732f05",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 22",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1,
+      "clicks": 0,
+      "views": 1,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "22/01/2026",
+        "impressions": "1",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "89"
+      }
+    },
+    {
+      "id": "a3b277a873d1a24b",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 23",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 7,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 7,
+        "total": 14
+      },
+      "reach": 8,
+      "clicks": 1,
+      "views": 8,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "23/01/2026",
+        "impressions": "8",
+        "clicks": "1",
+        "reactions": "7",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.125",
+        "unique": "34"
+      }
+    },
+    {
+      "id": "b5b9898557ba869b",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 24",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1,
+      "clicks": 0,
+      "views": 1,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "24/01/2026",
+        "impressions": "1",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "67"
+      }
+    },
+    {
+      "id": "9e9125d3d4e58613",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 25",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 58,
+        "shares": 0,
+        "reactions": 0,
+        "total": 58
+      },
+      "reach": 3,
+      "clicks": 0,
+      "views": 3,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "25/01/2026",
+        "impressions": "3",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "58",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "0"
+      }
+    },
+    {
+      "id": "8e19de5727727ed7",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 26",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1,
+      "clicks": 0,
+      "views": 1,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "26/01/2026",
+        "impressions": "1",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "75",
+        "engagements": "0",
+        "unique": "0"
+      }
+    },
+    {
+      "id": "cba254d2d315d231",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 27",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 1,
+      "clicks": 0,
+      "views": 1,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "27/01/2026",
+        "impressions": "1",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.885",
+        "unique": "0"
+      }
+    },
+    {
+      "id": "feaea276d89a29f7",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 28",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 1,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 1,
+        "total": 2
+      },
+      "reach": 10,
+      "clicks": 0,
+      "views": 10,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "28/01/2026",
+        "impressions": "10",
+        "clicks": "0",
+        "reactions": "1",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0.1",
+        "unique": "54"
+      }
+    },
+    {
+      "id": "9d64647017200023",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 29",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 7,
+      "clicks": 0,
+      "views": 7,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "29/01/2026",
+        "impressions": "7",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "32"
+      }
+    },
+    {
+      "id": "017c984e708882f7",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 30",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 0,
+      "clicks": 0,
+      "views": 0,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "30/01/2026",
+        "impressions": "0",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "21"
+      }
+    },
+    {
+      "id": "5f549d9772c13c29",
+      "platform": "LinkedIn",
+      "source": "LinkedIn Analytics Jan 2026.csv",
+      "title": "Post 31",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 0,
+      "clicks": 0,
+      "views": 0,
+      "followers": 0,
+      "createdAt": 1779577322052,
+      "raw": {
+        "month": "31/01/2026",
+        "impressions": "0",
+        "clicks": "0",
+        "reactions": "0",
+        "comments": "0",
+        "reposts": "0",
+        "engagements": "0",
+        "unique": "34"
+      }
+    },
+    {
+      "id": "f3789a150ef051dc",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 1",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 21,
+      "clicks": 0,
+      "views": 21,
+      "followers": 0,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "3/27/2026",
+        "follows": "0",
+        "visits": "0",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "21",
+        "viewers": "10"
+      }
+    },
+    {
+      "id": "b9f35fbb366c0d29",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 2",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 29,
+      "clicks": 0,
+      "views": 29,
+      "followers": 2,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "3/28/2026",
+        "follows": "2",
+        "visits": "9",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "29",
+        "viewers": "20"
+      }
+    },
+    {
+      "id": "4f0e437ad6b47ffc",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 3",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 59250,
+      "clicks": 0,
+      "views": 59250,
+      "followers": 0,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "3/29/2026",
+        "follows": "0",
+        "visits": "66",
+        "link clicks": "1808",
+        "interactions": "112",
+        "views": "59250",
+        "viewers": "51216"
+      }
+    },
+    {
+      "id": "711a2147fc84d888",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 4",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 29622,
+      "clicks": 0,
+      "views": 29622,
+      "followers": 3,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "3/30/2026",
+        "follows": "3",
+        "visits": "84",
+        "link clicks": "1704",
+        "interactions": "101",
+        "views": "29622",
+        "viewers": "25787"
+      }
+    },
+    {
+      "id": "80ddc7adadbdbff4",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 5",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 25949,
+      "clicks": 0,
+      "views": 25949,
+      "followers": 6,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "3/31/2026",
+        "follows": "6",
+        "visits": "111",
+        "link clicks": "1629",
+        "interactions": "149",
+        "views": "25949",
+        "viewers": "22117"
+      }
+    },
+    {
+      "id": "3d39f3b2ee012193",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 6",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 21670,
+      "clicks": 0,
+      "views": 21670,
+      "followers": 0,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "4/1/2026",
+        "follows": "0",
+        "visits": "101",
+        "link clicks": "1797",
+        "interactions": "65",
+        "views": "21670",
+        "viewers": "17994"
+      }
+    },
+    {
+      "id": "2e5dc3b76a819699",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 7",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 20659,
+      "clicks": 0,
+      "views": 20659,
+      "followers": 2,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "4/2/2026",
+        "follows": "2",
+        "visits": "55",
+        "link clicks": "1403",
+        "interactions": "60",
+        "views": "20659",
+        "viewers": "17160"
+      }
+    },
+    {
+      "id": "d65399861de45076",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 8",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 6411,
+      "clicks": 0,
+      "views": 6411,
+      "followers": 5,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "4/3/2026",
+        "follows": "5",
+        "visits": "52",
+        "link clicks": "537",
+        "interactions": "20",
+        "views": "6411",
+        "viewers": "5563"
+      }
+    },
+    {
+      "id": "1c0bee163bf5ab5f",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 9",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 368,
+      "clicks": 0,
+      "views": 368,
+      "followers": 1,
+      "createdAt": 1779577322055,
+      "raw": {
+        "month": "4/4/2026",
+        "follows": "1",
+        "visits": "34",
+        "link clicks": "2",
+        "interactions": "6",
+        "views": "368",
+        "viewers": "161"
+      }
+    },
+    {
+      "id": "e68723be7f1129f3",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 10",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 102,
+      "clicks": 0,
+      "views": 102,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/5/2026",
+        "follows": "0",
+        "visits": "0",
+        "link clicks": "0",
+        "interactions": "1",
+        "views": "102",
+        "viewers": "54"
+      }
+    },
+    {
+      "id": "62a107d898eb1544",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 11",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 48,
+      "clicks": 0,
+      "views": 48,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/6/2026",
+        "follows": "0",
+        "visits": "4",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "48",
+        "viewers": "31"
+      }
+    },
+    {
+      "id": "8259565fc9f8f71e",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 12",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 54,
+      "clicks": 0,
+      "views": 54,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/7/2026",
+        "follows": "0",
+        "visits": "5",
+        "link clicks": "0",
+        "interactions": "1",
+        "views": "54",
+        "viewers": "38"
+      }
+    },
+    {
+      "id": "addc103d2fb6ac24",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 13",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 59,
+      "clicks": 0,
+      "views": 59,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/8/2026",
+        "follows": "0",
+        "visits": "1",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "59",
+        "viewers": "40"
+      }
+    },
+    {
+      "id": "1f4a0de591a97631",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 14",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 34,
+      "clicks": 0,
+      "views": 34,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/9/2026",
+        "follows": "0",
+        "visits": "2",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "34",
+        "viewers": "19"
+      }
+    },
+    {
+      "id": "cac8d13b5b0a72e4",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 15",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 47,
+      "clicks": 0,
+      "views": 47,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/10/2026",
+        "follows": "0",
+        "visits": "0",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "47",
+        "viewers": "25"
+      }
+    },
+    {
+      "id": "43e10b2f0988ecee",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 16",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 25,
+      "clicks": 0,
+      "views": 25,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/11/2026",
+        "follows": "0",
+        "visits": "1",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "25",
+        "viewers": "12"
+      }
+    },
+    {
+      "id": "991d9303b4c47c4b",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 17",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 8,
+      "clicks": 0,
+      "views": 8,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/12/2026",
+        "follows": "0",
+        "visits": "0",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "8",
+        "viewers": "5"
+      }
+    },
+    {
+      "id": "2104687770a54927",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 18",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 19,
+      "clicks": 0,
+      "views": 19,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/13/2026",
+        "follows": "0",
+        "visits": "1",
+        "link clicks": "0",
+        "interactions": "1",
+        "views": "19",
+        "viewers": "18"
+      }
+    },
+    {
+      "id": "579f23b95f480d58",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 19",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 12,
+      "clicks": 0,
+      "views": 12,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/14/2026",
+        "follows": "0",
+        "visits": "0",
+        "link clicks": "0",
+        "interactions": "2",
+        "views": "12",
+        "viewers": "9"
+      }
+    },
+    {
+      "id": "889b2a3d1f9c5733",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 20",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 230,
+      "clicks": 0,
+      "views": 230,
+      "followers": 2,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/15/2026",
+        "follows": "2",
+        "visits": "7",
+        "link clicks": "0",
+        "interactions": "3",
+        "views": "230",
+        "viewers": "208"
+      }
+    },
+    {
+      "id": "a1fe6eb0d5fc28d8",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 21",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 114,
+      "clicks": 0,
+      "views": 114,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/16/2026",
+        "follows": "0",
+        "visits": "2",
+        "link clicks": "0",
+        "interactions": "6",
+        "views": "114",
+        "viewers": "71"
+      }
+    },
+    {
+      "id": "3437a5b21e8c1faf",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 22",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 109,
+      "clicks": 0,
+      "views": 109,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/17/2026",
+        "follows": "0",
+        "visits": "4",
+        "link clicks": "0",
+        "interactions": "3",
+        "views": "109",
+        "viewers": "87"
+      }
+    },
+    {
+      "id": "a90d4f65f5ee071f",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 23",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 141,
+      "clicks": 0,
+      "views": 141,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/18/2026",
+        "follows": "0",
+        "visits": "6",
+        "link clicks": "0",
+        "interactions": "2",
+        "views": "141",
+        "viewers": "55"
+      }
+    },
+    {
+      "id": "35849dd7bece26b4",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 24",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 99329,
+      "clicks": 0,
+      "views": 99329,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/19/2026",
+        "follows": "0",
+        "visits": "62",
+        "link clicks": "963",
+        "interactions": "96",
+        "views": "99329",
+        "viewers": "80131"
+      }
+    },
+    {
+      "id": "219107b2c34df3a5",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 25",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 70010,
+      "clicks": 0,
+      "views": 70010,
+      "followers": 1,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/20/2026",
+        "follows": "1",
+        "visits": "89",
+        "link clicks": "1050",
+        "interactions": "170",
+        "views": "70010",
+        "viewers": "44658"
+      }
+    },
+    {
+      "id": "9c2c8f2aa3ac356b",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 26",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 31073,
+      "clicks": 0,
+      "views": 31073,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/21/2026",
+        "follows": "0",
+        "visits": "82",
+        "link clicks": "495",
+        "interactions": "76",
+        "views": "31073",
+        "viewers": "21344"
+      }
+    },
+    {
+      "id": "05a9e51b55bbc94c",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 27",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 150,
+      "clicks": 0,
+      "views": 150,
+      "followers": 0,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/22/2026",
+        "follows": "0",
+        "visits": "13",
+        "link clicks": "4",
+        "interactions": "5",
+        "views": "150",
+        "viewers": "88"
+      }
+    },
+    {
+      "id": "a0b6b051d5bab88f",
+      "platform": "Facebook",
+      "source": "Facebook Analytics - For the Tool.csv",
+      "title": "Post 28",
+      "transcript": "",
+      "postedAt": null,
+      "status": "scheduled",
+      "engagement": {
+        "likes": 0,
+        "comments": 0,
+        "shares": 0,
+        "reactions": 0,
+        "total": 0
+      },
+      "reach": 100,
+      "clicks": 0,
+      "views": 100,
+      "followers": 1,
+      "createdAt": 1779577322056,
+      "raw": {
+        "month": "4/23/2026",
+        "follows": "1",
+        "visits": "11",
+        "link clicks": "0",
+        "interactions": "0",
+        "views": "100",
+        "viewers": "33"
+      }
+    }
+  ],
+  "lastUploadName": "Instagram Analytics Template - For the Tool.csv, LinkedIn Analytics Jan 2026.csv, Facebook Analytics - For the Tool.csv",
+  "metrics": {
+    "reach": 387578,
+    "interactions": 130,
+    "clicks": 41,
+    "reactions": 34,
+    "views": 387578,
+    "follows": 119,
+    "engagementRate": 0
+  },
+  "perPlatform": {
+    "Instagram": {
+      "reach": 21708,
+      "interactions": 0,
+      "clicks": 0,
+      "reactions": 0,
+      "views": 21708,
+      "follows": 96,
+      "count": 28
+    },
+    "LinkedIn": {
+      "reach": 227,
+      "interactions": 130,
+      "clicks": 41,
+      "reactions": 34,
+      "views": 227,
+      "follows": 0,
+      "count": 31
+    },
+    "Facebook": {
+      "reach": 365643,
+      "interactions": 0,
+      "clicks": 0,
+      "reactions": 0,
+      "views": 365643,
+      "follows": 23,
+      "count": 28
+    }
+  }
+}

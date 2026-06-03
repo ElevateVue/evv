@@ -133,6 +133,62 @@
     .admin-main {
       min-width: 0;
       padding: 20px 24px 32px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    .admin-content {
+      min-width: 0;
+    }
+
+    .client-sidebar {
+      background: rgba(27, 27, 32, 0.98);
+      border: 1px solid var(--admin-line);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .client-sidebar[hidden] {
+      display: none;
+    }
+
+    .client-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .client-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 12px;
+      color: #9b9ca7;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: .2s ease;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .client-nav a:hover,
+    .client-nav a.active {
+      color: #eef5ff;
+      background: linear-gradient(90deg, rgba(24, 215, 225, 0.14), rgba(93, 124, 255, 0.12));
+      border-color: rgba(24, 215, 225, 0.28);
+    }
+
+    .client-nav a.active {
+      box-shadow: inset 3px 0 0 var(--admin-cyan);
     }
 
     .admin-topbar {
@@ -578,6 +634,16 @@
       .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .admin-main {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .client-sidebar {
+        position: static;
+        width: 100%;
+      }
     }
 
     @media (max-width: 940px) {
@@ -632,6 +698,9 @@
 
       <nav class="admin-nav">
         <a href="featurehub.html">Feature Hub</a>
+        <a href="strategy.html">Strategy</a>
+        <a href="brand.html">Brand</a>
+        <a href="ad-copy-grader.html">Campaign Center</a>
         <a class="active" href="clienthub.html">Client Hub</a>
         <a href="dashboard-overview.html">Dashboard</a>
         <a href="connect.html">Connections</a>
@@ -641,64 +710,82 @@
 
       <div class="admin-sidebar-footer">
         <a href="landing.html">Help Center</a>
+        <a href="admin-signin.html">Switch Admin</a>
         <a href="login.html">Logout</a>
       </div>
     </aside>
 
     <main class="admin-main">
-      <div class="admin-topbar">
-        <div class="admin-topbar-copy">
-          <strong>ElevateVue</strong>
-          <span>Client Management</span>
+      <div class="admin-content">
+        <div class="admin-topbar">
+          <div class="admin-topbar-copy">
+            <strong>ElevateVue</strong>
+            <span>Client Management</span>
+          </div>
+          <input class="admin-search" id="clientSearch" type="search" placeholder="Search clients, emails, tools..." />
         </div>
-        <input class="admin-search" id="clientSearch" type="search" placeholder="Search clients, emails, tools..." />
+
+        <section class="hero">
+          <div>
+            <h1>Client Hub</h1>
+            <p>Every person who logs in gets a saved client card here. The admin view shows who they are, which tools or pages they use, and how much data has been stored for them in this browser.</p>
+          </div>
+          <div class="hero-actions">
+            <button class="ghost-btn" id="refreshHub" type="button">Refresh</button>
+            <button class="solid-btn" id="exportCsv" type="button">Export CSV</button>
+          </div>
+        </section>
+
+        <section class="stats-grid" id="statsGrid"></section>
+        <section class="client-grid" id="clientGrid"></section>
+        <section class="empty-state" id="emptyState" hidden>
+          <strong>No client cards yet</strong>
+          Once someone logs in and opens the platform, their usage card will appear here automatically.
+        </section>
       </div>
 
-      <section class="hero">
-        <div>
-          <h1>Client Hub</h1>
-          <p>Every person who logs in gets a saved client card here. The admin view shows who they are, which tools or pages they use, and how much data has been stored for them in this browser.</p>
-        </div>
-        <div class="hero-actions">
-          <button class="ghost-btn" id="refreshHub" type="button">Refresh</button>
-          <button class="solid-btn" id="exportCsv" type="button">Export CSV</button>
-        </div>
-      </section>
-
-      <section class="stats-grid" id="statsGrid"></section>
-      <section class="client-grid" id="clientGrid"></section>
-      <section class="empty-state" id="emptyState" hidden>
-        <strong>No client cards yet</strong>
-        Once someone logs in and opens the platform, their usage card will appear here automatically.
-      </section>
-      <section class="detail-panel" id="detailPanel" hidden>
-        <div class="detail-head">
-          <div>
-            <h2 id="detailName">Client Detail</h2>
-            <p id="detailSubtitle">Select a client card to inspect sign-ins, recent actions, saved data, and overall usage.</p>
-          </div>
-          <button class="ghost-btn" id="closeDetail" type="button">Close</button>
-        </div>
-        <div class="detail-grid">
-          <article class="detail-card">
-            <h3>Identity</h3>
-            <div class="detail-meta" id="detailMeta"></div>
-          </article>
-          <article class="detail-card">
-            <h3>Tools Used</h3>
-            <div class="chip-row" id="detailTools"></div>
-          </article>
-          <article class="detail-card">
-            <h3>Saved Data</h3>
-            <div class="detail-meta" id="detailSaved"></div>
-          </article>
-          <article class="detail-card">
-            <h3>Recent Activity</h3>
-            <div class="activity-list" id="detailActivity"></div>
-          </article>
-        </div>
-      </section>
+      <aside class="client-sidebar" id="clientSidebar" hidden>
+        <nav class="client-nav">
+          <a href="#overview" class="active" data-section="overview">Overview</a>
+          <a href="#data" data-section="data">Data & Metrics</a>
+          <a href="#activities" data-section="activities">Activities</a>
+          <a href="#settings" data-section="settings">Settings</a>
+        </nav>
+      </aside>
     </main>
+  </div>
+
+  <div class="detail-panel" id="detailPanel" hidden>
+    <div class="detail-head">
+      <div>
+        <h2 id="detailName">Client Detail</h2>
+        <p id="detailSubtitle">Select a client card to inspect sign-ins, recent actions, saved data, and overall usage.</p>
+      </div>
+      <button class="ghost-btn" id="closeDetail" type="button">Close</button>
+    </div>
+    <div class="detail-grid">
+      <article class="detail-card" id="detailOverview">
+        <h3>Identity</h3>
+        <div class="detail-meta" id="detailMeta"></div>
+        <div style="margin-top: 16px; display: flex; gap: 8px;">
+          <button class="ghost-btn" id="editClientBtn" type="button" style="font-size: 12px; padding: 8px 12px;">Edit Details</button>
+          <button class="solid-btn" id="saveClientBtn" type="button" style="font-size: 12px; padding: 8px 12px; display: none;">Save Changes</button>
+          <button class="ghost-btn" id="cancelEditBtn" type="button" style="font-size: 12px; padding: 8px 12px; display: none;">Cancel</button>
+        </div>
+      </article>
+      <article class="detail-card" id="detailTools">
+        <h3>Tools Used</h3>
+        <div class="chip-row" id="detailToolsChips"></div>
+      </article>
+      <article class="detail-card" id="detailData">
+        <h3>Saved Data</h3>
+        <div class="detail-meta" id="detailSaved"></div>
+      </article>
+      <article class="detail-card" id="detailActivities">
+        <h3>Recent Activity</h3>
+        <div class="activity-list" id="detailActivity"></div>
+      </article>
+    </div>
   </div>
 
   <script>
@@ -847,7 +934,7 @@
       clientGrid.querySelectorAll('.detail-trigger').forEach((button) => {
         button.addEventListener('click', () => {
           const record = records.find((item) => item.id === button.dataset.id);
-          if (record) showDetail(record);
+          if (record) showClientDetail(record);
         });
       });
     }
@@ -862,34 +949,84 @@
       target.innerHTML = items.join('');
     }
 
-    function showDetail(record) {
-      const panel = document.getElementById('detailPanel');
-      if (!panel) return;
+    function showClientDetail(record) {
+      const sidebar = document.getElementById('clientSidebar');
+      const detailPanel = document.getElementById('detailPanel');
+      if (!sidebar || !detailPanel) return;
 
+      // Show sidebar and detail panel
+      sidebar.hidden = false;
+      detailPanel.hidden = false;
+
+      // Set active section to overview
+      setActiveSection('overview');
+
+      // Populate detail data
+      populateDetailData(record);
+
+      // Scroll to detail panel
+      detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setActiveSection(section) {
+      // Update sidebar navigation
+      document.querySelectorAll('.client-nav a').forEach(link => {
+        link.classList.toggle('active', link.dataset.section === section);
+      });
+
+      // Update detail panel sections
+      document.querySelectorAll('.detail-card').forEach(card => {
+        const cardId = card.id.toLowerCase().replace('detail', '');
+        card.style.display = cardId === section ? 'block' : 'none';
+      });
+    }
+
+    let currentClientRecord = null;
+    let isEditing = false;
+
+    function populateDetailData(record) {
+      currentClientRecord = record;
       document.getElementById('detailName').textContent = record.name || 'Client Detail';
       document.getElementById('detailSubtitle').textContent =
         `${record.email || 'No email'} • last sign-in ${record.lastSignInAt ? formatAgo(record.lastSignInAt) : 'not recorded'} • last active ${formatAgo(record.lastActive)}${record.workspace?.lastUploadName ? ` • last upload ${record.workspace.lastUploadName}` : ''}`;
 
+      renderIdentityFields(record, false);
+      // ... existing code for other sections
+    }
+
+    function renderIdentityFields(record, editing) {
       const identityItems = [
-        ['Email', record.email || '—'],
-        ['Company', record.companyName || '—'],
-        ['Account Type', record.accountType || '—'],
-        ['Role', record.role || 'client'],
-        ['View', record.view || 'client'],
-        ['Last Page', record.lastPage || '—'],
-        ['Last Sign-In', record.lastSignInAt ? new Date(record.lastSignInAt).toLocaleString() : '—'],
-        ['Total Visits', record.totalVisits || 0]
+        ['name', 'Name', record.name || ''],
+        ['email', 'Email', record.email || ''],
+        ['companyName', 'Company', record.companyName || ''],
+        ['accountType', 'Account Type', record.accountType || 'individual'],
+        ['role', 'Role', record.role || 'client'],
+        ['view', 'View', record.view || 'client']
       ];
 
-      document.getElementById('detailMeta').innerHTML = identityItems.map(([label, value]) => `
-        <div class="detail-meta-item">
-          <span>${escapeHtml(label)}</span>
-          <strong>${escapeHtml(value)}</strong>
-        </div>
-      `).join('');
+      const html = identityItems.map(([field, label, value]) => {
+        if (editing && ['name', 'email', 'companyName', 'accountType'].includes(field)) {
+          return `
+            <div class="detail-meta-item">
+              <span>${escapeHtml(label)}</span>
+              <input type="${field === 'email' ? 'email' : 'text'}" id="edit-${field}" value="${escapeHtml(value)}" style="flex: 1; padding: 4px 8px; border: 1px solid var(--admin-line); border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--admin-text);" />
+            </div>
+          `;
+        } else {
+          return `
+            <div class="detail-meta-item">
+              <span>${escapeHtml(label)}</span>
+              <strong>${escapeHtml(value)}</strong>
+            </div>
+          `;
+        }
+      }).join('');
+
+      document.getElementById('detailMeta').innerHTML = html;
+    }
 
       renderDetailSection(
-        'detailTools',
+        'detailToolsChips',
         (record.toolsUsed || []).map((tool) => `<div class="data-chip">${escapeHtml(tool)}</div>`),
         'No tools tracked yet'
       );
@@ -925,9 +1062,6 @@
         `),
         'No recent activity recorded'
       );
-
-      panel.hidden = false;
-      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function renderHub(query = '', sourceRecords = null) {
@@ -976,8 +1110,79 @@
     });
 
     document.getElementById('closeDetail')?.addEventListener('click', () => {
+      const sidebar = document.getElementById('clientSidebar');
       const panel = document.getElementById('detailPanel');
+      if (sidebar) sidebar.hidden = true;
       if (panel) panel.hidden = true;
+    });
+
+    // Sidebar navigation
+    document.querySelectorAll('.client-nav a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.dataset.section;
+        setActiveSection(section);
+      });
+    });
+
+    // Edit/Save/Cancel functionality
+    document.getElementById('editClientBtn')?.addEventListener('click', () => {
+      if (!currentClientRecord) return;
+      isEditing = true;
+      renderIdentityFields(currentClientRecord, true);
+      document.getElementById('editClientBtn').style.display = 'none';
+      document.getElementById('saveClientBtn').style.display = 'inline-block';
+      document.getElementById('cancelEditBtn').style.display = 'inline-block';
+    });
+
+    document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
+      if (!currentClientRecord) return;
+      isEditing = false;
+      renderIdentityFields(currentClientRecord, false);
+      document.getElementById('editClientBtn').style.display = 'inline-block';
+      document.getElementById('saveClientBtn').style.display = 'none';
+      document.getElementById('cancelEditBtn').style.display = 'none';
+    });
+
+    document.getElementById('saveClientBtn')?.addEventListener('click', async () => {
+      if (!currentClientRecord || !isEditing) return;
+
+      const updates = {
+        name: document.getElementById('edit-name')?.value.trim() || currentClientRecord.name,
+        email: document.getElementById('edit-email')?.value.trim() || currentClientRecord.email,
+        companyName: document.getElementById('edit-companyName')?.value.trim() || currentClientRecord.companyName,
+        accountType: document.getElementById('edit-accountType')?.value.trim() || currentClientRecord.accountType,
+      };
+
+      try {
+        const response = await fetch(`/api/client-hub/${currentClientRecord.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(updates)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update client');
+        }
+
+        const result = await response.json();
+        currentClientRecord = result.client;
+        isEditing = false;
+        renderIdentityFields(currentClientRecord, false);
+        document.getElementById('editClientBtn').style.display = 'inline-block';
+        document.getElementById('saveClientBtn').style.display = 'none';
+        document.getElementById('cancelEditBtn').style.display = 'none';
+
+        // Refresh the client list to show updated data
+        const records = await fetchServerRecords();
+        renderHub('', records);
+
+        alert('Client details updated successfully!');
+      } catch (error) {
+        alert('Failed to update client details. Please try again.');
+        console.error('Update error:', error);
+      }
     });
 
     document.getElementById('exportCsv')?.addEventListener('click', () => {
@@ -1005,3 +1210,4 @@
   </script>
 </body>
 </html>
+

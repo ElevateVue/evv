@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ad Copy Grader - EVV</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+  <script defer src="client-hub-tracker.js"></script>
+  <script defer src="footer.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div><div class="brand-name">Orbit</div><div class="brand-sub">by Elevate Vue</div></div><button class="icon-btn" id="closeSidebar">x</button></div>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
+    <div class="account-card"><div class="avatar">S</div><div><div class="name">Demo User</div><div class="email">demo@user.com</div></div></div>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
+      <div class="brand-inline"><img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" /><div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div></div>
+      <div class="spacer"></div>
+      <div class="avatar small">S</div>
+    </header>
+    <main>
+      <div class="campaign-shell">
+        <header class="campaign-hero">
+          <div class="campaign-heading">
+            <div class="campaign-title">
+              <h1>Ad Copy Grader</h1>
+              <p>Score your ad copy on hook, clarity, CTA, emotional pull, and platform fit.</p>
+            </div>
+          </div>
+          <div class="campaign-tabs" role="tablist">
+            <a class="campaign-tab active" href="ad-copy-grader.html">Ad Copy Grader</a>
+            <a class="campaign-tab" href="creative-brief-builder.html">Creative Brief Builder</a>
+          </div>
+        </header>
+
+        <section class="campaign-tool-page">
+          <article class="campaign-tool-card">
+            <form id="adCopyGraderForm" class="campaign-form">
+              <div class="field compact">
+                <label for="adCopyPlatform">Platform</label>
+                <select id="adCopyPlatform" required>
+                  <option>Facebook Ads</option>
+                  <option>Google Ads</option>
+                  <option>Instagram Ads</option>
+                  <option>LinkedIn Ads</option>
+                  <option>TikTok Ads</option>
+                </select>
+              </div>
+              <div class="field compact">
+                <label for="adCopyText">Ad Copy</label>
+                <textarea id="adCopyText" placeholder="Paste your ad copy here..." required></textarea>
+              </div>
+              <button class="pill-btn small" type="submit">Grade My Ad Copy</button>
+            </form>
+          </article>
+
+          <div id="campaignResults" class="campaign-results" hidden></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="beams-overlay"></div>
+</body>
+</html>
+
+

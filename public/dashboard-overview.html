@@ -28,21 +28,14 @@
 <body>
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <img src="/logo.png" alt="EVV" class="brand-badge" />
+      <img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" />
       <div>
-        <div class="brand-name">Elevate</div>
-        <div class="brand-sub">vue</div>
+        <div class="brand-name">Orbit</div>
+        <div class="brand-sub">by Elevate Vue</div>
       </div>
       <button class="icon-btn" id="closeSidebar" aria-label="Close menu">×</button>
     </div>
-    <nav class="side-nav">
-      <div class="nav-label">Navigation</div>
-      <a class="nav-link" href="featurehub.html">Feature Hub</a>
-      <a class="nav-link" href="dashboard-overview.html">Dashboard</a>
-      <a class="nav-link" href="connect.html">Connect</a>
-      <a class="nav-link" href="upload.html">Scheduling</a>
-      <a class="nav-link" href="report.html">Report</a>
-    </nav>
+    <nav class="side-nav" id="sidebarNavRoot"></nav>
     <div class="account-card">
       <div class="avatar">S</div>
       <div>
@@ -57,8 +50,8 @@
     <header class="topbar">
       <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
       <div class="brand-inline">
-        <img src="/logo.png" alt="EVV" class="brand-badge" />
-        <div class="brand-name">Elevate <span class="brand-sub">vue</span></div>
+        <img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" />
+        <div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div>
       </div>
       <div class="spacer"></div>
       <div class="avatar small">S</div>
@@ -75,7 +68,7 @@
             <input type="file" id="dashUploadFile" style="display:none" multiple />
             <button class="ghost-btn outline rainbow-border" id="dashUploadBtn">↑ Upload Data</button>
             <span class="upload-status" id="uploadStatus"></span>
-            <a class="pill-btn" href="report.html">Generate AI Report</a>
+            <a class="pill-btn" href="report.html">Generate Report</a>
           </div>
         </div>
 
@@ -83,37 +76,30 @@
 
         <div class="metric-grid">
           <div class="metric-card cyan">
-            <div class="metric-icon"><img src="/reach.png" alt="Reach" class="metric-img" /></div>
             <div class="metric-title">Reach / Impressions</div>
             <div class="metric-value cyan">0</div>
           </div>
           <div class="metric-card purple">
-            <div class="metric-icon"><img src="/interaction.png" alt="Interactions" class="metric-img" /></div>
             <div class="metric-title">Interactions</div>
             <div class="metric-value purple">0</div>
           </div>
           <div class="metric-card pink">
-            <div class="metric-icon"><img src="/click.png" alt="Clicks" class="metric-img" /></div>
             <div class="metric-title">Clicks</div>
             <div class="metric-value pink">0</div>
           </div>
           <div class="metric-card orange">
-            <div class="metric-icon"><img src="/reaction.png" alt="Reactions" class="metric-img" /></div>
             <div class="metric-title">Reactions</div>
             <div class="metric-value orange">0</div>
           </div>
           <div class="metric-card green">
-            <div class="metric-icon"><img src="/view.png" alt="Views" class="metric-img" /></div>
             <div class="metric-title">Views</div>
             <div class="metric-value green">0</div>
           </div>
           <div class="metric-card yellow">
-            <div class="metric-icon"><img src="/follows.png" alt="Follows" class="metric-img" /></div>
             <div class="metric-title">Follows</div>
             <div class="metric-value yellow">0</div>
           </div>
           <div class="metric-card cyan">
-            <div class="metric-icon"><img src="/engagement.png" alt="Avg Engagement" class="metric-img" /></div>
             <div class="metric-title">Avg. Engagement</div>
             <div class="metric-value cyan">0.00%</div>
           </div>
@@ -132,7 +118,7 @@
 
         <div class="card reports-card">
           <div class="card-head">
-            <h3>Recent AI Reports</h3>
+            <h3>Recent Reports</h3>
             <a class="view-link" href="report.html">View All</a>
           </div>
           <div id="recentReportsList" class="recent-reports"></div>
@@ -141,10 +127,10 @@
 
         <div class="card ai-feedback-card" hidden>
           <div class="card-head">
-            <h3>AI Feedback</h3>
+            <h3>Feedback</h3>
             <button class="ghost-btn outline small rainbow-border" id="editAIFeedbackBtn">Edit</button>
           </div>
-          <div id="aiFeedbackContent" class="ai-feedback-paragraph">Upload analytics data to generate AI feedback.</div>
+          <div id="aiFeedbackContent" class="ai-feedback-paragraph">Upload analytics data to generate feedback.</div>
         </div>
 
         <div class="card feedback-card collapsed">
@@ -157,7 +143,7 @@
             <button class="chip rainbow-border active" data-type="Suggestion">Suggestion</button>
             <button class="chip rainbow-border" data-type="Challenges">Challenges</button>
             <button class="chip rainbow-border" data-type="Ideal Solutions">Ideal Solutions</button>
-            <button class="chip rainbow-border" data-type="AI Suggestions">AI Suggestions</button>
+            <button class="chip rainbow-border" data-type="Suggestions">Suggestions</button>
           </div>
           <div class="feedback-body">
             <textarea id="feedbackText" placeholder="Write your suggestion here..."></textarea>
@@ -169,7 +155,25 @@
         </div>
       </section>
     </main>
-  </div>
+
+    <div class="modal-backdrop" id="uploadModalBackdrop"></div>
+    <div class="modal upload-modal" id="uploadModal">
+      <div class="modal-header">
+        <h3>Upload CSV data</h3>
+        <button class="icon-btn" id="uploadModalClose" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="upload-dropzone" id="uploadModalDrop">
+          <p>Drag and drop up to 3 CSV files here.</p>
+          <button type="button" class="pill-btn" id="uploadModalBrowse">Browse files</button>
+          <input type="file" id="uploadModalInput" accept=".csv" multiple hidden />
+        </div>
+        <div class="upload-items" id="uploadList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="pill-btn full" id="uploadModalSubmit" type="button">Upload Files</button>
+      </div>
+    </div>
 
   <div class="modal-backdrop" id="modalBackdrop"></div>
   <div class="modal" id="modal">

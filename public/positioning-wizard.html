@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand Positioning Wizard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #dbeafe;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #ea580c;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --text-primary: var(--gray-900);
+      --text-secondary: var(--gray-600);
+      --border-color: var(--gray-200);
+      --bg-light: var(--gray-50);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: white;
+      padding: 20px 0;
+      margin-bottom: 30px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-bottom: 4px solid var(--primary);
+    }
+
+    header h1 {
+      font-size: 28px;
+      color: var(--primary);
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    header p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    nav {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: var(--gray-100);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    nav button.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    nav button:hover:not(.active) {
+      background: var(--gray-200);
+    }
+
+    .content-area {
+      display: none;
+    }
+
+    .content-area.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 18px 22px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 24px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      background: #f8fafc;
+      color: #0f172a;
+      min-height: 60px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .form-row .form-group {
+      margin-bottom: 0;
+    }
+
+    .form-row.full-width .form-group {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .checkbox-group {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background: var(--bg-light);
+      border-radius: 6px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .checkbox-item input[type='checkbox'] {
+      width: auto;
+      margin-right: 10px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    .checkbox-item:hover {
+      background: var(--gray-100);
+    }
+
+    .checkbox-item input[type='checkbox']:checked + label {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .checkbox-item label {
+      cursor: pointer;
+      flex: 1;
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .tag-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      min-height: 44px;
+    }
+
+    .tag {
+      background: var(--primary);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .tag-input input {
+      border: none;
+      flex: 1;
+      min-width: 100px;
+      padding: 6px;
+      font-size: 14px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-secondary {
+      background: var(--gray-200);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-300);
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .report-section {
+      margin: 30px 0;
+      border-left: 4px solid var(--primary);
+      padding-left: 20px;
+    }
+
+    .report-section h2 {
+      font-size: 20px;
+      color: var(--primary);
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .report-section h3 {
+      font-size: 16px;
+      color: var(--text-primary);
+      margin-top: 15px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .report-content {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    .report-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .report-list li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .report-list li:before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .report-item {
+      background: var(--bg-light);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .report-item strong {
+      color: var(--text-primary);
+    }
+
+    .preview-section {
+      background: var(--gray-50);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border: 2px dashed var(--gray-300);
+    }
+
+    .preview-section h3 {
+      margin-top: 0;
+    }
+
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .report-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      border: 2px solid var(--border-color);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .report-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-color: var(--primary);
+    }
+
+    .report-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .report-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .report-card-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .report-card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .report-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .report-card-actions button {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .alert.active {
+      display: block;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid var(--success);
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid var(--danger);
+    }
+
+    .alert-info {
+      background: var(--primary-light);
+      color: #1e3a8a;
+      border-left: 4px solid var(--primary);
+    }
+
+    .print-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .print-button.active {
+      display: flex;
+    }
+
+    .print-button:hover {
+      background: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      header,
+      nav,
+      .button-group,
+      .print-button,
+      .preview-section {
+        display: none;
+      }
+      .card {
+        box-shadow: none;
+        page-break-inside: avoid;
+      }
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>🎯 Brand Positioning Wizard</h1>
+      <p>Create a professional brand positioning strategy</p>
+      <nav>
+        <button class="tab-button active" data-tab="wizard">Create Positioning</button>
+        <button class="tab-button" data-tab="dashboard">Saved Reports</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Alert Messages -->
+    <div class="alert alert-success" id="successAlert">
+      <strong>Success!</strong> <span id="successMessage"></span>
+    </div>
+    <div class="alert alert-error" id="errorAlert">
+      <strong>Error!</strong> <span id="errorMessage"></span>
+    </div>
+
+    <!-- Wizard Section -->
+    <div id="wizard" class="content-area active">
+      <div class="card">
+        <h2>Brand Information</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+          Enter your brand details to generate a comprehensive positioning strategy
+        </p>
+
+        <form id="positioningForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="brandName">Brand Name *</label>
+              <input
+                type="text"
+                id="brandName"
+                placeholder="e.g., Tesla, Airbnb, Notion"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="industry">Industry *</label>
+              <input
+                type="text"
+                id="industry"
+                placeholder="e.g., Electric Vehicles, Travel Tech, Productivity"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="usp">Unique Selling Proposition (USP) *</label>
+              <textarea
+                id="usp"
+                placeholder="What makes your brand unique? What's your main competitive advantage?"
+                required
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label for="brandTone">Brand Tone *</label>
+              <select id="brandTone" required>
+                <option value="">Select a tone...</option>
+                <option value="professional">Professional & Corporate</option>
+                <option value="creative">Creative & Innovative</option>
+                <option value="friendly">Friendly & Approachable</option>
+                <option value="luxury">Luxury & Premium</option>
+                <option value="bold">Bold & Rebellious</option>
+                <option value="educational">Educational & Informative</option>
+                <option value="playful">Playful & Fun</option>
+                <option value="inspiring">Inspiring & Motivational</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Brand Values (Select at least 2) *</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_innovation"
+                  name="brandValues"
+                  value="Innovation"
+                />
+                <label for="value_innovation">Innovation</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_sustainability"
+                  name="brandValues"
+                  value="Sustainability"
+                />
+                <label for="value_sustainability">Sustainability</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_trust"
+                  name="brandValues"
+                  value="Trust"
+                />
+                <label for="value_trust">Trust & Transparency</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_quality"
+                  name="brandValues"
+                  value="Quality"
+                />
+                <label for="value_quality">Quality & Excellence</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_community"
+                  name="brandValues"
+                  value="Community"
+                />
+                <label for="value_community">Community & Connection</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_empowerment"
+                  name="brandValues"
+                  value="Empowerment"
+                />
+                <label for="value_empowerment">Empowerment</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_simplicity"
+                  name="brandValues"
+                  value="Simplicity"
+                />
+                <label for="value_simplicity">Simplicity & Ease</label>
+              </div>
+              <div class="checkbox-item">
+                <input
+                  type="checkbox"
+                  id="value_authenticity"
+                  name="brandValues"
+                  value="Authenticity"
+                />
+                <label for="value_authenticity">Authenticity</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="loading" id="generateLoading">
+            <div class="spinner"></div>
+            <p>Generating your positioning strategy...</p>
+          </div>
+
+          <div class="button-group">
+            <button type="submit" class="btn-primary">
+              ✨ Generate Positioning
+            </button>
+            <button type="reset" class="btn-secondary">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Report Preview Section -->
+      <div id="reportPreview" style="display: none;">
+        <div class="card">
+          <div class="button-group">
+            <button class="btn-success btn-small" id="saveReportBtn">
+              💾 Save Report
+            </button>
+            <button class="btn-secondary btn-small" id="regenerateBtn">
+              🔄 Regenerate
+            </button>
+            <button class="btn-secondary btn-small" onclick="window.print()">
+              🖨️ Print
+            </button>
+            <button class="btn-secondary btn-small" id="copyReportBtn">
+              📋 Copy to Clipboard
+            </button>
+          </div>
+        </div>
+
+        <div id="reportContent"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="content-area">
+      <div class="card">
+        <h2>Your Positioning Reports</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+          View and manage all your saved brand positioning reports
+        </p>
+
+        <div id="reportsContainer">
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>No Reports Yet</h3>
+            <p>Create your first brand positioning report to get started</p>
+            <button
+              class="btn-primary"
+              onclick="switchTab('wizard')"
+            >
+              Create Positioning Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <div class="modal-header">Confirm Action</div>
+      <div class="modal-body" id="confirmMessage"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-danger" id="confirmBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/positioning-wizard.js"></script>
+</body>
+</html>
+
