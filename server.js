@@ -151,6 +151,7 @@ function createEmptyWorkspace() {
     posts: [],
     metrics: createEmptyMetrics(),
     perPlatform: {},
+    platformDashboards: {},
     lastUploadName: null,
     reports: [],
     onboarding: createEmptyOnboarding(),
@@ -309,10 +310,21 @@ function platformFromFilename(filename = '') {
   const base = String(filename).toLowerCase();
   if (base.startsWith('ig_') || base.includes('instagram')) return 'Instagram';
   if (base.startsWith('fb_') || base.includes('facebook')) return 'Facebook';
-  if (base.startsWith('link_') || base.startsWith('linkedin_') || base.includes('linkedin')) return 'LinkedIn';
+  if (base.startsWith('link_') || base.startsWith('linkedin_') || base.includes('linkedin') || base.includes('linkedlin')) return 'LinkedIn';
   if (base.startsWith('tiktok_') || base.includes('tiktok')) return 'TikTok';
   if (base.startsWith('snap_') || base.includes('snapchat')) return 'Snapchat';
   return 'Upload';
+}
+
+function platformFromUpload(fileObj = {}) {
+  const explicitPlatform = String(fileObj.platform || '').trim();
+  if (['Instagram', 'Facebook', 'LinkedIn', 'TikTok', 'Snapchat'].includes(explicitPlatform)) {
+    return explicitPlatform;
+  }
+  return platformFromFilename([
+    fileObj.filename || fileObj.name || '',
+    String(fileObj.csv || '').slice(0, 5000),
+  ].join('\n'));
 }
 
 function extractJsonPayload(text = '') {
@@ -353,6 +365,11 @@ function buildPostsFromNormalizedRows(rows, filename, globalIndexOffset) {
   return rows.map((row, idx) => buildStandardPost(row || {}, globalIndexOffset + idx, fallbackPlatform));
 }
 
+function buildPostsFromUploadRows(rows, fileObj, globalIndexOffset) {
+  const fallbackPlatform = platformFromUpload(fileObj);
+  return rows.map((row, idx) => buildStandardPost(row || {}, globalIndexOffset + idx, fallbackPlatform));
+}
+
 function buildReportMetricsFromSummary(summaryMetrics) {
   return [
     { label: 'Reach', value: Number(summaryMetrics.reach || 0) },
@@ -377,6 +394,7 @@ function getRowValue(row, keyMap, aliases) {
 function parseFileLocally(fileObj, globalIndexOffset) {
   const { filename, csv } = fileObj;
   if (!csv) throw new Error('csv required');
+  const uploadPlatform = platformFromUpload(fileObj);
 
   const { headers, rows } = parseCsvTable(csv);
   if (!headers.length) throw new Error('empty csv');
@@ -393,7 +411,7 @@ function parseFileLocally(fileObj, globalIndexOffset) {
     return rows.map((row, idx) =>
       buildStandardPost(
         {
-          platform: getRowValue(row, keyMap, 'platform') || platformFromFilename(filename),
+          platform: getRowValue(row, keyMap, 'platform') || uploadPlatform,
           title: getRowValue(row, keyMap, 'title'),
           transcript: getRowValue(row, keyMap, 'transcript'),
           likes: getRowValue(row, keyMap, 'likes'),
@@ -408,7 +426,7 @@ function parseFileLocally(fileObj, globalIndexOffset) {
           postedAt: getRowValue(row, keyMap, ['postedAt', 'posted at', 'date']),
         },
         globalIndexOffset + idx,
-        platformFromFilename(filename)
+        uploadPlatform
       )
     );
   }
@@ -427,7 +445,7 @@ function parseFileLocally(fileObj, globalIndexOffset) {
       const title = `${postedAtRaw} summary ${idx + 1}`;
       return buildStandardPost(
         {
-          platform: platformFromFilename(filename),
+          platform: uploadPlatform,
           title,
           likes: getRowValue(row, keyMap, ['Likes', 'Reactions']),
           comments: getRowValue(row, keyMap, 'Comments'),
@@ -441,12 +459,72 @@ function parseFileLocally(fileObj, globalIndexOffset) {
           postedAt,
         },
         globalIndexOffset + idx,
-        platformFromFilename(filename)
+        uploadPlatform
       );
     });
   }
 
   throw new Error('Unsupported CSV format');
+}
+
+function labelizeMetricName(value = '') {
+  return String(value || '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function normalizeDashboardRow(rawRow = {}) {
+  const metrics = {};
+  let date = '';
+
+  Object.entries(rawRow).forEach(([key, value]) => {
+    const normalized = normalizeKey(key);
+    if (!date && /date|day|period|posted|publish|timestamp/.test(normalized)) {
+      const parsedDate = new Date(String(value || '').trim());
+      date = Number.isNaN(parsedDate.getTime())
+        ? String(value || '').trim()
+        : parsedDate.toISOString().slice(0, 10);
+      return;
+    }
+
+    const rawValue = String(value ?? '').trim();
+    if (!rawValue) return;
+    const numericValue = coerceNumber(rawValue);
+    if (!Number.isFinite(numericValue)) return;
+    metrics[labelizeMetricName(key)] = numericValue;
+  });
+
+  return { date, metrics, raw: rawRow };
+}
+
+function buildGenericDashboardRows(fileObj = {}) {
+  const { headers, rows } = parseCsvTable(fileObj.csv || '');
+  if (!headers.length) return [];
+  return rows
+    .map((row) => headers.reduce((acc, header, index) => {
+      acc[header] = row[index] || '';
+      return acc;
+    }, {}))
+    .map((row) => normalizeDashboardRow(row))
+    .filter((row) => Object.keys(row.metrics || {}).length);
+}
+
+function buildPlatformDashboards(files = []) {
+  return files.reduce((acc, fileObj) => {
+    const filename = fileObj.filename || 'file.csv';
+    const platform = platformFromUpload(fileObj);
+    if (!['Instagram', 'Facebook', 'LinkedIn', 'TikTok', 'Snapchat'].includes(platform)) return acc;
+    acc[platform] = {
+      platform,
+      filename,
+      uploadedAt: new Date().toISOString(),
+      rows: buildGenericDashboardRows(fileObj),
+      metricoolRows: [],
+    };
+    return acc;
+  }, {});
 }
 
 function isProviderAvailable(provider) {
@@ -1469,6 +1547,9 @@ function hydrateAppState() {
       users: Object.entries(persisted.users).reduce((acc, [userId, workspace]) => {
         const nextWorkspace = createEmptyWorkspace();
         nextWorkspace.posts = Array.isArray(workspace?.posts) ? workspace.posts : [];
+        nextWorkspace.platformDashboards = workspace?.platformDashboards && typeof workspace.platformDashboards === 'object' && !Array.isArray(workspace.platformDashboards)
+          ? workspace.platformDashboards
+          : {};
         nextWorkspace.lastUploadName = workspace?.lastUploadName ? String(workspace.lastUploadName).trim() : null;
         nextWorkspace.reports = Array.isArray(workspace?.reports) ? workspace.reports.map((report) => sanitizeReport(report)) : [];
         nextWorkspace.onboarding = sanitizeOnboarding(workspace?.onboarding || {});
@@ -1487,6 +1568,9 @@ function hydrateAppState() {
   // Backward-compatible migration from the old single shared workspace.
   const migratedWorkspace = createEmptyWorkspace();
   migratedWorkspace.posts = Array.isArray(persisted.posts) ? persisted.posts : [];
+  migratedWorkspace.platformDashboards = persisted.platformDashboards && typeof persisted.platformDashboards === 'object' && !Array.isArray(persisted.platformDashboards)
+    ? persisted.platformDashboards
+    : {};
   migratedWorkspace.lastUploadName = persisted.lastUploadName ? String(persisted.lastUploadName).trim() : null;
   migratedWorkspace.reports = Array.isArray(persisted.reports) ? persisted.reports.map((report) => sanitizeReport(report)) : [];
   if (!migratedWorkspace.posts.length) {
@@ -2025,6 +2109,18 @@ const server = http.createServer(async (req, res) => {
     recalcMetrics(workspace);
     saveAppState();
     return sendJson(res, 201, { post });
+  }
+
+  if (req.url.startsWith('/api/posts/') && req.method === 'DELETE') {
+    const workspace = ensureWorkspace(getSession(req)?.user, true);
+    const id = decodeURIComponent(req.url.split('/')[3] || '');
+    const posts = Array.isArray(workspace.posts) ? workspace.posts : [];
+    const nextPosts = posts.filter((post) => post.id !== id);
+    if (nextPosts.length === posts.length) return sendJson(res, 404, { message: 'not found' });
+    workspace.posts = nextPosts;
+    recalcMetrics(workspace);
+    saveAppState();
+    return sendJson(res, 200, { ok: true });
   }
 
   if (req.url.startsWith('/api/posts/') && req.url.endsWith('/publish') && req.method === 'POST') {
@@ -2854,6 +2950,7 @@ const server = http.createServer(async (req, res) => {
       metrics: workspace?.metrics || createEmptyMetrics(),
       lastUploadName: workspace?.lastUploadName || null,
       perPlatform: workspace?.perPlatform || {},
+      platformDashboards: workspace?.platformDashboards || {},
       dailyData: buildDailyData(workspace),
     });
   }
@@ -2894,6 +2991,7 @@ const server = http.createServer(async (req, res) => {
         const parsed = JSON.parse(body || '{}');
         const files = Array.isArray(parsed) ? parsed : parsed.files || [parsed];
         if (!files.length) return sendJson(res, 400, { message: 'no files found' });
+        const platformDashboards = buildPlatformDashboards(files);
 
         let aggregatePosts = [];
         let counter = 0;
@@ -2918,7 +3016,7 @@ const server = http.createServer(async (req, res) => {
             try {
               const normalized = await normalizeFileWithAi(fileObj);
               if (normalized?.rows?.length) {
-                parsedPosts = buildPostsFromNormalizedRows(normalized.rows, fileObj.filename, counter);
+                parsedPosts = buildPostsFromUploadRows(normalized.rows, fileObj, counter);
                 if (normalized.provider === 'gemini') normalizationSummary.gemini += 1;
                 if (normalized.provider === 'deepseek') normalizationSummary.deepseek += 1;
               }
@@ -2928,7 +3026,7 @@ const server = http.createServer(async (req, res) => {
                 step: 'ai',
                 message: aiError.message,
               });
-              throw localError;
+              parsedPosts = [];
             }
           }
 
@@ -2938,12 +3036,17 @@ const server = http.createServer(async (req, res) => {
 
         workspace.posts = aggregatePosts;
         workspace.lastUploadName = files.map((f) => f.filename || 'file.csv').join(', ');
+        workspace.platformDashboards = {
+          ...(workspace.platformDashboards || {}),
+          ...platformDashboards,
+        };
         recalcMetrics(workspace);
         saveAppState();
         return sendJson(res, 200, {
           ok: true,
           count: workspace.posts.length,
           metrics: workspace.metrics,
+          platformDashboards: workspace.platformDashboards,
           files: files.length,
           normalization: {
             provider: normalizationSummary.gemini

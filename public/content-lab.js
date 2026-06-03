@@ -108,6 +108,36 @@
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   }
 
+  function buildFallbackHashtags(text) {
+    const words = String(text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((word) => word.length > 3)
+      .slice(0, 5);
+    const tags = Array.from(new Set(words.map((word) => `#${word}`)));
+    return tags.length ? tags.join(' ') : '#content #socialmedia #orbit';
+  }
+
+  function combineCaptionAndHashtags(caption, hashtags, fallbackText = '') {
+    const cleanCaption = String(caption || '').trim();
+    const hashtagText = Array.isArray(hashtags) ? hashtags.join(' ') : String(hashtags || '').trim();
+    const normalizedHashtags = hashtagText || buildFallbackHashtags(fallbackText || cleanCaption);
+    if (/(^|\s)#\w+/.test(cleanCaption)) return cleanCaption;
+    return `${cleanCaption}\n\n${normalizedHashtags}`.trim();
+  }
+
+  async function deletePost(postId) {
+    if (!postId) return;
+    if (!confirm('Delete this scheduled post?')) return;
+    try {
+      await api(`/api/posts/${encodeURIComponent(postId)}`, { method: 'DELETE' });
+      fetchAndRender();
+    } catch (err) {
+      alert(err.message || 'Failed to delete post.');
+    }
+  }
+
   function renderCalendar(posts = []) {
     if (!calendarGrid) return;
     calendarGrid.innerHTML = '';
@@ -151,10 +181,11 @@
       for (let day = 1; day <= daysInMonth; day += 1) {
         const date = new Date(year, month, day);
         const iso = toIsoDate(date);
-        const el = document.createElement('button');
-        el.type = 'button';
+        const el = document.createElement('div');
         el.className = 'day';
         el.dataset.date = iso;
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
         if (sameDay(date, today)) el.classList.add('today');
 
         const dateEl = document.createElement('span');
@@ -174,10 +205,31 @@
               event.stopPropagation();
               alert(JSON.stringify(post, null, 2));
             });
+            pill.textContent = '';
+            const label = document.createElement('span');
+            label.className = 'post-pill-text';
+            label.textContent = `${post.mediaName ? 'File: ' : ''}${post.title} (${post.platform})`;
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'post-delete-btn';
+            deleteButton.title = 'Delete post';
+            deleteButton.setAttribute('aria-label', `Delete ${post.title || 'post'}`);
+            deleteButton.textContent = 'x';
+            deleteButton.addEventListener('click', (event) => {
+              event.stopPropagation();
+              deletePost(post.id);
+            });
+            pill.append(label, deleteButton);
             el.appendChild(pill);
           });
 
         el.addEventListener('click', () => openScheduleModal(iso));
+        el.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openScheduleModal(iso);
+          }
+        });
         grid.appendChild(el);
       }
 
@@ -263,7 +315,7 @@
         }),
       });
       if (schCaption) {
-        schCaption.value = `${res.caption || ''}\n\n${Array.isArray(res.hashtags) ? res.hashtags.join(' ') : ''}`.trim();
+        schCaption.value = combineCaptionAndHashtags(res.caption || '', res.hashtags, topic || schTitle?.value);
       }
       if (res.notice) alert(res.notice);
     } catch (err) {
@@ -275,10 +327,16 @@
   });
 
   document.getElementById('saveScheduleBtn')?.addEventListener('click', async () => {
+    const captionWithHashtags = combineCaptionAndHashtags(
+      schCaption?.value || '',
+      '',
+      `${schTopic?.value || ''} ${schTitle?.value || ''} ${schPlatform?.value || ''}`
+    );
     const payload = {
       platform: schPlatform?.value,
       title: schTitle?.value || 'Untitled',
-      transcript: schCaption?.value || '',
+      transcript: captionWithHashtags,
+      caption: captionWithHashtags,
       postType: schType?.value,
       scheduledAt: schDate?.value,
       ...(selectedMedia || {}),

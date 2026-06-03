@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Overview • EVV</title>
+  <title>Dashboard Overview - EVV</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css" />
   <script>
@@ -22,6 +22,7 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script defer src="app.js"></script>
+  <script defer src="dashboard-platforms.js"></script>
   <script defer src="client-hub-tracker.js"></script>
   <script defer src="footer.js"></script>
 </head>
@@ -33,7 +34,7 @@
         <div class="brand-name">Orbit</div>
         <div class="brand-sub">by Elevate Vue</div>
       </div>
-      <button class="icon-btn" id="closeSidebar" aria-label="Close menu">×</button>
+      <button class="icon-btn" id="closeSidebar" aria-label="Close menu">x</button>
     </div>
     <nav class="side-nav" id="sidebarNavRoot"></nav>
     <div class="account-card">
@@ -48,7 +49,7 @@
 
   <div class="page">
     <header class="topbar">
-      <button class="icon-btn" id="openSidebar" aria-label="Open menu">☰</button>
+      <button class="icon-btn menu-icon" id="openSidebar" aria-label="Open menu">☰</button>
       <div class="brand-inline">
         <img src="/orbit-logo.svg" alt="Orbit" class="brand-badge" />
         <div class="brand-name">Orbit <span class="brand-sub">by Elevate Vue</span></div>
@@ -62,76 +63,58 @@
         <div class="panel-head overview-head">
           <div class="overview-copy">
             <h1>Dashboard Overview</h1>
-            <p>Monitor your social media performance across all channels.</p>
+            <p>Monitor Instagram, Facebook, and LinkedIn from one platform-specific dashboard.</p>
           </div>
           <div class="cta-row">
-            <input type="file" id="dashUploadFile" style="display:none" multiple />
-            <button class="ghost-btn outline rainbow-border" id="dashUploadBtn">↑ Upload Data</button>
-            <span class="upload-status" id="uploadStatus"></span>
+            <button class="ghost-btn outline rainbow-border" id="platformUploadBtn">Upload CSV Data</button>
             <a class="pill-btn" href="report.html">Generate Report</a>
+            <span class="upload-status" id="uploadStatus"></span>
           </div>
+        </div>
+
+        <div class="dashboard-controls">
+          <label class="field compact">
+            <span>Platform</span>
+            <select id="platformSelector" class="brand-select">
+              <option>Instagram</option>
+              <option>Facebook</option>
+              <option>LinkedIn</option>
+            </select>
+          </label>
         </div>
 
         <div class="period-label" id="periodLabel">Awaiting upload</div>
 
-        <div class="metric-grid">
-          <div class="metric-card cyan">
-            <div class="metric-title">Reach / Impressions</div>
-            <div class="metric-value cyan">0</div>
-          </div>
-          <div class="metric-card purple">
-            <div class="metric-title">Interactions</div>
-            <div class="metric-value purple">0</div>
-          </div>
-          <div class="metric-card pink">
-            <div class="metric-title">Clicks</div>
-            <div class="metric-value pink">0</div>
-          </div>
-          <div class="metric-card orange">
-            <div class="metric-title">Reactions</div>
-            <div class="metric-value orange">0</div>
-          </div>
-          <div class="metric-card green">
-            <div class="metric-title">Views</div>
-            <div class="metric-value green">0</div>
-          </div>
-          <div class="metric-card yellow">
-            <div class="metric-title">Follows</div>
-            <div class="metric-value yellow">0</div>
-          </div>
-          <div class="metric-card cyan">
-            <div class="metric-title">Avg. Engagement</div>
-            <div class="metric-value cyan">0.00%</div>
-          </div>
-        </div>
+        <section class="dashboard-section">
+          <div class="section-header"><h2>Metrics Overview</h2></div>
+          <div class="metric-grid platform-metric-grid" id="platformMetricGrid"></div>
+        </section>
 
-        <div class="card chart-card">
+        <section class="dashboard-section card chart-card">
           <div class="chart-header">
-            <span class="chart-title" id="chartTitle">All Metrics Trend</span>
-            <div class="btn-row" id="btnRow"></div>
+            <span class="chart-title" id="platformChartTitle">Performance Graphs</span>
+            <div class="btn-row" id="platformMetricToggles"></div>
           </div>
           <div class="canvas-wrap">
-            <canvas id="metricChart"></canvas>
+            <canvas id="platformMetricChart"></canvas>
           </div>
-          <div class="legend" id="legend"></div>
-        </div>
+          <div class="legend" id="platformLegend"></div>
+        </section>
 
-        <div class="card reports-card">
+        <section class="card ai-feedback-card" id="platformFeedbackCard">
           <div class="card-head">
-            <h3>Recent Reports</h3>
-            <a class="view-link" href="report.html">View All</a>
+            <h3>Feedback & Recommendations</h3>
           </div>
-          <div id="recentReportsList" class="recent-reports"></div>
-          <div class="empty-report" id="recentReportsEmpty">No reports generated yet.</div>
-        </div>
+          <div id="platformFeedbackContent" class="ai-feedback-paragraph">Upload analytics data to generate feedback.</div>
+        </section>
 
-        <div class="card ai-feedback-card" hidden>
+        <section class="card reports-card">
           <div class="card-head">
-            <h3>Feedback</h3>
-            <button class="ghost-btn outline small rainbow-border" id="editAIFeedbackBtn">Edit</button>
+            <h3>Reports</h3>
           </div>
-          <div id="aiFeedbackContent" class="ai-feedback-paragraph">Upload analytics data to generate feedback.</div>
-        </div>
+          <div id="platformReportSummary" class="recent-reports"></div>
+          <div class="empty-report" id="recentReportsEmpty">No platform report data yet.</div>
+        </section>
 
         <div class="card feedback-card collapsed">
           <div class="feedback-head">
@@ -156,38 +139,39 @@
       </section>
     </main>
 
-    <div class="modal-backdrop" id="uploadModalBackdrop"></div>
-    <div class="modal upload-modal" id="uploadModal">
+    <div class="modal-backdrop" id="platformUploadModalBackdrop"></div>
+    <div class="modal upload-modal" id="platformUploadModal">
       <div class="modal-header">
         <h3>Upload CSV data</h3>
-        <button class="icon-btn" id="uploadModalClose" aria-label="Close">×</button>
+        <button class="icon-btn" id="platformUploadModalClose" aria-label="Close">x</button>
       </div>
       <div class="modal-body">
-        <div class="upload-dropzone" id="uploadModalDrop">
-          <p>Drag and drop up to 3 CSV files here.</p>
-          <button type="button" class="pill-btn" id="uploadModalBrowse">Browse files</button>
-          <input type="file" id="uploadModalInput" accept=".csv" multiple hidden />
+        <div class="upload-dropzone" id="platformUploadModalDrop">
+          <p>Drag and drop up to three CSV files here, one for each platform.</p>
+          <button type="button" class="pill-btn" id="platformUploadModalBrowse">Browse files</button>
+          <input type="file" id="platformUploadModalInput" accept=".csv,text/csv" multiple hidden />
         </div>
-        <div class="upload-items" id="uploadList"></div>
+        <div class="upload-items" id="platformUploadList"></div>
       </div>
       <div class="modal-footer">
-        <button class="pill-btn full" id="uploadModalSubmit" type="button">Upload Files</button>
+        <button class="pill-btn full" id="platformUploadModalSubmit" type="button">Upload Files</button>
       </div>
     </div>
 
-  <div class="modal-backdrop" id="modalBackdrop"></div>
-  <div class="modal" id="modal">
-    <div class="modal-header">
-      <h3>Login to <span id="modalPlatform"></span></h3>
-      <button class="icon-btn" id="modalClose">×</button>
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3>Login to <span id="modalPlatform"></span></h3>
+        <button class="icon-btn" id="modalClose">x</button>
+      </div>
+      <form id="modalForm" class="modal-body">
+        <label>Username / Email</label>
+        <input id="modalUser" required />
+        <label>Password</label>
+        <input id="modalPass" type="password" required />
+        <button class="btn-outline full" type="submit">Save</button>
+      </form>
     </div>
-    <form id="modalForm" class="modal-body">
-      <label>Username / Email</label>
-      <input id="modalUser" required />
-      <label>Password</label>
-      <input id="modalPass" type="password" required />
-      <button class="btn-outline full" type="submit">Save</button>
-    </form>
   </div>
   <div class="beams-overlay"></div>
 </body>

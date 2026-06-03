@@ -1420,6 +1420,14 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 201, { post });
   }
 
+  if (req.url.startsWith('/api/posts/') && req.method === 'DELETE') {
+    const id = decodeURIComponent(req.url.split('/')[3] || '');
+    const nextPosts = posts.filter((post) => post.id !== id);
+    if (nextPosts.length === posts.length) return sendJson(res, 404, { message: 'not found' });
+    posts = nextPosts;
+    return sendJson(res, 200, { ok: true });
+  }
+
   // AI generation endpoints for Content Lab
   if (parsedUrl.pathname === '/api/generate/caption' && req.method === 'POST') {
     try {

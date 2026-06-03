@@ -45,7 +45,7 @@ function saveWorkspace() {
   saveJsonFile(workspaceFile, workspace);
 }
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { files: 3, fileSize: 15 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { files: 5, fileSize: 15 * 1024 * 1024 } });
 const app = express();
 app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ extended: true, limit: '12mb' }));
@@ -55,6 +55,8 @@ const platformFieldMap = {
   instagramFile: 'Instagram',
   facebookFile: 'Facebook',
   linkedinFile: 'LinkedIn',
+  tiktokFile: 'TikTok',
+  snapchatFile: 'Snapchat',
 };
 
 function normalizeKey(value = '') {
@@ -471,6 +473,8 @@ app.post('/api/dashboard/upload-metrics', upload.fields([
   { name: 'instagramFile', maxCount: 1 },
   { name: 'facebookFile', maxCount: 1 },
   { name: 'linkedinFile', maxCount: 1 },
+  { name: 'tiktokFile', maxCount: 1 },
+  { name: 'snapchatFile', maxCount: 1 },
 ]), async (req, res) => {
   try {
     const blogId = String(req.body.blogId || req.query.blogId || '').trim();
@@ -615,6 +619,17 @@ app.post('/api/posts', (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message || 'Unable to save post.' });
   }
+});
+
+app.delete('/api/posts/:id', (req, res) => {
+  const id = String(req.params.id || '');
+  const posts = Array.isArray(workspace.posts) ? workspace.posts : [];
+  const nextPosts = posts.filter((post) => post.id !== id);
+  if (nextPosts.length === posts.length) return res.status(404).json({ message: 'not found' });
+  workspace.posts = nextPosts;
+  workspace.metrics = aggregateMetrics(workspace.posts);
+  saveWorkspace();
+  return res.json({ ok: true });
 });
 
 app.get('/api/google/oauth-url', (req, res) => {

@@ -2272,6 +2272,121 @@ function buildReportChartSnapshot() {
   };
 }
 
+const reportChartMetricColors = {
+  'Reach / Impressions': '#6bbcff',
+  Reach: '#6bbcff',
+  Impressions: '#6bbcff',
+  Interactions: '#6fe3b2',
+  Clicks: '#f58ac8',
+  Reactions: '#ff6b6b',
+  Views: '#00d9ff',
+  Follows: '#ffe27a',
+  Followers: '#ffe27a',
+  Visits: '#c5a3ff',
+  Viewers: '#7cc6ff',
+  Unique: '#7c5dfa',
+  Comments: '#ffb86b',
+  Reports: '#9aa3ff',
+  Engagement: '#6fe3b2',
+  'Avg. Engagement': '#7c5dfa',
+  'Avg Engagement': '#7c5dfa',
+};
+
+function buildPlatformReportChartSnapshot(metricsData = {}, platform = 'Instagram') {
+  const dashboard = metricsData.platformDashboards?.[platform];
+  const rows = [...(dashboard?.rows || []), ...(dashboard?.metricoolRows || [])];
+  const definitions = reportMetricDefinitions[platform] || reportMetricDefinitions.Instagram;
+  const timeline = buildReportMonthlyTimeline(rows);
+  const title = getReportTimelineTitle(rows, platform);
+
+  return {
+    title,
+    platform,
+    days: timeline.map((entry) => ({
+      day: entry.day,
+      dateLabel: `Day ${entry.day}`,
+      summaryLabel: 'Uploaded CSV metrics',
+      platformLabel: platform,
+      metrics: entry.metrics,
+      totals: {
+        reach: reportMetricValue(entry.metrics, ['reach', 'impressions', 'reach / impressions']),
+        interactions: reportMetricValue(entry.metrics, ['interactions', 'engagement']),
+        clicks: reportMetricValue(entry.metrics, ['clicks', 'link clicks']),
+        reactions: reportMetricValue(entry.metrics, ['reactions', 'likes']),
+        views: reportMetricValue(entry.metrics, ['views']),
+        follows: reportMetricValue(entry.metrics, ['follows', 'followers']),
+      },
+    })),
+    series: definitions.map((metric, index) => ({
+      name: metric.label,
+      color: reportChartMetricColors[metric.label] || ['#6bbcff', '#6fe3b2', '#f58ac8', '#ffb86b'][index % 4],
+      values: timeline.map((entry) => (
+        typeof metric.formula === 'function'
+          ? metric.formula(entry.metrics)
+          : reportMetricValue(entry.metrics, metric.aliases || [metric.label])
+      )),
+      labels: timeline.map((entry) => `Day ${entry.day}`),
+    })),
+  };
+}
+
+function buildReportMonthlyTimeline(rows = []) {
+  const dayMap = new Map();
+  const sourceRows = rows.length ? rows : [{ metrics: {} }];
+
+  sourceRows.forEach((row, index) => {
+    const day = getReportDayNumber(row.date, index);
+    if (!dayMap.has(day)) dayMap.set(day, { day, metrics: {} });
+    const entry = dayMap.get(day);
+    Object.entries(row.metrics || {}).forEach(([label, value]) => {
+      entry.metrics[label] = (entry.metrics[label] || 0) + Number(value || 0);
+    });
+  });
+
+  const timelineLength = getReportTimelineLength(sourceRows);
+  return Array.from({ length: timelineLength }, (_, index) => {
+    const day = index + 1;
+    return dayMap.get(day) || { day, metrics: {} };
+  });
+}
+
+function getReportTimelineLength(rows = []) {
+  const datedRows = rows
+    .map((row) => new Date(String(row.date || '').trim()))
+    .filter((date) => !Number.isNaN(date.getTime()));
+
+  if (!datedRows.length) return 31;
+
+  const first = datedRows[0];
+  const sameMonth = datedRows.every((date) => date.getFullYear() === first.getFullYear() && date.getMonth() === first.getMonth());
+  if (!sameMonth) return 31;
+
+  return new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+}
+
+function getReportTimelineTitle(rows = [], platform = 'Platform') {
+  const firstDate = rows
+    .map((row) => new Date(String(row.date || '').trim()))
+    .find((date) => !Number.isNaN(date.getTime()));
+
+  return firstDate
+    ? `${platform} ${firstDate.toLocaleString(undefined, { month: 'long', year: 'numeric' })}`
+    : `${platform} Monthly Performance`;
+}
+
+function getReportDayNumber(value, index) {
+  const text = String(value || '').trim();
+  const parsed = new Date(text);
+  if (!Number.isNaN(parsed.getTime())) return clampReportDay(parsed.getDate());
+  const matched = text.match(/\b([1-9]|[12][0-9]|3[01])\b/);
+  if (matched) return clampReportDay(Number(matched[1]));
+  return clampReportDay(index + 1);
+}
+
+function clampReportDay(value) {
+  return Math.min(31, Math.max(1, Number(value) || 1));
+}
+
 
 
 
@@ -2772,12 +2887,23 @@ function showDetail(report) {
 
     const metricColor = {
       'Reach': 'cyan',
+      'Reach / Impressions': 'cyan',
+      'Impressions': 'cyan',
+      'Unique': 'cyan',
       'Interactions': 'purple',
+      'Visits': 'purple',
       'Clicks': 'blue',
       'Reactions': 'pink',
+      'Comments': 'pink',
+      'Reports': 'pink',
       'Views': 'green',
+      'Viewers': 'green',
       'Followers': 'yellow',
+      'Follows': 'yellow',
       'Avg Engagement Rate': 'orange',
+      'Avg. Engagement': 'orange',
+      'Avg Engagement': 'orange',
+      'Engagement': 'orange',
     };
 
     (report.metrics || []).forEach((m) => {
@@ -2910,6 +3036,84 @@ function formatReportValue(value) {
   return String(value);
 }
 
+const reportMetricDefinitions = {
+  Instagram: [
+    { label: 'Reach / Impressions', aliases: ['reach', 'impressions'] },
+    { label: 'Interactions', aliases: ['interactions', 'engagement', 'engagements', 'total interactions'] },
+    { label: 'Clicks', aliases: ['clicks', 'link clicks', 'website clicks', 'profile clicks'] },
+    { label: 'Reactions', aliases: ['reactions', 'likes', 'reaction'] },
+    { label: 'Views', aliases: ['views', 'video views', 'plays'] },
+    { label: 'Follows', aliases: ['follows', 'followers', 'new follows'] },
+    { label: 'Avg. Engagement', aliases: ['avg engagement', 'average engagement', 'engagement rate'], sub: '%', formula: (totals) => reportPercent(reportMetricValue(totals, ['interactions', 'clicks', 'reactions']), reportMetricValue(totals, ['reach', 'impressions', 'views'])) },
+  ],
+  Facebook: [
+    { label: 'Follows', aliases: ['follows', 'followers', 'new follows'] },
+    { label: 'Visits', aliases: ['visits', 'page visits', 'profile visits'] },
+    { label: 'Clicks', aliases: ['clicks', 'link clicks', 'website clicks'] },
+    { label: 'Interactions', aliases: ['interactions', 'engagement', 'engagements', 'total interactions'] },
+    { label: 'Views', aliases: ['views', 'video views', 'total views'] },
+    { label: 'Viewers', aliases: ['viewers', 'unique viewers'] },
+    { label: 'Avg Engagement', aliases: ['avg engagement', 'average engagement'], formula: (totals) => reportMetricValue(totals, ['link clicks', 'clicks']) + reportMetricValue(totals, ['interactions']) },
+  ],
+  LinkedIn: [
+    { label: 'Impressions', aliases: ['impressions'] },
+    { label: 'Unique', aliases: ['unique', 'unique impressions', 'unique visitors', 'unique views'] },
+    { label: 'Clicks', aliases: ['clicks', 'link clicks'] },
+    { label: 'Reactions', aliases: ['reactions', 'likes'] },
+    { label: 'Comments', aliases: ['comments', 'comment count'] },
+    { label: 'Reports', aliases: ['reports', 'reposts', 'shares', 'shared reports'] },
+    { label: 'Engagement', aliases: ['engagement', 'engagement rate'], sub: '%' },
+    { label: 'Avg Engagement', aliases: ['avg engagement', 'average engagement'], formula: (totals) => reportMetricValue(totals, ['clicks']) + reportMetricValue(totals, ['reactions']) + reportMetricValue(totals, ['comments']) + reportMetricValue(totals, ['reports', 'reposts', 'shares']) },
+  ],
+};
+
+function reportNormalizeKey(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function reportMetricValue(totals, aliases) {
+  const aliasKeys = aliases.map(reportNormalizeKey);
+  const found = Object.entries(totals || {}).find(([key]) => {
+    const normalized = reportNormalizeKey(key);
+    return aliasKeys.includes(normalized) || aliasKeys.some((alias) => normalized.includes(alias) || alias.includes(normalized));
+  });
+  return found ? Number(found[1] || 0) : 0;
+}
+
+function reportPercent(value, base) {
+  return base ? Number(((value / base) * 100).toFixed(2)) : 0;
+}
+
+function buildPlatformReportMetrics(metricsData = {}, platform = 'Instagram') {
+  const dashboard = metricsData.platformDashboards?.[platform];
+  const rows = [...(dashboard?.rows || []), ...(dashboard?.metricoolRows || [])];
+  if (!rows.length) {
+    const source = metricsData.metrics || {};
+    return [
+      { label: 'Reach / Impressions', value: source.reach || 0 },
+      { label: 'Interactions', value: source.interactions || 0 },
+      { label: 'Clicks', value: source.clicks || 0 },
+      { label: 'Reactions', value: source.reactions || 0 },
+      { label: 'Views', value: source.views || 0 },
+      { label: 'Follows', value: source.follows || 0 },
+      { label: 'Avg. Engagement', value: source.engagementRate || 0, sub: '%' },
+    ];
+  }
+
+  const totals = {};
+  rows.forEach((row) => {
+    Object.entries(row.metrics || {}).forEach(([label, value]) => {
+      totals[label] = (totals[label] || 0) + Number(value || 0);
+    });
+  });
+
+  return (reportMetricDefinitions[platform] || reportMetricDefinitions.Instagram).map((metric) => ({
+    label: metric.label,
+    value: typeof metric.formula === 'function' ? metric.formula(totals) : reportMetricValue(totals, metric.aliases),
+    ...(metric.sub ? { sub: metric.sub } : {}),
+  }));
+}
+
 async function createReport(startDate, endDate, logoFile, platform = 'Instagram') {
   let metricsData = { metrics: {} };
   try {
@@ -2919,26 +3123,20 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
     console.warn('Unable to load metrics for report generation', err);
   }
 
-  const source = metricsData.metrics || {};
+  const metrics = buildPlatformReportMetrics(metricsData, platform);
+  const metricMap = metrics.reduce((acc, metric) => {
+    acc[metric.label] = Number(metric.value || 0);
+    return acc;
+  }, {});
   const aggregated = {
-    reach: source.reach || 0,
-    interactions: source.interactions || 0,
-    clicks: source.clicks || 0,
-    reactions: source.reactions || 0,
-    views: source.views || 0,
-    followers: source.follows || 0,
-    engagement: source.engagementRate || 0,
+    reach: metricMap['Reach / Impressions'] || metricMap.Impressions || 0,
+    interactions: metricMap.Interactions || 0,
+    clicks: metricMap.Clicks || 0,
+    reactions: metricMap.Reactions || 0,
+    views: metricMap.Views || 0,
+    followers: metricMap.Follows || 0,
+    engagement: metricMap['Avg. Engagement'] || metricMap['Avg Engagement'] || metricMap.Engagement || 0,
   };
-
-  const metrics = [
-    { label: 'Reach', value: aggregated.reach },
-    { label: 'Interactions', value: aggregated.interactions },
-    { label: 'Clicks', value: aggregated.clicks },
-    { label: 'Reactions', value: aggregated.reactions },
-    { label: 'Views', value: aggregated.views },
-    { label: 'Followers', value: aggregated.followers },
-    { label: 'Avg Engagement Rate', value: aggregated.engagement, sub: '%'},
-  ].filter((m) => m.value !== undefined);
 
   let summary = `Performance report for ${platform}. Reach: ${formatReportValue(aggregated.reach)}, Interactions: ${formatReportValue(aggregated.interactions)}, Clicks: ${formatReportValue(aggregated.clicks)}.`;
 
@@ -3014,7 +3212,7 @@ async function createReport(startDate, endDate, logoFile, platform = 'Instagram'
     metrics,
     takeaways,
     actions,
-    chartSnapshot: buildReportChartSnapshot(),
+    chartSnapshot: buildPlatformReportChartSnapshot(metricsData, platform),
   };
 
   const reports = loadReports();
@@ -3262,35 +3460,42 @@ function renderPerformanceChart(report) {
   const interactions = lookupValue('Interactions');
   const clicks = lookupValue('Clicks');
 
-  const series = snapshot?.days?.length
+  const series = snapshot?.series?.length
+    ? snapshot.series.map((metric, index) => ({
+        name: metric.name,
+        color: metric.color || ['#6bbcff', '#6fe3b2', '#f58ac8', '#ffb86b'][index % 4],
+        values: (metric.values || []).map((value) => Number(value || 0)),
+        labels: metric.labels || snapshot.days?.map((day) => day.dateLabel || `Day ${day.day}`) || [],
+      }))
+    : snapshot?.days?.length
     ? [
         {
           name: 'Reach',
-          color: '#4d7aff',
+          color: '#6bbcff',
           values: snapshot.days.map((day) => Number(day.totals?.reach || 0)),
           labels: snapshot.days.map((day) => day.dateLabel || `Day ${day.day}`),
         },
         {
           name: 'Interactions',
-          color: '#8a5cff',
+          color: '#6fe3b2',
           values: snapshot.days.map((day) => Number(day.totals?.interactions || 0)),
           labels: snapshot.days.map((day) => day.dateLabel || `Day ${day.day}`),
         },
         {
           name: 'Clicks',
-          color: '#00d4ff',
+          color: '#f58ac8',
           values: snapshot.days.map((day) => Number(day.totals?.clicks || 0)),
           labels: snapshot.days.map((day) => day.dateLabel || `Day ${day.day}`),
         },
       ]
     : [
-        { name: 'Reach', color: '#4d7aff', values: [Math.round(reach * 0.28), Math.round(reach * 0.42), Math.round(reach * 0.55), Math.round(reach * 0.7), Math.round(reach * 0.64), Math.round(reach * 0.83), Math.round(reach)] },
-        { name: 'Interactions', color: '#8a5cff', values: [Math.round(interactions * 0.18), Math.round(interactions * 0.32), Math.round(interactions * 0.4), Math.round(interactions * 0.5), Math.round(interactions * 0.58), Math.round(interactions * 0.7), Math.round(interactions * 0.85)] },
-        { name: 'Clicks', color: '#00d4ff', values: [Math.round(clicks * 0.14), Math.round(clicks * 0.22), Math.round(clicks * 0.3), Math.round(clicks * 0.42), Math.round(clicks * 0.5), Math.round(clicks * 0.63), Math.round(clicks * 0.79)] },
+        { name: 'Reach', color: '#6bbcff', values: [Math.round(reach * 0.28), Math.round(reach * 0.42), Math.round(reach * 0.55), Math.round(reach * 0.7), Math.round(reach * 0.64), Math.round(reach * 0.83), Math.round(reach)], labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'] },
+        { name: 'Interactions', color: '#6fe3b2', values: [Math.round(interactions * 0.18), Math.round(interactions * 0.32), Math.round(interactions * 0.4), Math.round(interactions * 0.5), Math.round(interactions * 0.58), Math.round(interactions * 0.7), Math.round(interactions * 0.85)], labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'] },
+        { name: 'Clicks', color: '#f58ac8', values: [Math.round(clicks * 0.14), Math.round(clicks * 0.22), Math.round(clicks * 0.3), Math.round(clicks * 0.42), Math.round(clicks * 0.5), Math.round(clicks * 0.63), Math.round(clicks * 0.79)], labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'] },
       ];
 
   if (reportChartTitle) {
-    reportChartTitle.textContent = snapshot?.title ? `${snapshot.title} Snapshot` : 'Saved Performance Snapshot';
+    reportChartTitle.textContent = snapshot?.title ? `${snapshot.title} Performance` : 'Saved Performance Snapshot';
   }
 
   chartLegend.innerHTML = series.map((metric) => `
@@ -3324,19 +3529,26 @@ function renderPerformanceChart(report) {
     return `${line} L ${lastX.toFixed(1)} ${height - padding} L ${padding} ${height - padding} Z`;
   };
 
-  const xAxisLabels = snapshot?.days?.length
-    ? snapshot.days.map((day) => {
-        const match = String(day.dateLabel || '').match(/^([A-Za-z]+)/);
-        return match ? match[1].slice(0, 3) : `D${day.day}`;
-      })
-    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const xAxisLabels = series[0]?.labels?.length
+    ? series[0].labels
+    : Array.from({ length: points }, (_, index) => `Day ${index + 1}`);
 
   const xLabels = xAxisLabels.map((label, index) => {
     const x = padding + index * xStep;
-    return `<text x="${x}" y="${height - 8}" class="chart-axis-label">${label}</text>`;
+    return `<text x="${x}" y="${height - 8}" class="chart-axis-label">${index % 2 === 0 || points <= 16 ? label : ''}</text>`;
   }).join('');
 
   const tooltipId = 'reportChartTooltip';
+  const colorWithAlpha = (color, alpha = 0.12) => {
+    const hex = String(color || '').replace('#', '');
+    if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    return String(color || 'rgba(107,188,255,0.12)').replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+  };
 
   chartSvgContainer.innerHTML = `
     <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" class="performance-svg">
@@ -3354,14 +3566,14 @@ function renderPerformanceChart(report) {
         }).join('')}
       </g>
       ${series.map((metric, index) => `
-        <path d="${buildArea(metric.values)}" fill="${metric.color.replace(')', ', 0.12)').replace('rgb', 'rgba')}" opacity="0.65"></path>
+        <path d="${buildArea(metric.values)}" fill="${colorWithAlpha(metric.color, index === 0 ? 0.1 : 0.045)}" opacity="0.8"></path>
         <path d="${buildLine(metric.values)}" fill="none" stroke="${metric.color}" stroke-width="3" stroke-linecap="round" />
       `).join('')}
       ${series.map((metric) => metric.values.map((value, index) => {
         const x = padding + index * xStep;
         const y = normalize(value);
         const actualValue = Math.round(Number(value || 0));
-        const dayLabel = metric.labels?.[index] || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index] || `Day ${index + 1}`;
+        const dayLabel = metric.labels?.[index] || xAxisLabels[index] || `Day ${index + 1}`;
         return `<circle class="report-chart-point" data-label="${metric.name}" data-day="${dayLabel}" data-value="${actualValue}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${metric.color}" stroke="#0b1117" stroke-width="2" />`;
       }).join('')).join('')}
       ${xLabels}
