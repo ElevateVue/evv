@@ -2396,3 +2396,326 @@ body.evv-modal-open {
   }
 }
 
+
+/* ══════════════════════════════════════════════
+   ORBIT PREMIUM DESIGN SYSTEM — ENHANCED LAYER
+   ══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ── Premium Animation Keyframes ── */
+@keyframes orbit-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes orbit-glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(26,213,255,0.15), 0 18px 40px rgba(0,0,0,0.3); }
+  50% { box-shadow: 0 0 40px rgba(26,213,255,0.3), 0 22px 50px rgba(0,0,0,0.35); }
+}
+
+@keyframes orbit-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-counter-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes orbit-fadeup {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orbit-scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer-slide {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Typography Upgrade ── */
+body {
+  font-family: 'Inter', 'Congenial', 'Poppins', system-ui, sans-serif;
+}
+
+h1, h2, h3, .panel h1, .brand-name {
+  font-family: 'Space Grotesk', 'Inter', 'Congenial', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ── Premium Navigation (Sidebar) ── */
+.sidebar {
+  background: rgba(9, 13, 22, 0.98) !important;
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255,255,255,0.05) !important;
+  box-shadow: 4px 0 40px rgba(0,0,0,0.4);
+}
+
+.nav-link {
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+  position: relative;
+}
+
+.nav-link:hover {
+  background: rgba(255,255,255,0.04) !important;
+  color: var(--text) !important;
+  transform: translateX(2px);
+}
+
+.nav-link.active {
+  color: #00d9ff !important;
+  background: rgba(0,217,255,0.1) !important;
+  box-shadow: inset 3px 0 0 #00d9ff;
+}
+
+/* ── Topbar Enhancement ── */
+.topbar {
+  background: rgba(8, 12, 22, 0.92) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+/* ── Premium Button Upgrades ── */
+.pill-btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, filter 0.2s ease !important;
+}
+
+.pill-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.2), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.pill-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 22px 44px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08) !important;
+  filter: brightness(1.05) !important;
+}
+
+.pill-btn:hover::before { opacity: 1; }
+.pill-btn:active { transform: translateY(0) scale(0.98) !important; }
+
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 16px 40px rgba(124,93,250,0.35) !important;
+}
+
+.ghost-btn {
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.ghost-btn:hover {
+  transform: translateY(-1px) !important;
+  background: rgba(0,217,255,0.08) !important;
+  box-shadow: 0 0 20px rgba(0,217,255,0.15) !important;
+}
+
+/* ── Premium Cards ── */
+.card {
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+.metric-card {
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease !important;
+}
+
+.metric-card:hover {
+  transform: translateY(-3px) !important;
+}
+
+.panel {
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  background: linear-gradient(180deg, rgba(15,20,29,0.98), rgba(12,16,23,0.98)) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03) !important;
+}
+
+/* ── Glassmorphism Panels ── */
+.platform-metric-card, .stat-card {
+  backdrop-filter: blur(10px);
+}
+
+/* ── Premium Form Inputs ── */
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: rgba(0,217,255,0.45) !important;
+  background: rgba(11,17,27,0.95) !important;
+  box-shadow: 0 0 0 3px rgba(0,217,255,0.1), 0 0 20px rgba(0,217,255,0.08) !important;
+  outline: none;
+}
+
+.login-input-shell:focus-within {
+  border-color: rgba(0,217,255,0.35) !important;
+  box-shadow: 0 0 0 3px rgba(0,217,255,0.1) !important;
+}
+
+/* ── Animated Counters hint ── */
+.stat-value, .metric-value, .hub-card-value {
+  transition: color 0.3s ease;
+}
+
+/* ── Enhanced Badges ── */
+.badge.success {
+  border: 1px solid rgba(111,204,128,0.3);
+  box-shadow: 0 0 12px rgba(111,204,128,0.1);
+}
+
+.badge.pending {
+  border: 1px solid rgba(255,199,92,0.3);
+  box-shadow: 0 0 12px rgba(255,199,92,0.1);
+}
+
+/* ── Orbit-Themed Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0,217,255,0.4), rgba(124,93,250,0.4));
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0,217,255,0.7), rgba(124,93,250,0.7));
+}
+
+/* ── Premium Table Row ── */
+.table-row {
+  transition: background 0.15s ease;
+  border-radius: 10px;
+}
+
+.table-row:not(.table-head):hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* ── Chip Hover Premium ── */
+.chip {
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+
+.chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124,106,215,0.2);
+}
+
+.chip.active {
+  box-shadow: 0 0 16px rgba(124,106,215,0.25);
+}
+
+/* ── Premium Section Divider ── */
+.orbit-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,217,255,0.2), rgba(124,93,250,0.2), transparent);
+  margin: 32px 0;
+}
+
+/* ── Avatar Enhancement ── */
+.avatar {
+  box-shadow: 0 0 0 2px rgba(0,217,255,0.2), 0 6px 16px rgba(0,0,0,0.3) !important;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.avatar:hover {
+  box-shadow: 0 0 0 3px rgba(0,217,255,0.4), 0 8px 20px rgba(0,0,0,0.4) !important;
+  transform: scale(1.05);
+}
+
+/* ── Platform Badge Enhancement ── */
+.platform-badge {
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease !important;
+}
+
+.platform-badge:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+}
+
+/* ── Floating Action Elevation ── */
+.modal.show, .edit-modal.show, .ai-modal.show {
+  animation: orbit-scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+/* ── Loading shimmer ── */
+.loading-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer-slide 1.5s infinite;
+}
+
+/* ── Premium Empty States ── */
+.empty-card {
+  background: linear-gradient(180deg, rgba(15,20,35,0.95), rgba(10,14,24,0.98)) !important;
+  border: 1px dashed rgba(255,255,255,0.08) !important;
+  transition: border-color 0.3s ease;
+}
+
+.empty-card:hover {
+  border-color: rgba(0,217,255,0.15) !important;
+}
+
+/* ── Score bars premium ── */
+.score-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.score-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+  animation: shimmer-slide 2s infinite;
+}
+
+/* ── Dashboard section elevated card ── */
+.summary-chart {
+  animation: orbit-float 6s ease-in-out infinite;
+}
+
+/* ── Content tabs active state ── */
+.content-tabs a.active,
+.campaign-tab.active {
+  box-shadow: 0 4px 16px rgba(124,93,250,0.3);
+}
+
+/* ── Calendar button hover ── */
+.calendar-grid button:hover {
+  background: rgba(0,217,255,0.1) !important;
+}
+
+.calendar-grid button.selected {
+  box-shadow: 0 6px 20px rgba(0,217,255,0.3) !important;
+  background: linear-gradient(135deg, #00d9ff, #7c5dfa) !important;
+}
+
+/* ── Mobile premium enhancements ── */
+@media (max-width: 960px) {
+  .sidebar {
+    box-shadow: 6px 0 60px rgba(0,0,0,0.6) !important;
+  }
+}

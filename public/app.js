@@ -450,14 +450,154 @@ class AnimatedDock {
   }
 }
 
+// Orbital Background Class for inner app pages
+class OrbitalBackground {
+  constructor(options = {}) {
+    this.options = {
+      rings: options.rings || 4,
+      opacity: options.opacity || 0.55,
+      speed: options.speed || 0.00012,
+      ...options
+    };
+    this.canvas = null;
+    this.ctx = null;
+    this.animationFrame = null;
+    this.rings = [];
+    this.particles = [];
+    this.W = 0;
+    this.H = 0;
+    this.dpr = 1;
+
+    this.init();
+  }
+
+  init() {
+    document.getElementById('orbital-bg-canvas')?.remove();
+    document.getElementById('waves-background')?.remove();
+    document.getElementById('beams-canvas')?.remove();
+
+    this.canvas = document.createElement('canvas');
+    this.canvas.id = 'orbital-bg-canvas';
+    this.canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;opacity:' + this.options.opacity + ';';
+    document.body.insertBefore(this.canvas, document.body.firstChild);
+    this.ctx = this.canvas.getContext('2d');
+
+    this.setupRings();
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.animate = this.animate.bind(this);
+    requestAnimationFrame(this.animate);
+  }
+
+  setupRings() {
+    const colors = [
+      [0, 217, 255],
+      [124, 93, 250],
+      [74, 94, 255],
+      [60, 200, 240],
+      [180, 120, 255],
+    ];
+    this.rings = Array.from({ length: this.options.rings }, (_, i) => ({
+      radiusFactor: 0.18 + i * 0.1,
+      speed: (i % 2 === 0 ? 1 : -1) * (this.options.speed + i * 0.00002),
+      color: colors[i % colors.length],
+      opacity: 0.12 - i * 0.018,
+      thickness: 1.0 - i * 0.12,
+      particleCount: 2,
+      particleAngles: Array.from({ length: 2 }, (_, j) => (j / 2) * Math.PI * 2),
+      dotR: 1.8 - i * 0.2,
+    }));
+  }
+
+  resize() {
+    this.dpr = window.devicePixelRatio || 1;
+    this.W = window.innerWidth;
+    this.H = window.innerHeight;
+    this.canvas.width = this.W * this.dpr;
+    this.canvas.height = this.H * this.dpr;
+    this.canvas.style.width = this.W + 'px';
+    this.canvas.style.height = this.H + 'px';
+    this.ctx.scale(this.dpr, this.dpr);
+  }
+
+  animate(t) {
+    const { ctx, W, H } = this;
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = W * 0.5;
+    const cy = H * 0.5;
+    const base = Math.min(W, H) * 0.5;
+
+    // Subtle center glow
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, base * 0.25);
+    grd.addColorStop(0, 'rgba(124,93,250,0.06)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(cx, cy, base * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+
+    this.rings.forEach(ring => {
+      const r = ring.radiusFactor * base;
+      const [rc, gc, bc] = ring.color;
+
+      // Ring
+      ctx.strokeStyle = 'rgba(' + rc + ',' + gc + ',' + bc + ',' + ring.opacity + ')';
+      ctx.lineWidth = ring.thickness;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Particles
+      ring.particleAngles = ring.particleAngles.map(a => a + ring.speed * 16);
+      ring.particleAngles.forEach(angle => {
+        const px = cx + Math.cos(angle) * r;
+        const py = cy + Math.sin(angle) * r;
+
+        // Trail
+        for (let s = 0; s < 12; s++) {
+          const ta = angle - (s / 12) * 0.3 * Math.sign(ring.speed);
+          const tx = cx + Math.cos(ta) * r;
+          const ty = cy + Math.sin(ta) * r;
+          const alpha = ring.opacity * (1 - s / 12) * 0.5;
+          ctx.beginPath();
+          ctx.arc(tx, ty, ring.dotR * (1 - s / 12 * 0.6), 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + rc + ',' + gc + ',' + bc + ',' + alpha + ')';
+          ctx.fill();
+        }
+
+        // Dot
+        ctx.beginPath();
+        ctx.arc(px, py, ring.dotR, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + rc + ',' + gc + ',' + bc + ',' + (ring.opacity * 2.5) + ')';
+        ctx.fill();
+      });
+    });
+
+    this.animationFrame = requestAnimationFrame(this.animate);
+  }
+
+  destroy() {
+    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    this.canvas?.remove();
+  }
+}
+
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize animated waves background
-  window.wavesBackground = new WavesBackground({
-    strokeColor: 'rgba(255,255,255,0.28)',
-    backgroundColor: '#000000',
-    pointerSize: 8
-  });
+  // Initialize premium orbital background for inner app pages
+  const isLandingPage = document.body.classList.contains('welcome-page') ||
+    location.pathname.endsWith('landing.html') ||
+    location.pathname === '/' ||
+    location.pathname === '';
+
+  if (!isLandingPage) {
+    window.orbitalBackground = new OrbitalBackground({
+      rings: 4,
+      opacity: 0.5,
+      speed: 0.00012
+    });
+  }
 
   initializeBrandHomeNavigation();
 
