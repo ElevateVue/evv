@@ -5,7 +5,7 @@
       credentials: 'same-origin',
     }, opts));
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.message || 'Request failed.');
+    if (!response.ok) throw new Error(data.message || data.error || 'Request failed.');
     return data;
   };
 
@@ -22,13 +22,16 @@
   const modal = document.getElementById('scheduleModal');
   const schDate = document.getElementById('schDate');
   const schPlatform = document.getElementById('schPlatform');
+  const schAccount = document.getElementById('schAccount');
   const schType = document.getElementById('schType');
   const schTitle = document.getElementById('schTitle');
   const schTopic = document.getElementById('schTopic');
+  const schMediaUrl = document.getElementById('schMediaUrl');
   const schCaption = document.getElementById('schCaption');
   const schMedia = document.getElementById('schMedia');
   const schMediaPreview = document.getElementById('schMediaPreview');
   let selectedMedia = null;
+  let socialAccounts = [];
 
   function setButtonLoading(button, isLoading, label = 'Generating...') {
     if (!button) return;
@@ -250,6 +253,39 @@
     }
   }
 
+  async function loadSocialAccounts() {
+    if (!schAccount) return;
+    try {
+      const response = await api('/api/social/accounts');
+      socialAccounts = Array.isArray(response.accounts) ? response.accounts : [];
+    } catch (error) {
+      socialAccounts = [];
+      console.warn('Unable to load Postiz accounts', error);
+    }
+    renderAccountOptions();
+  }
+
+  function renderAccountOptions() {
+    if (!schAccount) return;
+    const selectedPlatform = schPlatform?.value || '';
+    const matching = socialAccounts.filter((account) => !selectedPlatform || account.platform === selectedPlatform);
+    schAccount.innerHTML = '';
+    if (!matching.length) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = socialAccounts.length ? `No ${selectedPlatform} accounts connected` : 'Connect accounts in Postiz first';
+      schAccount.appendChild(option);
+      return;
+    }
+    matching.forEach((account) => {
+      const option = document.createElement('option');
+      option.value = account.accountId;
+      option.dataset.platform = account.platform;
+      option.textContent = `${account.displayName || account.username || account.platform} - ${account.platform}`;
+      schAccount.appendChild(option);
+    });
+  }
+
   function resetMedia() {
     selectedMedia = null;
     if (schMedia) schMedia.value = '';
@@ -263,10 +299,14 @@
     schType.value = 'image';
     schTitle.value = '';
     schTopic.value = '';
+    if (schMediaUrl) schMediaUrl.value = '';
     schCaption.value = readSaved('calendarCaption', '');
     resetMedia();
+    renderAccountOptions();
     modal.style.display = 'flex';
   }
+
+  schPlatform?.addEventListener('change', renderAccountOptions);
 
   document.getElementById('newPostBtn')?.addEventListener('click', () => openScheduleModal());
   document.getElementById('cancelScheduleBtn')?.addEventListener('click', () => {
@@ -334,15 +374,23 @@
     );
     const payload = {
       platform: schPlatform?.value,
+      accountId: schAccount?.value,
       title: schTitle?.value || 'Untitled',
       transcript: captionWithHashtags,
       caption: captionWithHashtags,
       postType: schType?.value,
-      scheduledAt: schDate?.value,
-      ...(selectedMedia || {}),
+      scheduledFor: schDate?.value,
     };
+    if (schMediaUrl?.value.trim()) {
+      payload.mediaUrl = schMediaUrl.value.trim();
+      payload.mediaType = schType?.value === 'video' || schType?.value === 'reel' ? 'video' : 'image';
+    }
     try {
-      const res = await api('/api/posts', { method: 'POST', body: JSON.stringify(payload) });
+      if (!payload.accountId) {
+        alert('Choose a connected Postiz account before scheduling.');
+        return;
+      }
+      const res = await api('/api/schedule-post', { method: 'POST', body: JSON.stringify(payload) });
       if (res.post && modal) {
         modal.style.display = 'none';
         fetchAndRender();
@@ -532,4 +580,5 @@
   }
 
   fetchAndRender();
+  loadSocialAccounts();
 })();

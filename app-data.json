@@ -2769,6 +2769,218 @@
     "queenofall8747@gmail.com": {
       "posts": [
         {
+          "id": "6a2351d27dd1bc0187c8b0e6",
+          "postizPostId": "6a2351d27dd1bc0187c8b0e6",
+          "platform": "Instagram",
+          "title": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?",
+          "transcript": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?\n\nartisticflowers flowerphotography darkbackground colorfulnature macroflowers floralart",
+          "postType": "Feed Post",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "status": "scheduled",
+          "postedAt": "2026-06-06T02:48",
+          "raw": {
+            "request": {
+              "title": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?",
+              "content": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?\n\nartisticflowers flowerphotography darkbackground colorfulnature macroflowers floralart",
+              "timezone": "Asia/Dubai",
+              "platforms": [
+                {
+                  "platform": "instagram",
+                  "accountId": "6a23443f2b2567671aecb2a4"
+                }
+              ],
+              "mediaItems": [
+                {
+                  "type": "image",
+                  "url": "https://i.postimg.cc/bwSDC48h/Screenshot-2026-05-08-173004.png",
+                  "title": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?"
+                }
+              ],
+              "scheduledFor": "2026-06-06T02:48"
+            },
+            "postiz": {
+              "post": {
+                "userId": "6a232eed91724f581e0a8b11",
+                "title": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?",
+                "content": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?\n\nartisticflowers flowerphotography darkbackground colorfulnature macroflowers floralart",
+                "mediaItems": [
+                  {
+                    "type": "image",
+                    "url": "https://i.postimg.cc/bwSDC48h/Screenshot-2026-05-08-173004.png",
+                    "title": "Layer upon layer of petals, each one saturated in color against the dark. These blooms demand your attention.\n\nShot with no editing—just natural light and a steady hand. Which flower is your favorite?",
+                    "_id": "6a2351d27dd1bc0187c8b0e7"
+                  }
+                ],
+                "platforms": [
+                  {
+                    "platform": "instagram",
+                    "accountId": {
+                      "_id": "6a23443f2b2567671aecb2a4",
+                      "platform": "instagram",
+                      "profileId": "6a232eed91724f581e0a8b17",
+                      "displayName": "🎨🎨",
+                      "isActive": true,
+                      "profilePicture": "https://scontent-lhr8-1.cdninstagram.com/v/t51.2885-19/332348987_233633355753865_3060757828402343522_n.jpg?stp=dst-jpg_s206x206_tt6&_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=XQPPewRD1vkQ7kNvwGEvLQZ&_nc_oc=AdpZmRdYAnGUTnVp7GMu498ADGaqo_e4h9sIs6Rzn6BddU5az--rBR4wo97ekYnXO_Q&_nc_zt=24&_nc_ht=scontent-lhr8-1.cdninstagram.com&edm=AP4hL3IEAAAA&_nc_tpa=Q5bMBQFZ91X7EK0IX4eAhc--ZRbnXRHI13pN_jILOtd7EnJK4iYx3J1DKJNwrXhjTx4PTKauAHyiuEG6iw&oh=00_Af857okpOvnZFgjJmIT6TqerguaYHD2SkDrQhzqEtCjhSw&oe=6A29122E",
+                      "username": "i_artsy_heartsy_"
+                    },
+                    "profileId": "6a232eed91724f581e0a8b17",
+                    "customMedia": [],
+                    "scheduledFor": "2026-06-05T22:48:00.000Z",
+                    "platformSpecificData": {
+                      "__platformUserIdSnapshot": "26504721899205741",
+                      "__usernameSnapshot": "i_artsy_heartsy_"
+                    },
+                    "status": "pending",
+                    "publishAttempts": 0,
+                    "contentHash": "ce07065c7ab413f07b3eda03f783826d",
+                    "_id": "6a2351d27dd1bc0187c8b0e8"
+                  }
+                ],
+                "scheduledFor": "2026-06-05T22:48:00.000Z",
+                "timezone": "Asia/Dubai",
+                "status": "scheduled",
+                "tags": [],
+                "hashtags": [],
+                "mentions": [],
+                "visibility": "public",
+                "crosspostingEnabled": true,
+                "metadata": {
+                  "usageCounted": true
+                },
+                "publishAttempts": 0,
+                "contentHash": "ce07065c7ab413f07b3eda03f783826d",
+                "recycling": {
+                  "enabled": false,
+                  "gapFreq": "month",
+                  "recycleCount": 0,
+                  "contentVariations": [],
+                  "contentVariationIndex": 0
+                },
+                "_id": "6a2351d27dd1bc0187c8b0e6",
+                "createdAt": "2026-06-05T22:46:42.429Z",
+                "updatedAt": "2026-06-05T22:46:42.429Z",
+                "__v": 0
+              },
+              "message": "Post scheduled successfully"
+            }
+          }
+        },
+        {
+          "id": "6a234fcc8fad9cbcde055c25",
+          "postizPostId": "6a234fcc8fad9cbcde055c25",
+          "platform": "Instagram",
+          "title": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨",
+          "transcript": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨\n\nneonflowers digitalart abstractflora colorfulvibes blackbackground flowerart",
+          "postType": "Feed Post",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "status": "scheduled",
+          "postedAt": "2026-06-06T02:40",
+          "raw": {
+            "request": {
+              "title": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨",
+              "content": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨\n\nneonflowers digitalart abstractflora colorfulvibes blackbackground flowerart",
+              "timezone": "Asia/Dubai",
+              "platforms": [
+                {
+                  "platform": "instagram",
+                  "accountId": "6a23443f2b2567671aecb2a4"
+                }
+              ],
+              "mediaItems": [
+                {
+                  "type": "image",
+                  "url": "https://i.postimg.cc/bwSDC48h/Screenshot-2026-05-08-173004.png",
+                  "title": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨"
+                }
+              ],
+              "scheduledFor": "2026-06-06T02:40"
+            },
+            "postiz": {
+              "post": {
+                "userId": "6a232eed91724f581e0a8b11",
+                "title": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨",
+                "content": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨\n\nneonflowers digitalart abstractflora colorfulvibes blackbackground flowerart",
+                "mediaItems": [
+                  {
+                    "type": "image",
+                    "url": "https://i.postimg.cc/bwSDC48h/Screenshot-2026-05-08-173004.png",
+                    "title": "Electric neon blooms against a deep black backdrop. These aren't your garden-variety flowers—they're digital sculptures of color and light. Ready to brighten your feed. 🌸✨",
+                    "_id": "6a234fcc8fad9cbcde055c26"
+                  }
+                ],
+                "platforms": [
+                  {
+                    "platform": "instagram",
+                    "accountId": {
+                      "_id": "6a23443f2b2567671aecb2a4",
+                      "platform": "instagram",
+                      "profileId": "6a232eed91724f581e0a8b17",
+                      "displayName": "🎨🎨",
+                      "isActive": true,
+                      "profilePicture": "https://scontent-lhr8-1.cdninstagram.com/v/t51.2885-19/332348987_233633355753865_3060757828402343522_n.jpg?stp=dst-jpg_s206x206_tt6&_nc_cat=107&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy4xMDgwLkMzIn0%3D&_nc_ohc=XQPPewRD1vkQ7kNvwGEvLQZ&_nc_oc=AdpZmRdYAnGUTnVp7GMu498ADGaqo_e4h9sIs6Rzn6BddU5az--rBR4wo97ekYnXO_Q&_nc_zt=24&_nc_ht=scontent-lhr8-1.cdninstagram.com&edm=AP4hL3IEAAAA&_nc_tpa=Q5bMBQFZ91X7EK0IX4eAhc--ZRbnXRHI13pN_jILOtd7EnJK4iYx3J1DKJNwrXhjTx4PTKauAHyiuEG6iw&oh=00_Af857okpOvnZFgjJmIT6TqerguaYHD2SkDrQhzqEtCjhSw&oe=6A29122E",
+                      "username": "i_artsy_heartsy_"
+                    },
+                    "profileId": "6a232eed91724f581e0a8b17",
+                    "customMedia": [],
+                    "scheduledFor": "2026-06-05T22:40:00.000Z",
+                    "platformSpecificData": {
+                      "__platformUserIdSnapshot": "26504721899205741",
+                      "__usernameSnapshot": "i_artsy_heartsy_"
+                    },
+                    "status": "pending",
+                    "publishAttempts": 0,
+                    "contentHash": "c4f1a1d0443190f7f0999926a1b55577",
+                    "_id": "6a234fcc8fad9cbcde055c27"
+                  }
+                ],
+                "scheduledFor": "2026-06-05T22:40:00.000Z",
+                "timezone": "Asia/Dubai",
+                "status": "scheduled",
+                "tags": [],
+                "hashtags": [],
+                "mentions": [],
+                "visibility": "public",
+                "crosspostingEnabled": true,
+                "metadata": {
+                  "usageCounted": true
+                },
+                "publishAttempts": 0,
+                "contentHash": "c4f1a1d0443190f7f0999926a1b55577",
+                "recycling": {
+                  "enabled": false,
+                  "gapFreq": "month",
+                  "recycleCount": 0,
+                  "contentVariations": [],
+                  "contentVariationIndex": 0
+                },
+                "_id": "6a234fcc8fad9cbcde055c25",
+                "createdAt": "2026-06-05T22:38:04.885Z",
+                "updatedAt": "2026-06-05T22:38:04.885Z",
+                "__v": 0
+              },
+              "message": "Post scheduled successfully"
+            }
+          }
+        },
+        {
           "id": "p1",
           "platform": "Instagram",
           "title": "3/27/2026 summary 1",
@@ -3822,7 +4034,7 @@
         "completedAt": null
       },
       "strategyReports": {},
-      "updatedAt": "2026-05-06T17:57:04.516Z"
+      "updatedAt": "2026-06-05T22:46:46.007Z"
     },
     "codex-smoke@example.com": {
       "posts": [],
@@ -4378,7 +4590,125 @@
       },
       "strategyReports": {},
       "updatedAt": "2026-05-25T20:59:07.465Z"
+    },
+    "demo@user.com": {
+      "posts": [],
+      "metrics": {
+        "reach": 0,
+        "interactions": 0,
+        "clicks": 0,
+        "reactions": 0,
+        "views": 0,
+        "follows": 0,
+        "engagementRate": 0
+      },
+      "perPlatform": {},
+      "platformDashboards": {},
+      "lastUploadName": null,
+      "reports": [],
+      "onboarding": {
+        "started": false,
+        "completed": false,
+        "currentStep": 0,
+        "answers": {
+          "fullName": "",
+          "businessName": "",
+          "businessDescription": "",
+          "industries": [],
+          "industryOther": "",
+          "location": "",
+          "businessStage": "",
+          "personalityTraits": [],
+          "personalityOther": "",
+          "toneFormality": 5,
+          "preferredPhrases": "",
+          "restrictedPhrases": "",
+          "uniqueValueProposition": "",
+          "brandColors": [],
+          "logo": null
+        },
+        "updatedAt": null,
+        "completedAt": null
+      },
+      "strategyReports": {},
+      "updatedAt": "2026-06-05T21:22:28.673Z"
+    },
+    "wekpofiwlj@ndckjnc.com": {
+      "posts": [],
+      "metrics": {
+        "reach": 0,
+        "interactions": 0,
+        "clicks": 0,
+        "reactions": 0,
+        "views": 0,
+        "follows": 0,
+        "engagementRate": 0
+      },
+      "perPlatform": {},
+      "platformDashboards": {},
+      "lastUploadName": null,
+      "reports": [],
+      "onboarding": {
+        "started": true,
+        "completed": true,
+        "currentStep": 11,
+        "answers": {
+          "fullName": "zarah",
+          "businessName": "ahswin",
+          "businessDescription": "wjncjknx",
+          "industries": [
+            "Food & Hospitality",
+            "Education & Training",
+            "Beauty & Personal Care Services"
+          ],
+          "industryOther": "",
+          "location": "sharjah",
+          "businessStage": "Just launched (<1 yr)",
+          "personalityTraits": [
+            "Bold",
+            "Authoritative",
+            "Luxurious"
+          ],
+          "personalityOther": "",
+          "toneFormality": 6,
+          "preferredPhrases": "dklcnkdscnskjks",
+          "restrictedPhrases": "dcmkidlmcldsc",
+          "uniqueValueProposition": "ice cream",
+          "brandColors": [],
+          "logo": null
+        },
+        "updatedAt": "2026-06-06T13:37:24.262Z",
+        "completedAt": "2026-06-06T13:37:24.262Z"
+      },
+      "strategyReports": {},
+      "updatedAt": "2026-06-06T13:37:24.262Z"
+    },
+    "test@example.com": {
+      "posts": [],
+      "metrics": {
+        "reach": 0,
+        "interactions": 0,
+        "clicks": 0,
+        "reactions": 0,
+        "views": 0,
+        "follows": 0,
+        "engagementRate": 0
+      },
+      "perPlatform": {},
+      "platformDashboards": {},
+      "lastUploadName": null,
+      "reports": [],
+      "onboarding": {
+        "started": false,
+        "completed": false,
+        "currentStep": 0,
+        "answers": {},
+        "updatedAt": null,
+        "completedAt": null
+      },
+      "strategyReports": {},
+      "updatedAt": "2026-06-10T19:15:27.929Z"
     }
   },
-  "updatedAt": "2026-06-03T16:48:01.844Z"
+  "updatedAt": "2026-06-10T19:15:27.929Z"
 }

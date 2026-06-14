@@ -41,8 +41,9 @@
       margin: 0;
       color: var(--welcome-text);
       background:
-        radial-gradient(circle at 50% 22%, rgba(64, 83, 142, 0.16), transparent 34%),
-        linear-gradient(180deg, #0a0d14 0%, #0b0f17 100%);
+        radial-gradient(circle at 50% 18%, rgba(24, 67, 120, 0.18), transparent 34%),
+        radial-gradient(circle at 78% 40%, rgba(28, 205, 232, 0.08), transparent 28%),
+        linear-gradient(180deg, #0d121e 0%, #090d15 100%);
       min-height: 100vh;
       overflow-x: hidden;
     }
@@ -53,44 +54,15 @@
       z-index: 1;
     }
 
-    .welcome-waves {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-      background: #000000;
-    }
-
-    .welcome-waves svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-      opacity: 0.72;
-    }
-
-    .welcome-waves-dot {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.28);
-      transform: translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0);
-      box-shadow: 0 0 18px rgba(255,255,255,0.35);
-      will-change: transform;
-    }
-
     .welcome-shell::before {
       content: "";
       position: fixed;
       inset: 0;
       background:
-        linear-gradient(120deg, rgba(255, 255, 255, 0.015) 0, transparent 18%),
-        linear-gradient(300deg, rgba(255, 255, 255, 0.015) 0, transparent 22%);
+        radial-gradient(circle, rgba(255, 255, 255, 0.11) 1px, transparent 1px),
+        linear-gradient(120deg, rgba(255, 255, 255, 0.012) 0, transparent 18%),
+        linear-gradient(300deg, rgba(255, 255, 255, 0.012) 0, transparent 22%);
+      background-size: 42px 42px, auto, auto;
       pointer-events: none;
       z-index: -1;
     }
@@ -604,6 +576,135 @@
       margin-top: 4px;
     }
 
+    .hero-orbit-stage {
+      position: relative;
+      width: min(620px, 92vw);
+      aspect-ratio: 1;
+      margin-top: 16px;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      isolation: isolate;
+    }
+
+    .hero-orbit-stage::before {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(53, 94, 255, 0.16), transparent 54%);
+      filter: blur(10px);
+      opacity: 0.78;
+      z-index: -1;
+    }
+
+    .hero-orbit-grid {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background-image: radial-gradient(circle, rgba(180, 211, 255, 0.16) 1px, transparent 1px);
+      background-size: 18px 18px;
+      mask-image: radial-gradient(circle, black 0 68%, transparent 78%);
+      -webkit-mask-image: radial-gradient(circle, black 0 68%, transparent 78%);
+      opacity: 0.34;
+    }
+
+    .hero-orbit-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      border: 1px solid rgba(107, 95, 207, 0.32);
+      transform: translate(-50%, -50%);
+      animation: orbit-spin var(--orbit-speed, 18s) linear infinite;
+    }
+
+    .hero-orbit-ring::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      width: var(--dot-size, 12px);
+      height: var(--dot-size, 12px);
+      border-radius: 50%;
+      background: var(--dot-color, #7ee8fa);
+      transform: translateX(-50%);
+      box-shadow:
+        0 0 0 5px color-mix(in srgb, var(--dot-color, #7ee8fa) 18%, transparent),
+        0 0 22px var(--dot-color, #7ee8fa);
+    }
+
+    .hero-orbit-ring.one {
+      width: 20%;
+      height: 20%;
+      --orbit-speed: 7s;
+      --dot-color: #7ee8fa;
+      --dot-size: 9px;
+      border-color: rgba(126, 232, 250, 0.5);
+    }
+
+    .hero-orbit-ring.two {
+      width: 42%;
+      height: 42%;
+      --orbit-speed: 13s;
+      --dot-color: #2e5bff;
+      --dot-size: 12px;
+      border-color: rgba(46, 91, 255, 0.42);
+      animation-direction: reverse;
+    }
+
+    .hero-orbit-ring.three {
+      width: 68%;
+      height: 68%;
+      --orbit-speed: 20s;
+      --dot-color: #9d50ff;
+      --dot-size: 11px;
+      border-color: rgba(157, 80, 255, 0.32);
+    }
+
+    .hero-orbit-ring.four {
+      width: 92%;
+      height: 92%;
+      --orbit-speed: 29s;
+      --dot-color: #00f5ff;
+      --dot-size: 12px;
+      border-color: rgba(0, 245, 255, 0.24);
+      animation-direction: reverse;
+    }
+
+    .hero-orbit-logo {
+      width: clamp(74px, 13vw, 110px);
+      height: clamp(74px, 13vw, 110px);
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      background: rgba(16, 21, 32, 0.72);
+      box-shadow: 0 0 42px rgba(126, 232, 250, 0.12);
+    }
+
+    .hero-orbit-logo img {
+      width: 86%;
+      height: 86%;
+      object-fit: contain;
+      animation: orbit-logo-float 4.5s ease-in-out infinite;
+    }
+
+    @keyframes orbit-spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes orbit-logo-float {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.04) rotate(8deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-orbit-ring,
+      .hero-orbit-logo img {
+        animation-duration: 36s;
+      }
+    }
+
     .summary-card h3,
     .feature-card h3 {
       margin: 0 0 10px;
@@ -1074,6 +1175,17 @@
         font-size: 1.06rem;
       }
 
+      .hero-orbit-stage {
+        width: min(420px, 92vw);
+        margin-top: 8px;
+      }
+
+      .hero-orbit-logo {
+        width: 76px;
+        height: 76px;
+        border-radius: 22px;
+      }
+
       .summary-chart {
         padding: 22px;
         gap: 22px;
@@ -1095,7 +1207,6 @@
   </style>
 </head>
 <body class="welcome-page">
-  <div class="welcome-waves" id="welcomeWaves" style="--x:-0.5rem;--y:50%;" aria-hidden="true"></div>
   <div class="welcome-shell" id="top">
     <nav class="welcome-nav">
       <div class="welcome-nav-left">
@@ -1189,6 +1300,17 @@
             </svg>
           </a>
           <a href="#demo" class="welcome-btn secondary">View Demo</a>
+        </div>
+
+        <div class="hero-orbit-stage" aria-hidden="true">
+          <div class="hero-orbit-grid"></div>
+          <div class="hero-orbit-ring one"></div>
+          <div class="hero-orbit-ring two"></div>
+          <div class="hero-orbit-ring three"></div>
+          <div class="hero-orbit-ring four"></div>
+          <div class="hero-orbit-logo">
+            <img src="orbit-logo.svg" alt="" />
+          </div>
         </div>
       </div>
     </header>
@@ -1352,128 +1474,6 @@
   </div>
 
   <script>
-    class WelcomeWaves {
-      constructor() {
-        this.container = document.getElementById('welcomeWaves');
-        if (!this.container) return;
-        this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        this.dot = document.createElement('div');
-        this.dot.className = 'welcome-waves-dot';
-        this.container.append(this.svg, this.dot);
-        this.paths = [];
-        this.lines = [];
-        this.mouse = { x: -10, y: 0, lx: 0, ly: 0, sx: 0, sy: 0, vs: 0, a: 0, set: false };
-        this.setSize();
-        this.setLines();
-        window.addEventListener('resize', () => {
-          this.setSize();
-          this.setLines();
-        });
-        window.addEventListener('mousemove', (event) => this.setMouse(event.clientX, event.clientY));
-        window.addEventListener('touchmove', (event) => {
-          const touch = event.touches?.[0];
-          if (touch) this.setMouse(touch.clientX, touch.clientY);
-        }, { passive: true });
-        requestAnimationFrame((time) => this.tick(time));
-      }
-
-      setSize() {
-        this.bounds = this.container.getBoundingClientRect();
-        this.svg.style.width = `${this.bounds.width}px`;
-        this.svg.style.height = `${this.bounds.height}px`;
-      }
-
-      setLines() {
-        const xGap = 12;
-        const yGap = 12;
-        const { width, height } = this.bounds;
-        this.paths.forEach((path) => path.remove());
-        this.paths = [];
-        this.lines = [];
-        const totalLines = Math.ceil((width + 200) / xGap);
-        const totalPoints = Math.ceil((height + 30) / yGap);
-        const xStart = (width - xGap * totalLines) / 2;
-        const yStart = (height - yGap * totalPoints) / 2;
-        for (let i = 0; i < totalLines; i += 1) {
-          const points = [];
-          for (let j = 0; j < totalPoints; j += 1) {
-            points.push({ x: xStart + xGap * i, y: yStart + yGap * j, wave: { x: 0, y: 0 }, cursor: { x: 0, y: 0, vx: 0, vy: 0 } });
-          }
-          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          path.setAttribute('fill', 'none');
-          path.setAttribute('stroke', 'rgba(255,255,255,0.28)');
-          path.setAttribute('stroke-width', '1');
-          this.svg.appendChild(path);
-          this.paths.push(path);
-          this.lines.push(points);
-        }
-      }
-
-      setMouse(x, y) {
-        const mouse = this.mouse;
-        mouse.x = x - this.bounds.left;
-        mouse.y = y - this.bounds.top;
-        if (!mouse.set) {
-          mouse.sx = mouse.x;
-          mouse.sy = mouse.y;
-          mouse.lx = mouse.x;
-          mouse.ly = mouse.y;
-          mouse.set = true;
-        }
-      }
-
-      updatePoint(point, time) {
-        const mouse = this.mouse;
-        const move = ((Math.sin(point.x * 0.028 + time * 0.0008) + Math.sin(point.y * 0.021 + time * 0.00045) + Math.sin((point.x + point.y) * 0.012 + time * 0.0006)) / 3) * 8;
-        point.wave.x = Math.cos(move) * 12;
-        point.wave.y = Math.sin(move) * 6;
-        const dx = point.x - mouse.sx;
-        const dy = point.y - mouse.sy;
-        const distance = Math.hypot(dx, dy);
-        const limit = Math.max(175, mouse.vs);
-        if (distance < limit) {
-          const strength = (1 - distance / limit) * Math.cos(distance * 0.001);
-          point.cursor.vx += Math.cos(mouse.a) * strength * limit * mouse.vs * 0.00035;
-          point.cursor.vy += Math.sin(mouse.a) * strength * limit * mouse.vs * 0.00035;
-        }
-        point.cursor.vx += (0 - point.cursor.x) * 0.01;
-        point.cursor.vy += (0 - point.cursor.y) * 0.01;
-        point.cursor.vx *= 0.95;
-        point.cursor.vy *= 0.95;
-        point.cursor.x = Math.min(50, Math.max(-50, point.cursor.x + point.cursor.vx));
-        point.cursor.y = Math.min(50, Math.max(-50, point.cursor.y + point.cursor.vy));
-      }
-
-      tick(time) {
-        const mouse = this.mouse;
-        mouse.sx += (mouse.x - mouse.sx) * 0.1;
-        mouse.sy += (mouse.y - mouse.sy) * 0.1;
-        const dx = mouse.x - mouse.lx;
-        const dy = mouse.y - mouse.ly;
-        const distance = Math.hypot(dx, dy);
-        mouse.vs += (distance - mouse.vs) * 0.1;
-        mouse.vs = Math.min(100, mouse.vs);
-        mouse.lx = mouse.x;
-        mouse.ly = mouse.y;
-        mouse.a = Math.atan2(dy, dx);
-        this.container.style.setProperty('--x', `${mouse.sx}px`);
-        this.container.style.setProperty('--y', `${mouse.sy}px`);
-        this.lines.forEach((points, index) => {
-          let d = '';
-          points.forEach((point, pointIndex) => {
-            this.updatePoint(point, time);
-            const x = point.x + point.wave.x + (pointIndex ? point.cursor.x : 0);
-            const y = point.y + point.wave.y + (pointIndex ? point.cursor.y : 0);
-            d += `${pointIndex ? 'L' : 'M'} ${x} ${y}`;
-          });
-          this.paths[index]?.setAttribute('d', d);
-        });
-        requestAnimationFrame((nextTime) => this.tick(nextTime));
-      }
-    }
-
-    new WelcomeWaves();
-
     if (!location.hash) {
       history.replaceState(null, "", "#top");
     }
