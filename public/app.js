@@ -1510,13 +1510,15 @@ modalForm?.addEventListener('submit', (e) => {
     return;
   }
   const nextConnection = {
+    id: `${platform || 'account'}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
     platform,
     username,
     userId,
+    displayName: username,
+    accountId: userId || username,
     savedAt: Date.now(),
   };
-  const nextConnections = readConnections().filter((connection) => connection.platform !== platform);
-  nextConnections.push(nextConnection);
+  const nextConnections = [...readConnections(), nextConnection];
   writeConnections(nextConnections);
   trackClientActivity({
     eventType: 'edit_connection',
@@ -1532,7 +1534,7 @@ modalForm?.addEventListener('submit', (e) => {
   renderAvailableAccounts();
 });
 
-const META_APP_ID = '3101946309996937';
+const META_APP_ID = '1502053464099181';
 const META_API_VERSION = 'v25.0';
 let facebookSdkReadyPromise = null;
 
@@ -1750,14 +1752,23 @@ async function loadPostizConnections() {
 
 async function renderConnections() {
   const list = await loadPostizConnections();
+  const groupedConnections = list.reduce((groups, connection) => {
+    const platform = connection.platform || '';
+    if (!platform) return groups;
+    if (!groups[platform]) groups[platform] = [];
+    groups[platform].push(connection);
+    return groups;
+  }, {});
   document.querySelectorAll('.connect-user').forEach((el) => {
     const platform = el.dataset.platform;
-    const found = list.find((connection) => connection.platform === platform);
+    const found = groupedConnections[platform] || [];
     const btn = getConnectionButton(platform);
-    if (found) {
-      el.innerHTML = `<span class="connected-badge">Connected</span> <span>${getConnectionDisplayName(found)}</span>`;
+    if (found.length) {
+      const preview = found.slice(0, 2).map((connection) => getConnectionDisplayName(connection)).join(', ');
+      const suffix = found.length > 2 ? ` +${found.length - 2} more` : '';
+      el.innerHTML = `<span class="connected-badge">Connected</span> <span>${escapeHtml(preview)}${escapeHtml(suffix)}</span>`;
       if (btn) {
-        btn.textContent = 'Edit Connection';
+        btn.textContent = '+ Connect another';
         btn.disabled = false;
         btn.style.opacity = '1';
       }

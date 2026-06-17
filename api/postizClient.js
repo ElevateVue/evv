@@ -48,6 +48,7 @@ function normalizePostizBaseUrl(value = process.env.POSTIZ_API_BASE_URL || DEFAU
   if (base === 'http://127.0.0' || base === 'http://127.0.0.1' || base === 'http://localhost') {
     base = DEFAULT_POSTIZ_API_BASE_URL;
   }
+  base = base.replace(/\/api\/v1\/?$/i, '/api/public/v1');
   return base.replace(/\/+$/, '');
 }
 

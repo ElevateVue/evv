@@ -11,16 +11,16 @@
     "view": "client",
     "initials": "D",
     "firstSeen": 1777387666187,
-    "lastActive": 1781135129051,
-    "totalVisits": 273,
+    "lastActive": 1781474990163,
+    "totalVisits": 278,
     "lastPage": "Connect",
     "pageUsage": {
       "featurehub.html": {
         "name": "Feature Hub",
         "category": "Overview",
-        "visits": 79,
+        "visits": 80,
         "firstVisited": 1777387666187,
-        "lastVisited": 1781135127423
+        "lastVisited": 1781474017122
       },
       "clienthub.html": {
         "name": "Client Hub",
@@ -53,9 +53,9 @@
       "connect.html": {
         "name": "Connect",
         "category": "Connections",
-        "visits": 20,
+        "visits": 24,
         "firstVisited": 1777848538804,
-        "lastVisited": 1781135129051
+        "lastVisited": 1781474990163
       },
       "strategy.html": {
         "name": "Strategy",
@@ -199,9 +199,72 @@
       "totalSavedItems": 4
     },
     "onboarding": null,
-    "signInCount": 34,
-    "lastSignInAt": 1781135127010,
+    "signInCount": 35,
+    "lastSignInAt": 1781474016676,
     "activity": [
+      {
+        "id": "evt-1781474990163-8b438d",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1781474990164,
+        "meta": {}
+      },
+      {
+        "id": "evt-1781474299543-a23800",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1781474299543,
+        "meta": {}
+      },
+      {
+        "id": "evt-1781474259398-12e5fb",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1781474259398,
+        "meta": {}
+      },
+      {
+        "id": "evt-1781474023967-562110",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1781474023967,
+        "meta": {}
+      },
+      {
+        "id": "evt-1781474017122-f4135c",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1781474017123,
+        "meta": {}
+      },
+      {
+        "id": "evt-1781474016677-5ae342",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1781474016677,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
       {
         "id": "evt-1781135129051-dd6dd5",
         "type": "page_view",
@@ -564,73 +627,13 @@
           "role": "client",
           "view": "client"
         }
-      },
-      {
-        "id": "evt-1780503131053-55a4dd",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780503131053,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780503120702-894243",
-        "type": "page_view",
-        "label": "Report",
-        "detail": "",
-        "pageFile": "report.html",
-        "pageName": "Report",
-        "timestamp": 1780503120702,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780503093245-79a051",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780503093245,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780502940737-ff03b8",
-        "type": "page_view",
-        "label": "Strategy",
-        "detail": "",
-        "pageFile": "strategy.html",
-        "pageName": "Strategy",
-        "timestamp": 1780502940737,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780502657202-e0d0ef",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780502657202,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780502084754-2abd7d",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780502084754,
-        "meta": {}
       }
     ],
     "activitySummary": {
-      "pageViews": 32,
+      "pageViews": 31,
       "edits": 0,
       "actions": 1,
-      "signIns": 34
+      "signIns": 35
     }
   },
   "queenofall8747@gmail.com": {

@@ -660,5 +660,20 @@
       "createdAt": 1781135127008
     },
     "createdAt": 1781135127008
+  },
+  {
+    "token": "sess-329e6696c9ef48ecfcd890dd",
+    "user": {
+      "name": "Demo User",
+      "email": "sabiha.habeeb1972@gmail.com",
+      "firstName": "Demo",
+      "lastName": "User",
+      "accountType": "individual",
+      "companyName": "",
+      "role": "client",
+      "view": "client",
+      "createdAt": 1781474016670
+    },
+    "createdAt": 1781474016670
   }
 ]

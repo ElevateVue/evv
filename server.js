@@ -296,8 +296,23 @@ function extractPostizList(payload, key) {
   return [];
 }
 
-function buildPostizUrl(endpoint, query = {}) {
-  const url = new URL(`${POSTIZ_API_BASE}${endpoint}`);
+function getPostizBaseCandidates() {
+  const configuredBase = String(process.env.POSTIZ_API_BASE_URL || POSTIZ_API_BASE || '').trim().replace(/\/+$/, '');
+  const candidates = new Set();
+  if (configuredBase) {
+    candidates.add(configuredBase);
+    if (configuredBase.includes('/api/public/v1')) {
+      candidates.add(configuredBase.replace('/api/public/v1', '/api/v1'));
+    } else if (configuredBase.includes('/api/v1')) {
+      candidates.add(configuredBase.replace('/api/v1', '/api/public/v1'));
+    }
+  }
+  if (!candidates.size) candidates.add('https://api.postiz.com/public/v1');
+  return Array.from(candidates);
+}
+
+function buildPostizUrl(endpoint, query = {}, baseUrl = POSTIZ_API_BASE) {
+  const url = new URL(`${baseUrl}${endpoint}`);
   Object.entries(query || {}).forEach(([key, value]) => {
     if (value === undefined || value === null || value === '') return;
     url.searchParams.set(key, String(value));
@@ -305,13 +320,11 @@ function buildPostizUrl(endpoint, query = {}) {
   return url;
 }
 
-async function postizFetch(endpoint, method = 'GET', body = null) {
-  if (!POSTIZ_API_KEY) throw new Error('Postiz API key is required in API.env as POSTIZ_API_KEY');
-  const url = buildPostizUrl(endpoint, method === 'GET' ? body || {} : {});
+async function executePostizRequest(url, method, body) {
   const payload = method === 'GET' || !body ? '' : JSON.stringify(body);
+  const transport = url.protocol === 'http:' ? http : https;
 
   return new Promise((resolve, reject) => {
-    const transport = url.protocol === 'http:' ? http : https;
     const request = transport.request(url, {
       method,
       headers: {
@@ -323,14 +336,15 @@ async function postizFetch(endpoint, method = 'GET', body = null) {
       let raw = '';
       response.on('data', (chunk) => { raw += chunk; });
       response.on('end', () => {
-        let parsed = {};
+        let parsed;
         try {
           parsed = raw ? JSON.parse(raw) : {};
         } catch {
           parsed = { raw };
         }
         if (response.statusCode && response.statusCode >= 400) {
-          return reject(new Error(parsed.error || parsed.message || raw || response.statusMessage));
+          const message = parsed.error || parsed.message || raw || response.statusMessage || `HTTP ${response.statusCode}`;
+          return reject(Object.assign(new Error(message), { statusCode: response.statusCode, raw }));
         }
         resolve(parsed);
       });
@@ -339,6 +353,28 @@ async function postizFetch(endpoint, method = 'GET', body = null) {
     if (payload) request.write(payload);
     request.end();
   });
+}
+
+async function postizFetch(endpoint, method = 'GET', body = null) {
+  if (!POSTIZ_API_KEY) throw new Error('Postiz API key is required in API.env as POSTIZ_API_KEY');
+  const query = method === 'GET' ? body || {} : {};
+  let lastError = null;
+
+  for (const baseUrl of getPostizBaseCandidates()) {
+    const url = buildPostizUrl(endpoint, query, baseUrl);
+    try {
+      const result = await executePostizRequest(url, method, body);
+      return result;
+    } catch (error) {
+      lastError = error;
+      const statusCode = Number(error?.statusCode || 0);
+      if (statusCode && statusCode !== 404 && statusCode !== 405) {
+        break;
+      }
+    }
+  }
+
+  throw new Error(lastError?.message || `Postiz request failed for ${endpoint}`);
 }
 
 async function resolvePostizCustomerId(preferredCustomerId = '') {
