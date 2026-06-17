@@ -1678,7 +1678,9 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
       btn.disabled = true;
       btn.textContent = 'Connecting...';
       const returnUrl = `${window.location.origin}/connect.html?connected=${encodeURIComponent(platform)}`;
-      const sessionToken = getSessionToken ? getSessionToken() : (localStorage.getItem('sessionToken') || '');
+      const sessionToken = (function () {
+        try { return JSON.parse(localStorage.getItem('user') || 'null')?.token || ''; } catch { return ''; }
+      })();
       const response = await fetch(`/api/auth/connect-link?platform=${encodeURIComponent(platform)}&sessionToken=${encodeURIComponent(sessionToken)}`);
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || payload.message || 'Could not start connection.');
@@ -1717,7 +1719,9 @@ window.addEventListener('message', (event) => {
 // Fetch live integrations from Postiz via server and merge into local connections list
 async function loadPostizConnections() {
   try {
-    const sessionToken = localStorage.getItem('sessionToken') || '';
+    const sessionToken = (function () {
+      try { return JSON.parse(localStorage.getItem('user') || 'null')?.token || ''; } catch { return ''; }
+    })();
     const res = await fetch(`/api/auth/postiz-integrations?sessionToken=${encodeURIComponent(sessionToken)}`, {
       headers: { 'x-session-token': sessionToken },
     });
@@ -1737,7 +1741,8 @@ async function loadPostizConnections() {
       const rawPlatform = (integration.identifier || integration.providerIdentifier || '').toLowerCase();
       const platform = platformMap[rawPlatform] || rawPlatform;
       if (!platform) return;
-      const alreadyExists = existing.find((c) => c.platform === platform && c.authProvider === 'postiz');
+      // Match by integration ID so the same account isn't duplicated on refresh
+      const alreadyExists = existing.find((c) => c.integrationId === integration.id);
       if (!alreadyExists) {
         existing.push({
           platform,
@@ -1754,23 +1759,73 @@ async function loadPostizConnections() {
 
 function renderConnections() {
   const list = readScopedJson('connections', []);
+
+  // Group accounts by platform (multiple accounts allowed per platform)
+  const byPlatform = {};
+  list.forEach((c) => {
+    const key = (c.platform || 'Unknown').toLowerCase();
+    byPlatform[key] = byPlatform[key] || [];
+    byPlatform[key].push(c);
+  });
+
+  // Update each platform card
   document.querySelectorAll('.connect-user').forEach((el) => {
     const platform = el.dataset.platform;
-    const found = list.find((c) => c.platform === platform);
-    if (found) {
-      el.innerHTML = `<span class="connected-badge">● Connected</span> <span>${found.username || found.email || ''}</span>`;
-      // Update the connect button to show connected state
-      const btn = document.querySelector(`.connect-btn[data-platform="${platform}"], .connect-trigger[data-platform="${platform}"]`);
-      if (btn) {
-        btn.textContent = 'Connected ✓';
-        btn.disabled = true;
-        btn.style.opacity = '0.7';
-      }
+    const accounts = byPlatform[platform.toLowerCase()] || [];
+
+    if (accounts.length === 0) {
+      el.innerHTML = '<span style="font-size:13px;opacity:0.5">Not connected</span>';
+      return;
+    }
+
+    el.innerHTML = accounts.map((acc, idx) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+        <span style="color:#4ade80;font-size:12px;font-weight:500">● Connected</span>
+        <span style="font-size:13px;opacity:0.85;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${acc.username || acc.email || 'Account ' + (idx + 1)}</span>
+        <button class="disconnect-btn" data-platform="${platform}" data-index="${idx}"
+          style="background:transparent;border:1px solid rgba(255,80,80,0.4);color:#ff6b6b;border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;flex-shrink:0"
+          title="Disconnect this account">✕ Remove</button>
+      </div>`).join('');
+  });
+
+  // Wire up disconnect buttons
+  document.querySelectorAll('.disconnect-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const platform = btn.dataset.platform;
+      const idx = parseInt(btn.dataset.index, 10);
+      disconnectAccount(platform, idx);
+    });
+  });
+
+  // Update connect button text — show "+ Add Another" if already has accounts
+  document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
+    const platform = btn.dataset.platform;
+    const accounts = byPlatform[(platform || '').toLowerCase()] || [];
+    if (accounts.length > 0) {
+      btn.textContent = '+ Add Another';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    } else {
+      btn.textContent = '+ Connect';
+      btn.disabled = false;
+      btn.style.opacity = '1';
     }
   });
+
   const statConnected = document.getElementById('statConnected');
   statConnected && (statConnected.textContent = list.length);
   renderAvailableAccounts && renderAvailableAccounts();
+}
+
+function disconnectAccount(platform, idx) {
+  const list = readScopedJson('connections', []);
+  const platformAccounts = list.filter((c) => (c.platform || '').toLowerCase() === platform.toLowerCase());
+  const toRemove = platformAccounts[idx];
+  if (!toRemove) return;
+  const updated = list.filter((c) => c !== toRemove);
+  writeScopedJson('connections', updated);
+  renderConnections();
 }
 
 // On page load, pull live integrations then render
