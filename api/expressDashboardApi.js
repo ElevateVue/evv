@@ -6,12 +6,18 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { URL, URLSearchParams } = require('url');
+const {
+  getSocialAuthLinks,
+  scheduleSocialPost,
+  getScheduledCalendarPosts,
+  getSocialAnalytics,
+} = require('./postizClient');
 
 require('dotenv').config({ path: path.join(__dirname, '..', 'API.env') });
 
-const METRICOOL_TOKEN = process.env.METRICOOL_TOKEN || '';
-const METRICOOL_USER_ID = process.env.METRICOOL_USER_ID || '';
-const METRICOOL_API_BASE = process.env.METRICOOL_API_BASE_URL || 'https://api.metricool.com/v1';
+const POSTIZ_API_KEY = process.env.POSTIZ_API_KEY || '';
+const POSTIZ_CUSTOMER_ID = process.env.POSTIZ_CUSTOMER_ID || '';
+const POSTIZ_API_BASE = process.env.POSTIZ_API_BASE_URL || 'https://api.postiz.com/public/v1';
 const PORT = Number(process.env.API_PORT || 4001);
 const publicDir = path.join(__dirname, '..', 'public');
 const sessionsFile = path.join(__dirname, '..', 'sessions.json');
@@ -361,24 +367,28 @@ function persistWorkspace() {
   saveWorkspace();
 }
 
-function buildMetricoolUrl(endpoint, query = {}) {
-  const url = new URL(`${METRICOOL_API_BASE}${endpoint}`);
-  const params = new URLSearchParams({ userId: METRICOOL_USER_ID, ...query });
+function buildPostizUrl(endpoint, query = {}) {
+  const url = new URL(`${POSTIZ_API_BASE}${endpoint}`);
+  const params = new URLSearchParams();
+  Object.entries(query || {}).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    params.set(key, String(value));
+  });
   url.search = params.toString();
   return url.toString();
 }
 
-async function metricoolFetch(endpoint, method = 'GET', body = null) {
-  if (!METRICOOL_TOKEN || !METRICOOL_USER_ID) {
-    throw new Error('Metricool credentials are required in API.env');
+async function postizFetch(endpoint, method = 'GET', body = null) {
+  if (!POSTIZ_API_KEY) {
+    throw new Error('Postiz API key is required in API.env as POSTIZ_API_KEY');
   }
 
-  const url = buildMetricoolUrl(endpoint, method === 'GET' ? body || {} : {});
+  const url = buildPostizUrl(endpoint, method === 'GET' ? body || {} : {});
   const options = {
     method,
     headers: {
       'Content-Type': 'application/json',
-      'X-Mc-Auth': METRICOOL_TOKEN,
+      Authorization: POSTIZ_API_KEY,
     },
   };
 
@@ -394,6 +404,318 @@ async function metricoolFetch(endpoint, method = 'GET', body = null) {
     if (!response.ok) throw new Error(text || response.statusText);
     return {};
   }
+}
+
+async function resolvePostizCustomerId(preferredCustomerId = '') {
+  const customerId = String(preferredCustomerId || POSTIZ_CUSTOMER_ID || '').trim();
+  if (customerId) return customerId;
+  const groups = await postizFetch('/groups', 'GET').catch(() => []);
+  const group = extractPostizList(groups, 'groups')[0];
+  return group?.id || '';
+}
+
+function postizPlatform(value = '') {
+  const platform = String(value || '').trim().toLowerCase();
+  if (platform === 'twitter') return 'x';
+  if (platform === 'google business' || platform === 'googlebusinessprofile' || platform === 'googlebusiness') return 'gmb';
+  if (platform === 'linkedin page' || platform === 'linkedinpage') return 'linkedin-page';
+  return platform.replace(/\s+/g, '');
+}
+
+function displayPlatform(value = '') {
+  const platform = String(value || '').trim().toLowerCase();
+  const labels = {
+    facebook: 'Facebook',
+    instagram: 'Instagram',
+    linkedin: 'LinkedIn',
+    tiktok: 'TikTok',
+    snapchat: 'Snapchat',
+    twitter: 'Twitter',
+    threads: 'Threads',
+    pinterest: 'Pinterest',
+    youtube: 'YouTube',
+    reddit: 'Reddit',
+    bluesky: 'Bluesky',
+    gmb: 'Google Business',
+    googlebusiness: 'Google Business',
+  };
+  return labels[platform] || String(value || 'Social').trim() || 'Social';
+}
+
+function extractPostizList(payload, key) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.[key])) return payload[key];
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.posts)) return payload.posts;
+  return [];
+}
+
+function normalizeScheduledFor(value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return `${text}T09:00:00`;
+  return text;
+}
+
+function postizMediaItems(body = {}) {
+  const items = Array.isArray(body.mediaItems) ? body.mediaItems : [];
+  const media = items.map((item) => ({
+    id: item.id || crypto.randomBytes(6).toString('hex'),
+    path: item.path || item.url,
+  })).filter((item) => item.path);
+  if (body.mediaUrl) {
+    media.push({ id: crypto.randomBytes(6).toString('hex'), path: body.mediaUrl });
+  }
+  return media;
+}
+
+function postizSettings(platform, body = {}) {
+  const type = postizPlatform(platform);
+  if (type === 'instagram' || type === 'instagram-standalone') {
+    return { __type: type, post_type: /story/i.test(body.postType || '') ? 'story' : 'post', is_trial_reel: false, collaborators: [] };
+  }
+  if (type === 'x') return { __type: 'x', who_can_reply_post: 'everyone', community: '' };
+  if (type === 'linkedin' || type === 'linkedin-page') return { __type: type, post_as_images_carousel: false };
+  if (type === 'facebook') return { __type: 'facebook' };
+  if (type === 'youtube') return { __type: 'youtube', title: String(body.title || 'Scheduled video').slice(0, 100), type: 'public', selfDeclaredMadeForKids: 'no' };
+  if (type === 'tiktok') {
+    return {
+      __type: 'tiktok',
+      privacy_level: 'PUBLIC_TO_EVERYONE',
+      duet: true,
+      stitch: true,
+      comment: true,
+      autoAddMusic: 'no',
+      brand_content_toggle: false,
+      brand_organic_toggle: false,
+      video_made_with_ai: false,
+      content_posting_method: 'DIRECT_POST',
+    };
+  }
+  if (type === 'gmb') return { __type: 'gmb', topicType: 'STANDARD' };
+  return { __type: type };
+}
+
+function buildPostizSchedulePayload(body = {}, normalizedPlatforms = []) {
+  const content = body.content || body.caption || body.transcript || '';
+  const scheduledFor = normalizeScheduledFor(body.scheduledFor || body.scheduledAt);
+  const media = postizMediaItems(body);
+  return {
+    type: body.publishNow ? 'now' : scheduledFor ? 'schedule' : 'draft',
+    date: scheduledFor || undefined,
+    shortLink: false,
+    tags: [],
+    posts: normalizedPlatforms.map((item) => ({
+      integration: { id: item.accountId },
+      value: [{ content, image: media }],
+      settings: postizSettings(item.platform, body),
+    })),
+  };
+}
+
+function normalizePostizAnalyticsPost(item = {}) {
+  const analytics = item.analytics || {};
+  const platformAnalytics = Array.isArray(item.platformAnalytics) ? item.platformAnalytics : [];
+  const firstPlatform = platformAnalytics[0] || {};
+  const platform = displayPlatform(item.platform || firstPlatform.platform || item.platforms?.[0]?.platform);
+  const likes = safeNumber(analytics.likes);
+  const comments = safeNumber(analytics.comments);
+  const shares = safeNumber(analytics.shares);
+  const saves = safeNumber(analytics.saves);
+  const reactions = safeNumber(analytics.reactions || analytics.likes);
+  const clicks = safeNumber(analytics.clicks);
+  const views = safeNumber(analytics.views);
+  const reach = safeNumber(analytics.reach || analytics.impressions);
+  const title = String(item.title || item.content || item.message || 'Postiz post').trim();
+
+  return {
+    id: item.postId || item._id || item.latePostId || crypto.randomBytes(8).toString('hex'),
+    postizPostId: item.postId || item._id || item.latePostId || null,
+    platform,
+    source: item.isExternal ? 'Postiz external sync' : 'Postiz',
+    title: title.length > 90 ? `${title.slice(0, 87)}...` : title,
+    transcript: String(item.content || item.message || '').trim(),
+    postedAt: item.publishedAt || item.scheduledFor || null,
+    status: item.status || 'published',
+    engagement: {
+      likes,
+      comments,
+      shares,
+      reactions,
+      saves,
+      total: likes + comments + shares + reactions + saves,
+    },
+    reach,
+    clicks,
+    views,
+    followers: 0,
+    createdAt: item.publishedAt ? new Date(item.publishedAt).getTime() : Date.now(),
+    raw: item,
+  };
+}
+
+function buildPlatformDashboardsFromPostiz(posts = [], followerStats = null) {
+  const dashboards = {};
+  posts.forEach((post) => {
+    const platform = post.platform || 'Social';
+    const row = {
+      date: post.postedAt ? formatIsoDate(post.postedAt) : formatIsoDate(Date.now()),
+      metrics: {
+        Impressions: Number(post.reach || 0),
+        Reach: Number(post.reach || 0),
+        Interactions: Number(post.engagement?.total || 0),
+        Clicks: Number(post.clicks || 0),
+        Reactions: Number(post.engagement?.reactions || 0),
+        Comments: Number(post.engagement?.comments || 0),
+        Shares: Number(post.engagement?.shares || 0),
+        Views: Number(post.views || 0),
+      },
+      raw: post.raw || post,
+    };
+    dashboards[platform] = dashboards[platform] || {
+      platform,
+      filename: 'Postiz live analytics',
+      uploadedAt: new Date().toISOString(),
+      rows: [],
+      postizRows: [],
+      metricoolRows: [],
+    };
+    dashboards[platform].rows.push(row);
+  });
+
+  const accounts = Array.isArray(followerStats?.accounts) ? followerStats.accounts : [];
+  accounts.forEach((account) => {
+    const platform = displayPlatform(account.platform);
+    dashboards[platform] = dashboards[platform] || {
+      platform,
+      filename: 'Postiz live analytics',
+      uploadedAt: new Date().toISOString(),
+      rows: [],
+      postizRows: [],
+      metricoolRows: [],
+    };
+    dashboards[platform].rows.push({
+      date: formatIsoDate(Date.now()),
+      metrics: {
+        Follows: safeNumber(account.currentFollowers),
+        Followers: safeNumber(account.currentFollowers),
+        'Follower Growth': safeNumber(account.growth),
+      },
+      raw: account,
+    });
+  });
+  return dashboards;
+}
+
+function analyticsSeriesValue(series = {}) {
+  const points = Array.isArray(series.data) ? series.data : [];
+  if (!points.length) return safeNumber(series.total || series.value || 0);
+  return points.reduce((total, point) => total + safeNumber(point.total || point.value), 0);
+}
+
+function rowsFromPostizAnalytics(integration = {}, analytics = []) {
+  const platform = displayPlatform(integration.identifier || integration.providerIdentifier);
+  const byDate = new Map();
+  analytics.forEach((series) => {
+    const label = String(series.label || '').trim();
+    const points = Array.isArray(series.data) ? series.data : [];
+    points.forEach((point) => {
+      const date = formatIsoDate(point.date || Date.now());
+      if (!date) return;
+      if (!byDate.has(date)) byDate.set(date, { date, metrics: {}, raw: { integration, analytics } });
+      byDate.get(date).metrics[label] = safeNumber(point.total || point.value);
+    });
+  });
+  if (!byDate.size && analytics.length) {
+    const metrics = {};
+    analytics.forEach((series) => {
+      if (series.label) metrics[series.label] = analyticsSeriesValue(series);
+    });
+    const today = formatIsoDate(Date.now());
+    byDate.set(today, { date: today, metrics, raw: { integration, analytics } });
+  }
+  return { platform, rows: Array.from(byDate.values()) };
+}
+
+function buildPostizPost(item = {}) {
+  const integration = item.integration || {};
+  const platform = displayPlatform(integration.providerIdentifier || integration.identifier || item.platform);
+  const title = String(item.title || item.content || item.value?.[0]?.content || 'Postiz post').trim();
+  return {
+    id: item.id || crypto.randomBytes(8).toString('hex'),
+    postizPostId: item.id || null,
+    platform,
+    title: title.length > 90 ? `${title.slice(0, 87)}...` : title,
+    transcript: String(item.content || item.value?.[0]?.content || '').trim(),
+    postedAt: item.publishDate || item.date || item.scheduledFor || item.createdAt || Date.now(),
+    status: item.state || item.status || 'scheduled',
+    engagement: { likes: 0, comments: 0, shares: 0, reactions: 0, total: 0 },
+    reach: 0,
+    clicks: 0,
+    views: 0,
+    followers: 0,
+    createdAt: item.createdAt ? new Date(item.createdAt).getTime() : Date.now(),
+    raw: item,
+  };
+}
+
+async function fetchPostizWorkspaceMetrics(query = {}) {
+  const customer = await resolvePostizCustomerId(query.customer || query.group || query.profileId);
+  const integrations = extractPostizList(await postizFetch('/integrations', 'GET', { group: customer }), 'integrations');
+  const groups = extractPostizList(await postizFetch('/groups', 'GET').catch(() => []), 'groups');
+  const days = String(query.days || query.date || 30);
+  const wantedPlatform = postizPlatform(query.platform || '');
+  const visibleIntegrations = integrations.filter((item) => {
+    if (item.disabled) return false;
+    if (!wantedPlatform) return true;
+    return postizPlatform(item.identifier || item.providerIdentifier) === wantedPlatform;
+  });
+  const analytics = {};
+  const platformDashboards = {};
+  const followerStats = { accounts: [] };
+  for (const integration of visibleIntegrations) {
+    const rows = await postizFetch(`/analytics/${encodeURIComponent(integration.id)}`, 'GET', { date: days }).catch((error) => ({ error: error.message }));
+    analytics[integration.id] = rows;
+    const series = Array.isArray(rows) ? rows : [];
+    const dashboard = rowsFromPostizAnalytics(integration, series);
+    platformDashboards[dashboard.platform] = platformDashboards[dashboard.platform] || {
+      platform: dashboard.platform,
+      filename: 'Postiz live analytics',
+      uploadedAt: new Date().toISOString(),
+      rows: [],
+      postizRows: [],
+      metricoolRows: [],
+    };
+    platformDashboards[dashboard.platform].rows.push(...dashboard.rows);
+    const followerSeries = series.find((item) => /follower/i.test(item.label || ''));
+    followerStats.accounts.push({
+      platform: integration.identifier || integration.providerIdentifier,
+      displayName: integration.name || integration.profile,
+      currentFollowers: followerSeries ? analyticsSeriesValue(followerSeries) : 0,
+      raw: integration,
+    });
+  }
+  const now = new Date();
+  const startDate = query.startDate || query.fromDate || new Date(now.getTime() - Number(days) * 86400000).toISOString();
+  const endDate = query.endDate || query.toDate || now.toISOString();
+  const postsResult = await postizFetch('/posts', 'GET', { startDate, endDate, customer }).catch(() => ({ posts: [] }));
+  const posts = extractPostizList(postsResult, 'posts').map(buildPostizPost);
+  const snapshot = aggregateMetrics(posts);
+  return {
+    posts,
+    metrics: snapshot.totals,
+    perPlatform: snapshot.perPlatform,
+    platformDashboards,
+    postiz: {
+      analytics,
+      integrations,
+      groups,
+      followerStats,
+      posts: postsResult,
+      customer,
+    },
+  };
 }
 
 async function parseCsvBuffer(buffer, filename) {
@@ -412,13 +734,20 @@ async function parseCsvBuffer(buffer, filename) {
   });
 }
 
-async function fetchMetricoolTimeline(platform, blogId) {
-  const query = { blogId, platform: platform.toLowerCase() };
-  const endpoint = '/analytics/timeline';
-  const result = await metricoolFetch(endpoint, 'GET', query).catch((error) => {
-    throw new Error(`Metricool timeline fetch failed for ${platform}: ${error.message}`);
-  });
-  return Array.isArray(result.data) ? result.data : Array.isArray(result.timeline) ? result.timeline : [];
+async function fetchPostizTimeline(platform) {
+  const wantedPlatform = postizPlatform(platform);
+  const customer = await resolvePostizCustomerId();
+  const integrations = extractPostizList(await postizFetch('/integrations', 'GET', { group: customer }), 'integrations')
+    .filter((item) => postizPlatform(item.identifier || item.providerIdentifier) === wantedPlatform);
+  const rows = [];
+  for (const integration of integrations) {
+    const analytics = await postizFetch(`/analytics/${encodeURIComponent(integration.id)}`, 'GET', { date: 30 }).catch(() => []);
+    rowsFromPostizAnalytics(integration, Array.isArray(analytics) ? analytics : []).rows.forEach((row) => rows.push({
+      date: row.date,
+      ...row.metrics,
+    }));
+  }
+  return rows;
 }
 
 app.post('/api/login', async (req, res) => {
@@ -489,7 +818,7 @@ app.post('/api/dashboard/upload-metrics', upload.fields([
       const platform = platformFieldMap[fieldName];
       const file = files[fieldName][0];
       const rows = await parseCsvBuffer(file.buffer, file.originalname);
-      const metricoolRows = await fetchMetricoolTimeline(platform, blogId).catch(() => []);
+      const metricoolRows = await fetchPostizTimeline(platform).catch(() => []);
       const mergedRows = mergeTimelineRows(rows, metricoolRows);
       const timeline = buildCleanTimeline(platform, mergedRows);
       const summary = calculatePlatformSummary(platform, mergedRows);
@@ -569,8 +898,29 @@ app.post('/api/upload', async (req, res) => {
   }
 });
 
-app.get('/api/metrics', (req, res) => {
+app.get('/api/metrics', async (req, res) => {
   ensureWorkspaceMetrics();
+  if (POSTIZ_API_KEY) {
+    try {
+      const live = await fetchPostizWorkspaceMetrics(req.query || {});
+      return res.json({
+        metrics: live.metrics,
+        perPlatform: live.perPlatform,
+        platformDashboards: live.platformDashboards,
+        lastUploadName: 'Postiz live analytics',
+        postiz: live.postiz,
+        fallbackMetrics: workspace.metrics || {},
+        fallbackPerPlatform: workspace.perPlatform || {},
+      });
+    } catch (error) {
+      return res.json({
+        metrics: workspace.metrics || {},
+        perPlatform: workspace.perPlatform || {},
+        lastUploadName: workspace.lastUploadName || '',
+        postiz: { error: error.message },
+      });
+    }
+  }
   return res.json({
     metrics: workspace.metrics || {},
     perPlatform: workspace.perPlatform || {},
@@ -640,25 +990,91 @@ app.get('/api/google/status', (req, res) => {
   return res.json({ gsc: null, ga4: null });
 });
 
+app.get('/api/social/accounts', async (req, res) => {
+  try {
+    const customer = await resolvePostizCustomerId(req.query.customer || req.query.profileId || '');
+    const wantedPlatform = postizPlatform(req.query.platform || '');
+    const result = await postizFetch('/integrations', 'GET', { group: customer });
+    const accounts = extractPostizList(result, 'integrations')
+      .filter((account) => !wantedPlatform || postizPlatform(account.identifier || account.providerIdentifier) === wantedPlatform)
+      .map((account) => ({
+      id: account.id,
+      accountId: account.id,
+      platform: displayPlatform(account.identifier || account.providerIdentifier),
+      platformKey: postizPlatform(account.identifier || account.providerIdentifier),
+      username: account.profile || account.name || '',
+      displayName: account.name || account.profile || '',
+      profileUrl: account.profileUrl || account.picture || '',
+      isActive: account.disabled !== true,
+      profileId: account.customer?.id || customer || '',
+      raw: account,
+    }));
+    return res.json({ accounts, hasAnalyticsAccess: true, raw: result });
+  } catch (error) {
+    return res.status(502).json({ error: `Postiz accounts lookup failed: ${error.message}` });
+  }
+});
+
 app.get('/api/auth/connect-link', async (req, res) => {
   try {
-    const result = await metricoolFetch('/profile/admin', 'GET');
-    const connectUrl = result?.connectUrl || result?.oauthUrl || `${METRICOOL_API_BASE}/oauth/whitelabel?userId=${METRICOOL_USER_ID}`;
-    return res.json({ connectUrl });
+    const platform = postizPlatform(req.query.platform || 'instagram');
+    const result = await postizFetch(`/social/${encodeURIComponent(platform)}`, 'GET', { refresh: req.query.refresh || '' });
+    const connectUrl = result?.authUrl || result?.auth_url || result?.connectUrl || result?.url;
+    if (!connectUrl) return res.status(502).json({ error: 'Postiz did not return a connect URL.', raw: result });
+    return res.json({ connectUrl, platform, raw: result });
   } catch (error) {
-    return res.status(502).json({ error: `Could not load connect-link: ${error.message}` });
+    return res.status(502).json({ error: `Could not load Postiz connect-link: ${error.message}` });
   }
 });
 
 app.post('/api/schedule-post', async (req, res) => {
   try {
-    const payload = req.body;
-    if (!payload || typeof payload !== 'object') {
+    const body = req.body || {};
+    if (!body || typeof body !== 'object') {
       return res.status(400).json({ error: 'Scheduling payload must be a valid JSON object.' });
     }
 
-    const result = await metricoolFetch('/schedule/post', 'POST', payload);
-    return res.json({ success: true, result });
+    const platforms = Array.isArray(body.platforms) && body.platforms.length
+      ? body.platforms
+      : [{
+        platform: postizPlatform(body.platform),
+        accountId: body.accountId || body.socialAccountId,
+      }];
+    const normalizedPlatforms = platforms
+      .map((item) => ({
+        platform: postizPlatform(item.platform),
+        accountId: item.accountId || item.id,
+      }))
+      .filter((item) => item.platform && item.accountId);
+
+    if (!normalizedPlatforms.length) {
+      return res.status(400).json({ error: 'Choose at least one connected Postiz social account before scheduling.' });
+    }
+
+    const payload = buildPostizSchedulePayload(body, normalizedPlatforms);
+    const content = body.content || body.caption || body.transcript || '';
+
+    const result = await postizFetch('/posts', 'POST', payload);
+    const postizPost = result.post || result.data?.post || result.data || result;
+    const localPost = {
+      id: postizPost._id || postizPost.id || crypto.randomBytes(8).toString('hex'),
+      postizPostId: postizPost._id || postizPost.id || null,
+      platform: displayPlatform(normalizedPlatforms[0].platform),
+      title: body.title || String(content || 'Scheduled post').slice(0, 80),
+      transcript: content,
+      postedAt: payload.date || postizPost.publishDate || new Date().toISOString(),
+      status: payload.type === 'now' ? 'publishing' : payload.type,
+      engagement: { likes: 0, comments: 0, shares: 0, reactions: 0, total: 0 },
+      reach: 0,
+      clicks: 0,
+      views: 0,
+      followers: 0,
+      createdAt: Date.now(),
+      raw: { request: payload, postiz: result },
+    };
+    workspace.posts.unshift(localPost);
+    persistWorkspace();
+    return res.json({ success: true, result, post: localPost });
   } catch (error) {
     return res.status(502).json({ error: `Scheduling failed: ${error.message}` });
   }
@@ -667,8 +1083,12 @@ app.post('/api/schedule-post', async (req, res) => {
 app.get('/api/content-lab/calendar', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    const result = await metricoolFetch('/content/calendar', 'GET', { startDate, endDate });
-    return res.json({ calendar: result.data || result || [] });
+    const result = await postizFetch('/posts', 'GET', {
+      startDate: startDate || new Date(Date.now() - 30 * 86400000).toISOString(),
+      endDate: endDate || new Date(Date.now() + 365 * 86400000).toISOString(),
+      customer: req.query.customer || POSTIZ_CUSTOMER_ID,
+    });
+    return res.json({ calendar: extractPostizList(result, 'posts'), raw: result });
   } catch (error) {
     return res.status(502).json({ error: `Calendar lookup failed: ${error.message}` });
   }
@@ -677,8 +1097,7 @@ app.get('/api/content-lab/calendar', async (req, res) => {
 app.get('/api/reports/competitors', async (req, res) => {
   try {
     const handles = String(req.query.handles || req.query.competitors || '').split(',').map((item) => item.trim()).filter(Boolean);
-    const result = await metricoolFetch('/reports/competitors', 'GET', { handles: handles.join(',') });
-    return res.json({ competitors: result.data || result || [], requestedHandles: handles });
+    return res.status(501).json({ error: 'Competitor reports are not available in the current Postiz integration.', requestedHandles: handles });
   } catch (error) {
     return res.status(502).json({ error: `Competitor report fetch failed: ${error.message}` });
   }
@@ -691,8 +1110,7 @@ app.post('/api/scheduling/generate-caption', async (req, res) => {
       return res.status(400).json({ error: 'Caption generation requires a topic field.' });
     }
 
-    const result = await metricoolFetch('/scheduling/generate-caption', 'POST', body);
-    return res.json({ caption: result.caption || result.text || '', raw: result });
+    return res.status(501).json({ error: 'Caption generation is handled by the local AI endpoints, not Postiz.' });
   } catch (error) {
     return res.status(502).json({ error: `Caption generation failed: ${error.message}` });
   }
@@ -715,6 +1133,44 @@ app.get('/api/dashboard/feedback/best-times', async (req, res) => {
     return res.json({ bestTimes: heatmap, labels: ['6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'] });
   } catch (error) {
     return res.status(500).json({ error: `Best-times feedback failed: ${error.message}` });
+  }
+});
+
+app.get('/api/postiz/auth-links', async (req, res) => {
+  try {
+    const links = await getSocialAuthLinks();
+    return res.json({ links });
+  } catch (error) {
+    return res.status(502).json({ error: `Postiz auth links failed: ${error.message}` });
+  }
+});
+
+app.post('/api/postiz/schedule', async (req, res) => {
+  try {
+    const result = await scheduleSocialPost(req.body || {});
+    return res.json({ success: true, result });
+  } catch (error) {
+    return res.status(502).json({ error: `Postiz scheduling failed: ${error.message}` });
+  }
+});
+
+app.get('/api/postiz/calendar', async (req, res) => {
+  try {
+    const posts = await getScheduledCalendarPosts(req.query || {});
+    return res.json({ posts });
+  } catch (error) {
+    return res.status(502).json({ error: `Postiz calendar lookup failed: ${error.message}` });
+  }
+});
+
+app.get('/api/postiz/analytics', async (req, res) => {
+  try {
+    const channelId = req.query.channelId || req.query.integrationId || '';
+    const dateRange = req.query.dateRange || req.query.date || '30';
+    const analytics = await getSocialAnalytics(channelId, dateRange);
+    return res.json({ analytics });
+  } catch (error) {
+    return res.status(502).json({ error: `Postiz analytics lookup failed: ${error.message}` });
   }
 });
 

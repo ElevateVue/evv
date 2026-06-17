@@ -72,11 +72,10 @@
 
             <div class="field">
               <label>Account</label>
-              <div class="input-row">
-                <input type="text" id="accountSearch" placeholder="Search or type account names, press Enter or click Add" />
-                <button type="button" id="addAccountBtn" class="pill-btn outline small">Add</button>
+              <div class="account-select-shell">
+                <input type="text" id="accountSearch" placeholder="Choose connected account(s)" autocomplete="off" readonly />
+                <div id="accountList" class="account-list account-dropdown"></div>
               </div>
-              <div id="accountList" class="account-list"></div>
               <div id="accountChips" class="chip-row"></div>
             </div>
 
@@ -108,6 +107,12 @@
             </div>
 
             <div class="field">
+              <label>Public media URL</label>
+              <input id="postMediaUrl" placeholder="https://... optional, required for Postiz media publishing" />
+              <span class="hint">Use a public image, video, or PDF URL when the post should publish with media.</span>
+            </div>
+
+            <div class="field">
               <label>Hashtags</label>
               <div class="input-row">
                 <input id="postHashtags" placeholder="#marketing #socialmedia ..." />
@@ -135,13 +140,13 @@
             </div>
 
             <div class="field">
-              <label>Admin approval email</label>
+              <label>Admin approval email <span class="muted">(optional)</span></label>
               <input id="approvalEmail" placeholder="admin@yourcompany.com" />
-              <span class="hint">An approval request will be sent to this email before scheduling.</span>
+              <span class="hint">Add an email only when this post needs approval before publishing.</span>
             </div>
 
             <div class="btn-row">
-              <button type="submit" class="pill-btn">Submit for Approval</button>
+              <button type="submit" class="pill-btn">Schedule Post</button>
             </div>
             </form>
           </section>

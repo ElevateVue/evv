@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -57,10 +57,12 @@
     <div class="content-modal-card">
       <h3>Schedule Post</h3>
       <input id="schDate" class="brand-field" placeholder="Date (YYYY-MM-DD)" />
-      <select id="schPlatform" class="brand-select"><option>Instagram</option><option>Facebook</option><option>LinkedIn</option></select>
+      <select id="schPlatform" class="brand-select"><option>Instagram</option><option>Facebook</option><option>LinkedIn</option><option>TikTok</option><option>Snapchat</option></select>
+      <select id="schAccount" class="brand-select"><option value="">Loading connected accounts...</option></select>
       <select id="schType" class="brand-select"><option value="image">Image</option><option value="video">Video</option><option value="carousel">Carousel</option><option value="story">Story</option><option value="reel">Reel</option><option value="text">Text</option></select>
       <input id="schTitle" class="brand-field" placeholder="Post title" />
       <input id="schTopic" class="brand-field" placeholder="Topic for caption generator" />
+      <input id="schMediaUrl" class="brand-field" placeholder="Public media URL for Postiz (optional)" />
       <label class="content-upload-field" for="schMedia">
         <span>Upload image, video, or post file</span>
         <input id="schMedia" type="file" accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx" />

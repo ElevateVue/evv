@@ -101,9 +101,19 @@
           <div class="legend" id="platformLegend"></div>
         </section>
 
+        <section class="card reports-card" id="postizAgencyCard">
+          <div class="card-head">
+            <h3>Agency</h3>
+          </div>
+          <div id="postizAgencySummary" class="recent-reports">
+            <div class="empty-report">Connect Postiz to see agency customers and channels here.</div>
+          </div>
+        </section>
+
         <section class="card ai-feedback-card" id="platformFeedbackCard">
           <div class="card-head">
             <h3>Feedback & Recommendations</h3>
+            <button class="ghost-btn outline small rainbow-border" id="generateAIFeedbackBtn" type="button">Generate</button>
           </div>
           <div id="platformFeedbackContent" class="ai-feedback-paragraph">Upload analytics data to generate feedback.</div>
         </section>
@@ -114,6 +124,15 @@
           </div>
           <div id="platformReportSummary" class="recent-reports"></div>
           <div class="empty-report" id="recentReportsEmpty">No platform report data yet.</div>
+        </section>
+
+        <section class="card reports-card" id="postizLiveCard">
+          <div class="card-head">
+            <h3>Postiz Live Data</h3>
+          </div>
+          <div id="postizLiveSummary" class="recent-reports">
+            <div class="empty-report">Connect social accounts to see live analytics here.</div>
+          </div>
         </section>
 
         <div class="card feedback-card collapsed">

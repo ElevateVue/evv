@@ -1109,6 +1109,8 @@ async function loadMetrics() {
     perPlatformMetrics = data.perPlatform || {};
     updateDashboardUploadHero(data.lastUploadName || readScopedString('lastUploadName'));
     if (uploadStatus) uploadStatus.textContent = data.lastUploadName ? `Using ${data.lastUploadName}` : '';
+    renderPostizLiveSummary(data);
+    renderPostizAgencySummary(data);
     const cards = document.querySelectorAll('.metric-card');
     const map = ['reach', 'interactions', 'clicks', 'reactions', 'views', 'follows', 'engagementRate'];
     cards.forEach((card, idx) => {
@@ -1181,7 +1183,7 @@ newPostFile?.addEventListener('change', async () => {
     alert('File uploaded and post created');
     await loadPosts();
     await loadMetrics();
-    await renderAIFeedback();
+    await renderAIFeedback({ generate: true });
   } catch (err) {
     alert(err.message || 'Upload failed');
   } finally {
@@ -1250,7 +1252,7 @@ dashUploadFile?.addEventListener('change', async () => {
     updateChartDisplay(activeMetric);
     await loadPosts();
     await loadMetrics();
-    await renderAIFeedback();
+    await renderAIFeedback({ generate: true });
   } catch (err) {
     alert(err.message || 'Upload failed');
   } finally {
@@ -1338,7 +1340,7 @@ uploadModalSubmit?.addEventListener('click', async () => {
     closeUploadModal();
     await loadPosts();
     await loadMetrics();
-    await renderAIFeedback();
+    await renderAIFeedback({ generate: true });
   } catch (err) {
     alert(err.message || 'Upload failed');
   }
@@ -1367,8 +1369,113 @@ function getConnectionButton(platform) {
 }
 
 function getConnectionDisplayName(connection = {}) {
-  return connection.userId || connection.username || connection.email || connection.platform || 'Connected account';
+  return connection.displayName || connection.username || connection.name || connection.email || connection.platform || 'Connected account';
 }
+
+function handlePostizPopupReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const connectedPlatform = params.get('connected');
+  if (!connectedPlatform) return;
+  try {
+    window.opener?.postMessage({ type: 'postiz-connected', platform: connectedPlatform }, window.location.origin);
+  } catch {
+    // The opener may be unavailable if the page was opened directly.
+  }
+  if (window.opener && !window.opener.closed) {
+    window.close();
+  } else {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+function renderPostizLiveSummary(data = {}) {
+  const container = document.getElementById('postizLiveSummary');
+  if (!container) return;
+  const postiz = data.postiz || {};
+  const analytics = postiz.analytics || {};
+  const metrics = data.metrics || {};
+  const accounts = Array.isArray(postiz.integrations) ? postiz.integrations : [];
+  const followerAccounts = Array.isArray(postiz.followerStats?.accounts) ? postiz.followerStats.accounts : [];
+  const postCount = Number(postiz.posts?.posts?.length || data.posts?.length || 0);
+
+  if (postiz.error) {
+    container.innerHTML = `<div class="empty-report">${escapeHtml(postiz.error)}</div>`;
+    return;
+  }
+
+  if (!accounts.length && !postCount && !followerAccounts.length) {
+    container.innerHTML = '<div class="empty-report">No Postiz accounts are connected yet. Use Connect Platforms first.</div>';
+    return;
+  }
+
+  const metricCards = [
+    ['Reach', metrics.reach],
+    ['Interactions', metrics.interactions],
+    ['Clicks', metrics.clicks],
+    ['Reactions', metrics.reactions],
+    ['Views', metrics.views],
+    ['Follows', metrics.follows],
+    ['Avg Engagement', `${formatNumber(metrics.engagementRate || 0)}%`],
+  ].map(([label, value]) => `
+    <div class="postiz-metric">
+      <span>${escapeHtml(label)}</span>
+      <strong>${typeof value === 'string' ? value : formatNumber(value || 0)}</strong>
+    </div>
+  `).join('');
+
+  const accountRows = accounts.slice(0, 8).map((account) => {
+    const label = account.name || account.profile || getConnectionDisplayName(account);
+    const platform = account.identifier || account.providerIdentifier || account.platform || '';
+    return `<div class="recent-report-row"><div><div class="recent-report-title">${escapeHtml(label)}</div><div class="recent-report-meta">${escapeHtml(platform)}</div></div><span class="badge">Connected</span></div>`;
+  }).join('');
+  const followerRows = followerAccounts.slice(0, 4).map((account) => {
+    const label = getConnectionDisplayName(account);
+    return `<div class="recent-report-row"><div><div class="recent-report-title">${escapeHtml(label)}</div><div class="recent-report-meta">${escapeHtml(account.platform || '')} follows</div></div><strong>${formatNumber(account.currentFollowers || 0)}</strong></div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="recent-report-row">
+      <div>
+        <div class="recent-report-title">${formatNumber(postCount)} Postiz posts tracked</div>
+        <div class="recent-report-meta">${accounts.length ? `${formatNumber(accounts.length)} connected channel${accounts.length === 1 ? '' : 's'}` : 'Analytics access active'}</div>
+      </div>
+    </div>
+    <div class="postiz-metric-grid">${metricCards}</div>
+    ${accountRows}
+    ${followerRows}
+  `;
+}
+
+function renderPostizAgencySummary(data = {}) {
+  const container = document.getElementById('postizAgencySummary');
+  if (!container) return;
+  const postiz = data.postiz || {};
+  const groups = Array.isArray(postiz.groups) ? postiz.groups : [];
+  const integrations = Array.isArray(postiz.integrations) ? postiz.integrations : [];
+  if (postiz.error) {
+    container.innerHTML = `<div class="empty-report">${escapeHtml(postiz.error)}</div>`;
+    return;
+  }
+  if (!groups.length && !integrations.length) {
+    container.innerHTML = '<div class="empty-report">No Postiz agency customers or channels returned yet.</div>';
+    return;
+  }
+  const groupRows = groups.slice(0, 6).map((group) => {
+    const count = integrations.filter((item) => item.customer?.id === group.id).length;
+    return `<div class="recent-report-row"><div><div class="recent-report-title">${escapeHtml(group.name || 'Customer')}</div><div class="recent-report-meta">${escapeHtml(group.id || '')}</div></div><strong>${formatNumber(count)}</strong></div>`;
+  }).join('');
+  const ungrouped = integrations.filter((item) => !item.customer?.id).length;
+  container.innerHTML = `
+    <div class="postiz-metric-grid">
+      <div class="postiz-metric"><span>Customers</span><strong>${formatNumber(groups.length)}</strong></div>
+      <div class="postiz-metric"><span>Channels</span><strong>${formatNumber(integrations.length)}</strong></div>
+      <div class="postiz-metric"><span>Ungrouped</span><strong>${formatNumber(ungrouped)}</strong></div>
+    </div>
+    ${groupRows}
+  `;
+}
+
+handlePostizPopupReturn();
 
 function openModal(platform) {
   const savedConnection = readConnections().find((connection) => connection.platform === platform);
@@ -1403,13 +1510,15 @@ modalForm?.addEventListener('submit', (e) => {
     return;
   }
   const nextConnection = {
+    id: `${platform || 'account'}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
     platform,
     username,
     userId,
+    displayName: username,
+    accountId: userId || username,
     savedAt: Date.now(),
   };
-  const nextConnections = readConnections().filter((connection) => connection.platform !== platform);
-  nextConnections.push(nextConnection);
+  const nextConnections = [...readConnections(), nextConnection];
   writeConnections(nextConnections);
   trackClientActivity({
     eventType: 'edit_connection',
@@ -1425,7 +1534,7 @@ modalForm?.addEventListener('submit', (e) => {
   renderAvailableAccounts();
 });
 
-const META_APP_ID = '4217728121773033';
+const META_APP_ID = '1502053464099181';
 const META_API_VERSION = 'v25.0';
 let facebookSdkReadyPromise = null;
 
@@ -1563,13 +1672,35 @@ async function startFacebookConnection() {
 }
 
 document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    if (btn.dataset.platform === 'Facebook') {
-      startFacebookConnection();
-      return;
+  btn.addEventListener('click', async () => {
+    const platform = btn.dataset.platform;
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Connecting...';
+      const returnUrl = `${window.location.origin}/connect.html?connected=${encodeURIComponent(platform)}`;
+      const response = await fetch(`/api/auth/connect-link?platform=${encodeURIComponent(platform)}&returnUrl=${encodeURIComponent(returnUrl)}`);
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || payload.message || 'Could not start Postiz OAuth.');
+      if (!payload.connectUrl) throw new Error('Postiz did not return a connect URL.');
+      const popup = window.open(payload.connectUrl, `postiz-${platform}`, 'width=720,height=820');
+      if (!popup) throw new Error('Allow popups for Orbit so the social login can open in a separate window.');
+      const poll = window.setInterval(() => {
+        if (!popup.closed) return;
+        window.clearInterval(poll);
+        btn.disabled = false;
+        renderConnections();
+      }, 900);
+    } catch (error) {
+      alert(`${platform} connection needs Postiz setup: ${error.message}`);
+      btn.disabled = false;
+      btn.textContent = '+ Connect';
     }
-    openModal(btn.dataset.platform);
   });
+});
+
+window.addEventListener('message', (event) => {
+  if (event.origin !== window.location.origin || event.data?.type !== 'postiz-connected') return;
+  renderConnections();
 });
 
 function renderConnections() {
@@ -1589,18 +1720,55 @@ function renderConnections() {
   });
   const statConnected = document.getElementById('statConnected');
   statConnected && (statConnected.textContent = list.length);
+  renderAvailableAccounts();
 }
 
-function renderConnections() {
-  const list = readConnections();
+async function loadPostizConnections() {
+  try {
+    const response = await fetch('/api/social/accounts');
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Unable to load Postiz accounts.');
+    const accounts = Array.isArray(payload.accounts) ? payload.accounts : [];
+    if (!accounts.length) return readConnections();
+    const manual = readConnections().filter((connection) => connection.authProvider !== 'postiz');
+    const postizConnections = accounts.map((account) => ({
+      platform: account.platform,
+      username: account.displayName || account.username || account.name || account.platform,
+      displayName: account.displayName || account.username || account.name || account.platform,
+      userId: account.accountId,
+      accountId: account.accountId,
+      authProvider: 'postiz',
+      profileUrl: account.profileUrl,
+      savedAt: Date.now(),
+    }));
+    const nextConnections = [...manual, ...postizConnections];
+    writeConnections(nextConnections);
+    return nextConnections;
+  } catch (error) {
+    console.warn('Postiz accounts unavailable', error);
+    return readConnections();
+  }
+}
+
+async function renderConnections() {
+  const list = await loadPostizConnections();
+  const groupedConnections = list.reduce((groups, connection) => {
+    const platform = connection.platform || '';
+    if (!platform) return groups;
+    if (!groups[platform]) groups[platform] = [];
+    groups[platform].push(connection);
+    return groups;
+  }, {});
   document.querySelectorAll('.connect-user').forEach((el) => {
     const platform = el.dataset.platform;
-    const found = list.find((connection) => connection.platform === platform);
+    const found = groupedConnections[platform] || [];
     const btn = getConnectionButton(platform);
-    if (found) {
-      el.innerHTML = `<span class="connected-badge">Connected</span> <span>${getConnectionDisplayName(found)}</span>`;
+    if (found.length) {
+      const preview = found.slice(0, 2).map((connection) => getConnectionDisplayName(connection)).join(', ');
+      const suffix = found.length > 2 ? ` +${found.length - 2} more` : '';
+      el.innerHTML = `<span class="connected-badge">Connected</span> <span>${escapeHtml(preview)}${escapeHtml(suffix)}</span>`;
       if (btn) {
-        btn.textContent = 'Edit Connection';
+        btn.textContent = '+ Connect another';
         btn.disabled = false;
         btn.style.opacity = '1';
       }
@@ -3320,10 +3488,12 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
-async function renderAIFeedback() {
+async function renderAIFeedback(options = {}) {
+  const shouldGenerate = Boolean(options.generate);
   const feedbackCardEl = document.querySelector('.ai-feedback-card');
   const feedbackEl = document.getElementById('aiFeedbackContent');
   const editBtn = document.getElementById('editAIFeedbackBtn');
+  const generateBtn = document.getElementById('generateAIFeedbackBtn');
   if (!feedbackEl || !feedbackCardEl) return;
 
   let metricsPayload = {};
@@ -3354,7 +3524,7 @@ async function renderAIFeedback() {
   }
 
   if (!hasUploadedAnalytics(metricsPayload, recentPosts, uploadName)) {
-    feedbackCardEl.hidden = true;
+    feedbackCardEl.hidden = false;
     feedbackEl.textContent = 'Upload analytics data to generate feedback.';
     if (editBtn) editBtn.disabled = true;
     return;
@@ -3362,7 +3532,15 @@ async function renderAIFeedback() {
 
   feedbackCardEl.hidden = false;
   if (editBtn) editBtn.disabled = false;
+  if (!shouldGenerate) {
+    feedbackEl.textContent = 'Metrics are loaded. Click Generate when you want AI feedback and recommendations.';
+    return;
+  }
   feedbackEl.textContent = 'Reading uploaded data and generating feedback...';
+  if (generateBtn) {
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Generating...';
+  }
 
   const sortedPosts = recentPosts
     .slice()
@@ -3433,7 +3611,15 @@ async function renderAIFeedback() {
     const safeFallback = escapeHtml(formatAiSuggestionText(fallback));
     feedbackEl.innerHTML = `<div class="ai-feedback-text">${safeFallback.replace(/\n/g, '<br>')}</div><button class="edit-ai-feedback-btn" onclick="editAIDashFeedback()">Edit</button>`;
   }
+  if (generateBtn) {
+    generateBtn.disabled = false;
+    generateBtn.textContent = 'Generate';
+  }
 }
+
+document.getElementById('generateAIFeedbackBtn')?.addEventListener('click', () => {
+  renderAIFeedback({ generate: true });
+});
 
 window.editAIDashFeedback = function() {
   const feedbackCardEl = document.querySelector('.ai-feedback-card');
@@ -3650,7 +3836,9 @@ const accountList = document.getElementById('accountList');
 const accountChips = document.getElementById('accountChips');
 const postDescription = document.getElementById('postDescription');
 const postCaption = document.getElementById('postCaption');
+const postMediaUrl = document.getElementById('postMediaUrl');
 const postHashtags = document.getElementById('postHashtags');
+const postType = document.getElementById('postType');
 const generateCaptionBtn = document.getElementById('generateCaption');
 const scheduleForm = document.getElementById('scheduleForm');
 const scheduleDate = document.getElementById('scheduleDate');
@@ -3710,7 +3898,7 @@ function persistPostQueue() {
   renderPostQueue();
 }
 
-function createQueueItem({ title, accounts, platforms, date, time, caption, hashtags, adminEmail }) {
+function createQueueItem({ title, accounts, platforms, date, time, caption, hashtags, adminEmail, status = 'scheduled' }) {
   return {
     id: `post-${Date.now()}`,
     title,
@@ -3720,7 +3908,7 @@ function createQueueItem({ title, accounts, platforms, date, time, caption, hash
     caption,
     hashtags,
     adminEmail,
-    status: 'pending',
+    status,
     createdAt: new Date().toISOString(),
   };
 }
@@ -3755,6 +3943,56 @@ function renderPostQueue() {
     `;
 
     if (item.status === 'pending') {
+      card.querySelector('.approve-btn')?.addEventListener('click', () => {
+        item.status = 'approved';
+        persistPostQueue();
+      });
+    }
+
+    postQueueList.appendChild(card);
+  });
+}
+
+function renderPostQueue() {
+  if (!postQueueList) return;
+
+  postQueue = (postQueue || []).map((item) => ({
+    ...item,
+    status: item.status === 'pending' && !String(item.adminEmail || '').trim() ? 'scheduled' : item.status,
+  }));
+  writeScopedJson('postQueue', postQueue);
+
+  postQueueList.innerHTML = '';
+  if (!postQueue.length) {
+    postQueueList.innerHTML = `<div class="queue-empty"><strong>No queued posts yet.</strong><p>Create a post and schedule it to see it here.</p></div>`;
+    if (queueCount) queueCount.textContent = '0';
+    return;
+  }
+
+  if (queueCount) queueCount.textContent = String(postQueue.length);
+  postQueue.forEach((item) => {
+    const status = item.status || 'scheduled';
+    const statusLabel = status === 'approved' ? 'Approved' : status === 'pending' ? 'Pending approval' : 'Scheduled';
+    const footerText = item.adminEmail ? `Approval request sent to ${item.adminEmail}` : 'Scheduled directly. No approval email was added.';
+    const card = document.createElement('div');
+    card.className = 'queue-item';
+    card.innerHTML = `
+      <div class="queue-row">
+        <div>
+          <div class="queue-title">${escapeHtml(item.title || 'Scheduled post')}</div>
+          <div class="queue-meta">${escapeHtml((item.platforms || []).join(', '))} - ${escapeHtml((item.accounts || []).join(', '))} - ${escapeHtml(item.scheduledAt || '')}</div>
+        </div>
+        <div class="queue-status ${escapeHtml(status)}">${escapeHtml(statusLabel)}</div>
+      </div>
+      <div class="queue-caption">${escapeHtml(item.caption || '')}</div>
+      <div class="queue-hashtags">${escapeHtml(item.hashtags || '')}</div>
+      <div class="queue-footer">
+        <span>${escapeHtml(footerText)}</span>
+        ${status === 'pending' ? '<button class="pill-btn outline small approve-btn">Approve</button>' : ''}
+      </div>
+    `;
+
+    if (status === 'pending') {
       card.querySelector('.approve-btn')?.addEventListener('click', () => {
         item.status = 'approved';
         persistPostQueue();
@@ -4147,6 +4385,116 @@ function renderAvailableAccounts() {
   });
 }
 
+function accountDisplayLabel(connection = {}) {
+  return getConnectionDisplayName(connection);
+}
+
+function addAccountChip(connection) {
+  const account = typeof connection === 'string'
+    ? { displayName: connection, username: connection, platform: '', accountId: connection }
+    : connection || {};
+  const label = accountDisplayLabel(account);
+  const accountId = account.accountId || account.userId || label;
+  if (!label || !accountId) return;
+  const exists = Array.from(accountChips?.children || []).some((chip) => chip.dataset.accountId === accountId);
+  if (exists) return;
+  const chip = document.createElement('div');
+  chip.className = 'chip-pill';
+  chip.dataset.name = label;
+  chip.dataset.accountId = accountId;
+  chip.dataset.platform = account.platform || '';
+  chip.innerHTML = `<span>${escapeHtml(label)}</span><button aria-label="Remove">x</button>`;
+  chip.querySelector('button')?.addEventListener('click', () => chip.remove());
+  accountChips?.appendChild(chip);
+}
+
+async function getAvailableConnections() {
+  try {
+    if (typeof loadPostizConnections === 'function') {
+      return await loadPostizConnections();
+    }
+  } catch {
+    // Local saved connections keep the selector usable if Postiz is temporarily unavailable.
+  }
+  return readConnections();
+}
+
+async function addAccountEntry() {
+  const connections = await getAvailableConnections();
+  const query = accountSearch?.value.trim().toLowerCase() || '';
+  const match = connections.find((connection) => {
+    const label = accountDisplayLabel(connection).toLowerCase();
+    return label === query || label.includes(query);
+  });
+  if (!match) return alert('Choose a connected account from the dropdown.');
+  addAccountChip(match);
+  if (accountSearch) accountSearch.value = '';
+  renderAvailableAccounts();
+}
+
+async function renderAvailableAccounts() {
+  if (!accountList) return;
+
+  const allConnections = await getAvailableConnections();
+  const selectedPlatforms = new Set(getSelectedPlatforms());
+  const query = accountSearch?.value.trim().toLowerCase() || '';
+  const selectedAccountIds = new Set(Array.from(accountChips?.children || []).map((chip) => chip.dataset.accountId));
+  const matchingConnections = allConnections.filter((connection) => {
+    const matchesPlatform = !selectedPlatforms.size || selectedPlatforms.has(connection.platform);
+    const haystack = `${connection.platform} ${connection.displayName || ''} ${connection.username || ''} ${connection.name || ''}`.toLowerCase();
+    const matchesQuery = !query || haystack.includes(query);
+    const accountId = connection.accountId || connection.userId || accountDisplayLabel(connection);
+    return matchesPlatform && matchesQuery && !selectedAccountIds.has(accountId);
+  });
+
+  accountList.innerHTML = '';
+
+  if (!allConnections.length) {
+    accountList.innerHTML = '<span class="hint">No connected accounts yet. Connect one from the Connect page first.</span>';
+    return;
+  }
+
+  if (!matchingConnections.length) {
+    accountList.innerHTML = '<span class="hint">No matching connected accounts.</span>';
+    return;
+  }
+
+  matchingConnections.forEach((connection) => {
+    const accountButton = document.createElement('button');
+    accountButton.type = 'button';
+    accountButton.className = 'account-item';
+    accountButton.innerHTML = `
+      <span class="account-avatar">${escapeHtml((connection.platform || '?').slice(0, 1))}</span>
+      <span class="account-meta">
+        <span class="account-name">${escapeHtml(accountDisplayLabel(connection))}</span>
+        <span class="account-sub">${escapeHtml(connection.platform || '')}</span>
+      </span>
+    `;
+    accountButton.addEventListener('click', () => {
+      addAccountChip(connection);
+      if (accountSearch) accountSearch.value = '';
+      renderAvailableAccounts();
+    });
+    accountList.appendChild(accountButton);
+  });
+}
+
+accountSearch?.addEventListener('focus', () => {
+  accountList?.classList.add('show');
+  renderAvailableAccounts();
+});
+
+accountSearch?.addEventListener('click', () => {
+  accountList?.classList.toggle('show');
+  renderAvailableAccounts();
+});
+
+document.addEventListener('click', (event) => {
+  if (!accountList || !accountSearch) return;
+  if (event.target === accountSearch || accountList.contains(event.target)) return;
+  accountList.classList.remove('show');
+});
+
 function getSelectedPlatforms() {
   return Array.from(platformPills || [])
     .filter((pill) => pill.classList.contains('active'))
@@ -4180,7 +4528,7 @@ function generateGeminiCaption(description, platformHint, file = null) {
     `${cleanDesc}. ${action} ${subject} ${platformHint ? `${platformHint} ` : ''}with purpose, clarity, and emotional impact.`,
     `${cleanDesc}. ${platformHint ? `${platformHint} ` : ''}This post is created to connect with your audience and spark real conversation.`,
     `${cleanDesc}. ${action} ${subject} now ${platformHint ? `${platformHint} ` : ''}and make it feel confident, clear, and meaningful.`,
-    `${cleanDesc}. ${platformHint ? `${platformHint} ` : ''}Designed to stand out with strong storytelling and smart engagement.`,
+    `${cleanDesc}. ${platformHint ? `${platformHint} ` : ''}Share the specific result, moment, or lesson your audience should remember.`,
   ];
   const caption = templates[Math.floor(Math.random() * templates.length)];
   const hashtags = generateHashtagsFromText(cleanDesc, file, platformHint);
@@ -4329,6 +4677,37 @@ function applyGeneratedText(caption, hashtags) {
   if (previewHashtags) previewHashtags.textContent = hashtags;
 }
 
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('Unable to read the selected file.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadSelectedMediaIfNeeded() {
+  const existingUrl = postMediaUrl?.value.trim();
+  if (existingUrl) return existingUrl;
+  const file = postFile?.files?.[0];
+  if (!file) return '';
+  const mediaData = await readFileAsDataUrl(file);
+  const response = await fetch('/api/media/upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({
+      filename: file.name,
+      mediaType: file.type,
+      mediaData,
+    }),
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.message || 'Unable to upload media for publishing.');
+  if (postMediaUrl) postMediaUrl.value = payload.url || '';
+  return payload.url || '';
+}
+
 saveHashtagsBtn?.addEventListener('click', () => {
   const hashtags = postHashtags?.value.trim();
   if (!hashtags) return alert('Enter hashtags to save first.');
@@ -4344,17 +4723,41 @@ postFile?.addEventListener('change', () => {
   const f = postFile.files?.[0];
   postFileLabel.textContent = f ? `${f.name} (${Math.round(f.size / 1024)} KB)` : 'Click to upload image, video, or PDF';
   renderPreviewFile(f);
-  if (f) {
-    const generated = buildCaptionFromInputs(f, postDescription?.value);
-    applyGeneratedText(generated.caption, generated.hashtags);
-  }
+  if (postMediaUrl) postMediaUrl.value = '';
 });
 
-generateCaptionBtn?.addEventListener('click', () => {
+generateCaptionBtn?.addEventListener('click', async () => {
   const f = postFile.files?.[0];
   if (!f && !postDescription?.value.trim()) return alert('Upload a media file or enter a description first.');
-  const generated = buildCaptionFromInputs(f, postDescription?.value);
-  applyGeneratedText(generated.caption, generated.hashtags);
+  const originalText = generateCaptionBtn.textContent;
+  try {
+    generateCaptionBtn.disabled = true;
+    generateCaptionBtn.textContent = 'Generating...';
+    const selectedPlatforms = getSelectedPlatforms();
+    const response = await fetch('/api/generate/caption', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        topic: postDescription?.value.trim() || f?.name || 'New post',
+        title: f?.name || '',
+        mediaName: f?.name || '',
+        mediaNotes: f ? `${f.name} ${f.type || ''}` : '',
+        platform: selectedPlatforms[0] || 'Instagram',
+        postType: postType?.value || 'Feed Post',
+        length: 'medium',
+      }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.message || payload.error || 'Caption generation failed.');
+    applyGeneratedText(payload.caption || '', Array.isArray(payload.hashtags) ? payload.hashtags.join(' ') : payload.hashtags || '');
+    if (payload.notice) console.warn(payload.notice);
+  } catch (error) {
+    alert(error.message || 'Caption generation failed.');
+  } finally {
+    generateCaptionBtn.disabled = false;
+    generateCaptionBtn.textContent = originalText;
+  }
 });
 
 postCaption?.addEventListener('input', () => {
@@ -4378,19 +4781,25 @@ renderAvailableAccounts();
 
 scheduleForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const accounts = Array.from(accountChips?.children || []).map((c) => c.dataset.name);
+  const selectedAccounts = Array.from(accountChips?.children || []).map((chip) => ({
+    accountId: chip.dataset.accountId,
+    platform: chip.dataset.platform,
+    label: chip.dataset.name,
+  })).filter((account) => account.accountId && account.platform);
+  const accounts = selectedAccounts.map((account) => account.label);
   const selectedPlatforms = getSelectedPlatforms();
-  if (!accounts.length) return alert('Add at least one account.');
+  const caption = [postCaption?.value.trim(), postHashtags?.value.trim()].filter(Boolean).join('\n\n');
+  const title = postCaption?.value.trim() || postDescription?.value.trim() || postFile?.files?.[0]?.name || 'Scheduled post';
+  if (!selectedAccounts.length) return alert('Choose at least one connected account.');
   if (!selectedPlatforms.length) return alert('Pick at least one platform.');
   if (selectedPlatforms.includes('LinkedIn') && postFile?.files?.[0] && !postFile.files[0].name.toLowerCase().endsWith('.pdf')) {
     return alert('LinkedIn requires a PDF upload.');
   }
-  if (!postFile?.files?.length) return alert('Attach a media file.');
+  if (!caption && !postMediaUrl?.value.trim() && !postFile?.files?.length) return alert('Add a caption, media URL, or media file.');
   if (!scheduleDate?.value || !scheduleTime?.value) return alert('Pick a date and time.');
-  if (!approvalEmail?.value.trim()) return alert('Enter an admin approval email.');
 
   const queueItem = createQueueItem({
-    title: postCaption?.value.trim() || postFile?.files?.[0]?.name || 'New post',
+    title,
     accounts,
     platforms: selectedPlatforms,
     date: scheduleDate.value,
@@ -4398,14 +4807,42 @@ scheduleForm?.addEventListener('submit', async (e) => {
     caption: postCaption?.value.trim() || 'No caption provided',
     hashtags: postHashtags?.value.trim() || 'No hashtags provided',
     adminEmail: approvalEmail.value.trim(),
+    status: approvalEmail?.value.trim() ? 'pending' : 'scheduled',
   });
   try {
-    await sendApprovalRequestEmail(queueItem);
+    const resolvedMediaUrl = await uploadSelectedMediaIfNeeded();
+    const scheduleResponse = await fetch('/api/schedule-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        title,
+        caption: caption || title,
+        content: caption || title,
+        scheduledFor: `${scheduleDate.value}T${scheduleTime.value}`,
+        platforms: selectedAccounts.map((account) => ({
+          platform: account.platform,
+          accountId: account.accountId,
+        })),
+        mediaUrl: resolvedMediaUrl,
+        mediaType: postFile?.files?.[0]?.type?.startsWith('video') ? 'video' : 'image',
+        postType: postType?.value || 'Feed Post',
+      }),
+    });
+    const scheduleResult = await scheduleResponse.json().catch(() => ({}));
+    if (!scheduleResponse.ok) throw new Error(scheduleResult.error || scheduleResult.message || 'Unable to schedule this post.');
+
+    if (approvalEmail?.value.trim()) {
+      await sendApprovalRequestEmail(queueItem);
+    }
+
     postQueue.unshift(queueItem);
     if (postQueue.length > 20) postQueue = postQueue.slice(0, 20);
     persistPostQueue();
 
-    alert(`Approval request sent to ${queueItem.adminEmail}. Your post has been added to the queue.`);
+    alert(approvalEmail?.value.trim()
+      ? `Post scheduled and approval request sent to ${queueItem.adminEmail}.`
+      : 'Post scheduled and added to the content calendar.');
 
     scheduleForm.reset();
     platformPills?.forEach((pill) => pill.classList.remove('active'));
@@ -4416,9 +4853,9 @@ scheduleForm?.addEventListener('submit', async (e) => {
     renderPreviewFile(null);
     if (previewCaption) previewCaption.textContent = 'No caption yet...';
     if (previewHashtags) previewHashtags.textContent = 'No hashtags yet...';
-    if (postQueue.length) window.location.href = 'post-queue.html';
+    window.location.href = 'content-calendar.html';
   } catch (error) {
-    alert(error.message || 'Unable to send the approval request right now.');
+    alert(error.message || 'Unable to schedule the post right now.');
   }
 });
 
