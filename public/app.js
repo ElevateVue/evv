@@ -1680,9 +1680,17 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
       const returnUrl = `${window.location.origin}/connect.html?connected=${encodeURIComponent(platform)}`;
       const response = await fetch(`/api/auth/connect-link?platform=${encodeURIComponent(platform)}&returnUrl=${encodeURIComponent(returnUrl)}`);
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error || payload.message || 'Could not start Postiz OAuth.');
-      if (!payload.connectUrl) throw new Error('Postiz did not return a connect URL.');
-      const popup = window.open(payload.connectUrl, `postiz-${platform}`, 'width=720,height=820');
+      if (!response.ok) throw new Error(payload.error || payload.message || 'Could not start connection.');
+      const targetUrl = payload.connectUrl || payload.postizDashboardUrl || 'https://app.postiz.com/launches';
+      // If pointing to Postiz dashboard, open as a full tab (not a popup) with instructions
+      if (targetUrl.includes('app.postiz.com')) {
+        btn.disabled = false;
+        btn.textContent = '+ Connect';
+        window.open(targetUrl, '_blank');
+        alert(`To connect ${platform}:\n\n1. The Postiz dashboard just opened in a new tab.\n2. Click "+ Channel" and connect your ${platform} account there.\n3. Come back here and refresh — it will show as Connected.`);
+        return;
+      }
+      const popup = window.open(targetUrl, `postiz-${platform}`, 'width=720,height=820');
       if (!popup) throw new Error('Allow popups for Orbit so the social login can open in a separate window.');
       const poll = window.setInterval(() => {
         if (!popup.closed) return;

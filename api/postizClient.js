@@ -218,26 +218,38 @@ async function getSocialAuthLinks() {
     if (platform) connectedByPlatform.set(platform, integration);
   });
 
+  const POSTIZ_CLOUD_URL = 'https://app.postiz.com/launches';
+
   const platforms = Array.from(new Set([...SUPPORTED_SOCIAL_CHANNELS, ...connectedByPlatform.keys()]));
   const links = await Promise.all(platforms.map(async (platform) => {
     const integration = connectedByPlatform.get(platform);
-    const response = await postizRequest(`/social/${encodeURIComponent(platform)}`, {
-      query: integration?.id ? { refresh: integration.id } : {},
-    }).catch((error) => {
-      console.error(`[Postiz] OAuth link unavailable for ${platform}: ${error.message}`);
-      return null;
-    });
+    const isConnected = Boolean(integration && !integration.disabled);
+
+    let connectUrl = '';
+
+    if (!isConnected) {
+      // Try to get OAuth link from self-hosted Postiz.
+      // Postiz Cloud does not expose this endpoint — fall back to the Postiz dashboard.
+      const response = await postizRequest(`/social/${encodeURIComponent(platform)}`, {
+        query: {},
+      }).catch(() => null);
+
+      connectUrl = response?.url || response?.connectUrl || response?.authUrl || POSTIZ_CLOUD_URL;
+    }
 
     return {
       platform,
       label: platformLabel(platform),
-      connectUrl: response?.url || response?.connectUrl || response?.authUrl || '',
+      connectUrl: isConnected ? '' : connectUrl,
       integrationId: integration?.id,
-      connected: Boolean(integration && !integration.disabled),
+      connected: isConnected,
+      postizDashboardUrl: POSTIZ_CLOUD_URL,
     };
   }));
 
-  return links.filter((link) => link.connectUrl);
+  // Return all platforms — connected ones have no connectUrl (already linked),
+  // unconnected ones point to Postiz dashboard or the OAuth URL.
+  return links;
 }
 
 /**

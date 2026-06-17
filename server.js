@@ -2631,18 +2631,35 @@ const server = http.createServer(async (req, res) => {
   if (parsedUrl.pathname === '/api/auth/connect-link' && req.method === 'GET') {
     try {
       const platform = postizPlatform(parsedUrl.searchParams.get('platform') || 'instagram');
-      const result = await postizFetch(`/social/${encodeURIComponent(platform)}`, 'GET', {
-        refresh: parsedUrl.searchParams.get('refresh') || '',
-      });
-      const connectUrl = result?.authUrl || result?.auth_url || result?.connectUrl || result?.url;
-      if (!connectUrl) return sendJson(res, 502, { error: 'Postiz did not return a connect URL.', raw: result });
+      const POSTIZ_DASHBOARD = 'https://app.postiz.com/launches';
+
+      // Try self-hosted /social/{platform} endpoint first.
+      // Postiz Cloud does not expose this endpoint — if it fails, return the
+      // Postiz dashboard URL so the frontend can redirect the user there instead.
+      let connectUrl = '';
+      try {
+        const result = await postizFetch(`/social/${encodeURIComponent(platform)}`, 'GET', {});
+        connectUrl = result?.authUrl || result?.auth_url || result?.connectUrl || result?.url || '';
+      } catch (_ignored) {
+        // Cloud or self-hosted without OAuth endpoint — use dashboard fallback
+      }
+
+      if (connectUrl) {
+        return sendJson(res, 200, {
+          connectUrl: withPostizReturnUrl(connectUrl, parsedUrl.searchParams.get('returnUrl')),
+          platform,
+        });
+      }
+
+      // Postiz Cloud fallback — send dashboard URL so the user can connect there
       return sendJson(res, 200, {
-        connectUrl: withPostizReturnUrl(connectUrl, parsedUrl.searchParams.get('returnUrl')),
+        connectUrl: '',
+        postizDashboardUrl: POSTIZ_DASHBOARD,
         platform,
-        raw: result,
+        message: 'Connect this account directly in the Postiz dashboard, then return here.',
       });
     } catch (err) {
-      return sendJson(res, 502, { error: `Could not load Postiz connect-link: ${err.message}` });
+      return sendJson(res, 502, { error: `Could not load connect-link: ${err.message}` });
     }
   }
 
