@@ -2632,113 +2632,49 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // ── Postiz OAuth: start connection flow ──────────────────────────────────────
-  // Builds the Postiz OAuth authorization URL using the app's Client ID.
-  // The user is sent to Postiz → connects their Instagram/Facebook there →
-  // Postiz redirects back to /api/auth/postiz-callback with a code.
+  // ── Postiz connect-link: asks self-hosted Postiz for the social OAuth URL ──────
+  // Self-hosted Postiz exposes GET /social/{platform} which returns the direct
+  // Instagram/Facebook/etc OAuth URL. We proxy it here so the frontend just gets
+  // a connectUrl to open in a popup — no Postiz Cloud involved at all.
   if (parsedUrl.pathname === '/api/auth/connect-link' && req.method === 'GET') {
     try {
-      if (!POSTIZ_CLIENT_ID) {
-        return sendJson(res, 500, { error: 'POSTIZ_CLIENT_ID is not set in environment variables.' });
-      }
-      const platform = parsedUrl.searchParams.get('platform') || 'instagram';
-      const redirectUri = `${PUBLIC_APP_URL}/api/auth/postiz-callback`;
-      const state = Buffer.from(JSON.stringify({
-        platform,
-        sessionToken: parsedUrl.searchParams.get('sessionToken') || '',
-        ts: Date.now(),
-      })).toString('base64url');
+      const rawPlatform = (parsedUrl.searchParams.get('platform') || 'instagram').toLowerCase();
+      const platformMap = {
+        instagram: 'instagram', facebook: 'facebook', linkedin: 'linkedin',
+        tiktok: 'tiktok', twitter: 'x', x: 'x', youtube: 'youtube',
+        threads: 'threads', pinterest: 'pinterest', snapchat: 'snapchat',
+      };
+      const postizPlatformId = platformMap[rawPlatform] || rawPlatform;
 
-      const authUrl = new URL('https://app.postiz.com/oauth2/authorize');
-      authUrl.searchParams.set('client_id', POSTIZ_CLIENT_ID);
-      authUrl.searchParams.set('redirect_uri', redirectUri);
-      authUrl.searchParams.set('response_type', 'code');
-      authUrl.searchParams.set('state', state);
+      // Call self-hosted Postiz to get the real social OAuth URL
+      const socialUrl = new URL(`${POSTIZ_API_BASE}/social/${encodeURIComponent(postizPlatformId)}`);
+      const transport = socialUrl.protocol === 'http:' ? http : https;
 
-      return sendJson(res, 200, { connectUrl: authUrl.toString(), platform });
-    } catch (err) {
-      return sendJson(res, 502, { error: `Could not build connect link: ${err.message}` });
-    }
-  }
-
-  // ── Postiz OAuth: exchange code → pos_ token, save to session ────────────────
-  // Postiz redirects here after the user connects their social account.
-  // We exchange the code for a pos_ token, fetch integrations, and store them.
-  if (parsedUrl.pathname === '/api/auth/postiz-callback' && req.method === 'GET') {
-    const code = parsedUrl.searchParams.get('code') || '';
-    const stateRaw = parsedUrl.searchParams.get('state') || '';
-    let stateData = {};
-    try { stateData = JSON.parse(Buffer.from(stateRaw, 'base64url').toString()); } catch (_) {}
-
-    try {
-      if (!code) throw new Error('No code returned from Postiz OAuth.');
-
-      // Exchange code for access token
-      const redirectUri = `${PUBLIC_APP_URL}/api/auth/postiz-callback`;
-      const tokenBody = JSON.stringify({
-        client_id: POSTIZ_CLIENT_ID,
-        client_secret: POSTIZ_CLIENT_SECRET,
-        code,
-        grant_type: 'authorization_code',
-        redirect_uri: redirectUri,
-      });
-
-      const tokenResult = await new Promise((resolve, reject) => {
-        const tokenReq = https.request('https://api.postiz.com/public/v1/oauth/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(tokenBody) },
-        }, (r) => {
-          let raw = '';
-          r.on('data', (c) => { raw += c; });
-          r.on('end', () => {
-            try { resolve(JSON.parse(raw)); } catch { reject(new Error(`Token parse failed: ${raw}`)); }
-          });
-        });
-        tokenReq.on('error', reject);
-        tokenReq.write(tokenBody);
-        tokenReq.end();
-      });
-
-      const posToken = tokenResult?.access_token || tokenResult?.token || '';
-      if (!posToken) throw new Error(`Postiz did not return an access token. Response: ${JSON.stringify(tokenResult)}`);
-
-      // Fetch integrations using the new token to find what was connected
-      const integrationsResult = await new Promise((resolve, reject) => {
-        const intReq = https.request(`${POSTIZ_API_BASE}/integrations`, {
+      const result = await new Promise((resolve, reject) => {
+        const r = transport.request(socialUrl, {
           method: 'GET',
-          headers: { Authorization: `Bearer ${posToken}`, 'Content-Type': 'application/json' },
-        }, (r) => {
+          headers: { Authorization: POSTIZ_API_KEY, 'Content-Type': 'application/json' },
+        }, (res2) => {
           let raw = '';
-          r.on('data', (c) => { raw += c; });
-          r.on('end', () => { try { resolve(JSON.parse(raw)); } catch { resolve({}); } });
+          res2.on('data', (c) => { raw += c; });
+          res2.on('end', () => { try { resolve(JSON.parse(raw)); } catch { resolve({ raw }); } });
         });
-        intReq.on('error', reject);
-        intReq.end();
+        r.on('error', reject);
+        r.end();
       });
 
-      const integrations = Array.isArray(integrationsResult) ? integrationsResult
-        : Array.isArray(integrationsResult?.integrations) ? integrationsResult.integrations
-        : Array.isArray(integrationsResult?.data) ? integrationsResult.data : [];
-
-      // Store token + integrations on the session so Orbit can use them
-      const sessionToken = stateData.sessionToken || '';
-      const session = sessions.find((s) => s.token === sessionToken);
-      if (session) {
-        session.postizToken = posToken;
-        session.postizIntegrations = integrations;
-        saveSessions(sessions);
+      const connectUrl = result?.url || result?.authUrl || result?.auth_url || result?.connectUrl || '';
+      if (!connectUrl) {
+        return sendJson(res, 502, {
+          error: `Self-hosted Postiz did not return a connect URL for ${postizPlatformId}. Check POSTIZ_API_BASE_URL and POSTIZ_API_KEY in Railway variables.`,
+          raw: result,
+        });
       }
 
-      // Redirect to connect page with success flag — page will poll and re-render
-      const platform = stateData.platform || 'social';
-      res.writeHead(302, { Location: `/connect.html?postiz_connected=1&platform=${encodeURIComponent(platform)}` });
-      res.end();
+      return sendJson(res, 200, { connectUrl, platform: postizPlatformId });
     } catch (err) {
-      console.error('[Postiz OAuth callback error]', err.message);
-      res.writeHead(302, { Location: `/connect.html?postiz_error=${encodeURIComponent(err.message)}` });
-      res.end();
+      return sendJson(res, 502, { error: `Connect link failed: ${err.message}` });
     }
-    return;
   }
 
   // ── Return saved Postiz integrations for current session ─────────────────────
