@@ -14,7 +14,9 @@ const {
 require('dotenv').config();
 const apiEnvPath = path.join(__dirname, 'API.env');
 if (fs.existsSync(apiEnvPath)) {
-  require('dotenv').config({ path: apiEnvPath, override: true });
+  // override: false — Railway/system env vars always win over API.env
+  // API.env is only used for local development defaults
+  require('dotenv').config({ path: apiEnvPath, override: false });
 }
 
 // Load GA4 service account
