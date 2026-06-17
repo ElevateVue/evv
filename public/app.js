@@ -1678,24 +1678,27 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
       btn.disabled = true;
       btn.textContent = 'Connecting...';
       const returnUrl = `${window.location.origin}/connect.html?connected=${encodeURIComponent(platform)}`;
-      const response = await fetch(`/api/auth/connect-link?platform=${encodeURIComponent(platform)}&returnUrl=${encodeURIComponent(returnUrl)}`);
+      const sessionToken = getSessionToken ? getSessionToken() : (localStorage.getItem('sessionToken') || '');
+      const response = await fetch(`/api/auth/connect-link?platform=${encodeURIComponent(platform)}&sessionToken=${encodeURIComponent(sessionToken)}`);
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || payload.message || 'Could not start connection.');
-      const targetUrl = payload.connectUrl || payload.postizDashboardUrl || 'https://app.postiz.com/launches';
-      // If pointing to Postiz dashboard, open as a full tab (not a popup) with instructions
-      if (targetUrl.includes('app.postiz.com')) {
-        btn.disabled = false;
-        btn.textContent = '+ Connect';
-        window.open(targetUrl, '_blank');
-        alert(`To connect ${platform}:\n\n1. The Postiz dashboard just opened in a new tab.\n2. Click "+ Channel" and connect your ${platform} account there.\n3. Come back here and refresh — it will show as Connected.`);
+      const targetUrl = payload.connectUrl || '';
+      if (!targetUrl) throw new Error('No connect URL returned. Check POSTIZ_CLIENT_ID is set in Railway variables.');
+      // Open Postiz OAuth in a popup — user logs in with their Instagram/Facebook
+      // Postiz handles the social auth and redirects back to /api/auth/postiz-callback
+      const popup = window.open(targetUrl, `postiz-connect-${platform}`, 'width=720,height=820,left=200,top=100');
+      if (!popup) {
+        // Popup blocked — fall back to same-tab redirect
+        window.location.href = targetUrl;
         return;
       }
-      const popup = window.open(targetUrl, `postiz-${platform}`, 'width=720,height=820');
-      if (!popup) throw new Error('Allow popups for Orbit so the social login can open in a separate window.');
-      const poll = window.setInterval(() => {
+      // Poll until popup closes, then refresh connections
+      const poll = window.setInterval(async () => {
         if (!popup.closed) return;
         window.clearInterval(poll);
         btn.disabled = false;
+        btn.textContent = '+ Connect';
+        await loadPostizConnections();
         renderConnections();
       }, 900);
     } catch (error) {
@@ -1711,6 +1714,44 @@ window.addEventListener('message', (event) => {
   renderConnections();
 });
 
+// Fetch live integrations from Postiz via server and merge into local connections list
+async function loadPostizConnections() {
+  try {
+    const sessionToken = localStorage.getItem('sessionToken') || '';
+    const res = await fetch(`/api/auth/postiz-integrations?sessionToken=${encodeURIComponent(sessionToken)}`, {
+      headers: { 'x-session-token': sessionToken },
+    });
+    if (!res.ok) return;
+    const { integrations } = await res.json().catch(() => ({ integrations: [] }));
+    if (!Array.isArray(integrations) || !integrations.length) return;
+
+    const platformMap = {
+      instagram: 'Instagram', 'instagram-standalone': 'Instagram',
+      facebook: 'Facebook', linkedin: 'LinkedIn', 'linkedin-page': 'LinkedIn',
+      tiktok: 'TikTok', x: 'Twitter', twitter: 'Twitter',
+      youtube: 'YouTube', threads: 'Threads', pinterest: 'Pinterest',
+    };
+
+    const existing = readScopedJson('connections', []);
+    integrations.forEach((integration) => {
+      const rawPlatform = (integration.identifier || integration.providerIdentifier || '').toLowerCase();
+      const platform = platformMap[rawPlatform] || rawPlatform;
+      if (!platform) return;
+      const alreadyExists = existing.find((c) => c.platform === platform && c.authProvider === 'postiz');
+      if (!alreadyExists) {
+        existing.push({
+          platform,
+          username: integration.name || integration.profile || integration.username || '',
+          integrationId: integration.id,
+          authProvider: 'postiz',
+          connectedAt: new Date().toISOString(),
+        });
+      }
+    });
+    writeScopedJson('connections', existing);
+  } catch (_) {}
+}
+
 function renderConnections() {
   const list = readScopedJson('connections', []);
   document.querySelectorAll('.connect-user').forEach((el) => {
@@ -1718,9 +1759,10 @@ function renderConnections() {
     const found = list.find((c) => c.platform === platform);
     if (found) {
       el.innerHTML = `<span class="connected-badge">● Connected</span> <span>${found.username || found.email || ''}</span>`;
-      const btn = document.querySelector(`.connect-trigger[data-platform="${platform}"]`);
+      // Update the connect button to show connected state
+      const btn = document.querySelector(`.connect-btn[data-platform="${platform}"], .connect-trigger[data-platform="${platform}"]`);
       if (btn) {
-        btn.textContent = 'Connected';
+        btn.textContent = 'Connected ✓';
         btn.disabled = true;
         btn.style.opacity = '0.7';
       }
@@ -1728,7 +1770,12 @@ function renderConnections() {
   });
   const statConnected = document.getElementById('statConnected');
   statConnected && (statConnected.textContent = list.length);
-  renderAvailableAccounts();
+  renderAvailableAccounts && renderAvailableAccounts();
+}
+
+// On page load, pull live integrations then render
+if (document.querySelector('.connect-btn, .connect-trigger')) {
+  loadPostizConnections().then(() => renderConnections());
 }
 
 async function loadPostizConnections() {

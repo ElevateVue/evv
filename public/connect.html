@@ -8,6 +8,42 @@
   <script defer src="app.js"></script>
   <script defer src="client-hub-tracker.js"></script>
   <script defer src="footer.js"></script>
+  <script>
+    // Handle Postiz OAuth callback — runs when Postiz redirects back here
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const connected = params.get('postiz_connected');
+      const errMsg = params.get('postiz_error');
+      const platform = params.get('platform') || 'account';
+
+      if (connected === '1') {
+        // Clean up URL, notify opener if in popup, then reload connections
+        window.history.replaceState({}, '', '/connect.html');
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({ type: 'postiz-connected', platform }, window.location.origin);
+          window.close();
+        }
+        // If not a popup, show success and reload
+        document.addEventListener('DOMContentLoaded', function () {
+          const banner = document.createElement('div');
+          banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1a7f37;color:#fff;padding:12px 24px;border-radius:8px;font-size:15px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+          banner.textContent = `✓ ${platform.charAt(0).toUpperCase() + platform.slice(1)} connected successfully!`;
+          document.body.appendChild(banner);
+          setTimeout(() => banner.remove(), 5000);
+        });
+      }
+
+      if (errMsg) {
+        document.addEventListener('DOMContentLoaded', function () {
+          const banner = document.createElement('div');
+          banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#d1242f;color:#fff;padding:12px 24px;border-radius:8px;font-size:15px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+          banner.textContent = `Connection failed: ${decodeURIComponent(errMsg)}`;
+          document.body.appendChild(banner);
+          setTimeout(() => banner.remove(), 8000);
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
   <aside class="sidebar" id="sidebar">
