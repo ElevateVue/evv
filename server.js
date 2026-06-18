@@ -2666,7 +2666,7 @@ const server = http.createServer(async (req, res) => {
       const connectUrl = result?.url || result?.authUrl || result?.auth_url || result?.connectUrl || '';
       if (!connectUrl) {
         return sendJson(res, 502, {
-          error: `Self-hosted Postiz did not return a connect URL for ${postizPlatformId}. Check POSTIZ_API_BASE_URL and POSTIZ_API_KEY in Railway variables.`,
+          error: `Self-hosted Postiz did not return a connect URL for ${postizPlatformId}. Railway is calling: ${socialUrl.toString()}`,
           raw: result,
         });
       }
