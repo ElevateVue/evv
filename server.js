@@ -2663,12 +2663,26 @@ const server = http.createServer(async (req, res) => {
         r.end();
       });
 
-      const connectUrl = result?.url || result?.authUrl || result?.auth_url || result?.connectUrl || '';
+      let connectUrl = result?.url || result?.authUrl || result?.auth_url || result?.connectUrl || '';
       if (!connectUrl) {
         return sendJson(res, 502, {
           error: `Self-hosted Postiz did not return a connect URL for ${postizPlatformId}. Railway is calling: ${socialUrl.toString()}`,
           raw: result,
         });
+      }
+
+      // Strip invalid/deprecated scopes from the OAuth URL before returning to client.
+      // Postiz may include instagram_basic, instagram_content_publish etc. which Meta rejects.
+      const VALID_SCOPES = {
+        instagram: ['pages_show_list', 'pages_read_engagement', 'business_management', 'pages_manage_posts'],
+        facebook:  ['pages_show_list', 'pages_read_engagement', 'business_management', 'pages_manage_posts'],
+      };
+      if (VALID_SCOPES[postizPlatformId]) {
+        try {
+          const oauthUrl = new URL(connectUrl);
+          oauthUrl.searchParams.set('scope', VALID_SCOPES[postizPlatformId].join(','));
+          connectUrl = oauthUrl.toString();
+        } catch (_) { /* leave connectUrl unchanged if URL parse fails */ }
       }
 
       return sendJson(res, 200, { connectUrl, platform: postizPlatformId });
