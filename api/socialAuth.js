@@ -46,9 +46,7 @@ async function handleFacebookConnect(req, res, getSession) {
     'pages_show_list',
     'pages_read_engagement',
     'pages_manage_posts',
-    'instagram_basic',
-    'instagram_content_publish',
-    'instagram_manage_insights',
+    'business_management',
   ].join(',');
 
   // Store email in state so we know who is connecting after redirect

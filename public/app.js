@@ -1673,7 +1673,7 @@ async function startFacebookConnection() {
 
 // Platforms handled by our own OAuth (direct, no 3rd party)
 const DIRECT_OAUTH_PLATFORMS = {
-  'Instagram': '/auth/facebook',   // Instagram connects via Facebook OAuth
+  'Instagram': '/auth/facebook',
   'Facebook': '/auth/facebook',
 };
 
@@ -1681,13 +1681,28 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
   btn.addEventListener('click', async () => {
     const platform = btn.dataset.platform;
 
-    // Use our direct OAuth for Facebook and Instagram
     if (DIRECT_OAUTH_PLATFORMS[platform]) {
-      window.location.href = DIRECT_OAUTH_PLATFORMS[platform];
+      const url = DIRECT_OAUTH_PLATFORMS[platform];
+      const w = 720, h = 820;
+      const left = Math.round(window.screenX + (window.outerWidth - w) / 2);
+      const top = Math.round(window.screenY + (window.outerHeight - h) / 2);
+      const popup = window.open(url, `connect-${platform}`, `width=${w},height=${h},left=${left},top=${top},scrollbars=yes`);
+
+      if (!popup) {
+        // Popup blocked — fall back to same tab
+        window.location.href = url;
+        return;
+      }
+
+      // When popup closes, reload connected accounts
+      const poll = setInterval(() => {
+        if (!popup.closed) return;
+        clearInterval(poll);
+        loadPostizConnections().then(() => renderConnections());
+      }, 800);
       return;
     }
 
-    // Other platforms — show coming soon for now
     alert(`${platform} connection is coming soon.`);
   });
 });

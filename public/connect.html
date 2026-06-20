@@ -29,6 +29,12 @@
 
       if (connected) {
         window.history.replaceState({}, '', '/connect.html');
+        // If opened as a popup, notify parent and close
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({ type: 'social-connected', platform: connected }, window.location.origin);
+          window.close();
+          return;
+        }
         const label = connected.charAt(0).toUpperCase() + connected.slice(1);
         const name = connectedName ? ` (${decodeURIComponent(connectedName)})` : '';
         showBanner('✓ ' + label + name + ' connected successfully!', '#1a7f37');
