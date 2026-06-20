@@ -9,38 +9,50 @@
   <script defer src="client-hub-tracker.js"></script>
   <script defer src="footer.js"></script>
   <script>
-    // Handle Postiz OAuth callback — runs when Postiz redirects back here
     (function () {
       const params = new URLSearchParams(window.location.search);
-      const connected = params.get('postiz_connected');
-      const errMsg = params.get('postiz_error');
-      const platform = params.get('platform') || 'account';
 
-      if (connected === '1') {
-        // Clean up URL, notify opener if in popup, then reload connections
-        window.history.replaceState({}, '', '/connect.html');
-        if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'postiz-connected', platform }, window.location.origin);
-          window.close();
-        }
-        // If not a popup, show success and reload
+      // Handle successful OAuth connection
+      const connected = params.get('connected');
+      const connectedName = params.get('name');
+      const errMsg = params.get('error');
+
+      function showBanner(text, color) {
         document.addEventListener('DOMContentLoaded', function () {
           const banner = document.createElement('div');
-          banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1a7f37;color:#fff;padding:12px 24px;border-radius:8px;font-size:15px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
-          banner.textContent = `✓ ${platform.charAt(0).toUpperCase() + platform.slice(1)} connected successfully!`;
+          banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:' + color + ';color:#fff;padding:12px 24px;border-radius:8px;font-size:15px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+          banner.textContent = text;
           document.body.appendChild(banner);
           setTimeout(() => banner.remove(), 5000);
         });
       }
 
+      if (connected) {
+        window.history.replaceState({}, '', '/connect.html');
+        const label = connected.charAt(0).toUpperCase() + connected.slice(1);
+        const name = connectedName ? ` (${decodeURIComponent(connectedName)})` : '';
+        showBanner('✓ ' + label + name + ' connected successfully!', '#1a7f37');
+      }
+
       if (errMsg) {
-        document.addEventListener('DOMContentLoaded', function () {
-          const banner = document.createElement('div');
-          banner.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#d1242f;color:#fff;padding:12px 24px;border-radius:8px;font-size:15px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
-          banner.textContent = `Connection failed: ${decodeURIComponent(errMsg)}`;
-          document.body.appendChild(banner);
-          setTimeout(() => banner.remove(), 8000);
-        });
+        window.history.replaceState({}, '', '/connect.html');
+        showBanner('Connection failed: ' + decodeURIComponent(errMsg), '#d1242f');
+      }
+
+      // Legacy Postiz callback support
+      const postizConnected = params.get('postiz_connected');
+      const postizPlatform = params.get('platform') || 'account';
+      const postizError = params.get('postiz_error');
+      if (postizConnected === '1') {
+        window.history.replaceState({}, '', '/connect.html');
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({ type: 'postiz-connected', platform: postizPlatform }, window.location.origin);
+          window.close();
+        }
+        showBanner('✓ ' + postizPlatform.charAt(0).toUpperCase() + postizPlatform.slice(1) + ' connected!', '#1a7f37');
+      }
+      if (postizError) {
+        showBanner('Connection failed: ' + decodeURIComponent(postizError), '#d1242f');
       }
     })();
   </script>

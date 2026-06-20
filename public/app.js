@@ -1671,43 +1671,24 @@ async function startFacebookConnection() {
   }
 }
 
+// Platforms handled by our own OAuth (direct, no 3rd party)
+const DIRECT_OAUTH_PLATFORMS = {
+  'Instagram': '/auth/facebook',   // Instagram connects via Facebook OAuth
+  'Facebook': '/auth/facebook',
+};
+
 document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
   btn.addEventListener('click', async () => {
     const platform = btn.dataset.platform;
-    try {
-      btn.disabled = true;
-      btn.textContent = 'Connecting...';
-      const returnUrl = `${window.location.origin}/connect.html?connected=${encodeURIComponent(platform)}`;
-      const sessionToken = (function () {
-        try { return JSON.parse(localStorage.getItem('user') || 'null')?.token || ''; } catch { return ''; }
-      })();
-      const response = await fetch(`/api/auth/connect-link?platform=${encodeURIComponent(platform)}&sessionToken=${encodeURIComponent(sessionToken)}`);
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error || payload.message || 'Could not start connection.');
-      const targetUrl = payload.connectUrl || '';
-      if (!targetUrl) throw new Error('No connect URL returned. Check POSTIZ_CLIENT_ID is set in Railway variables.');
-      // Open Postiz OAuth in a popup — user logs in with their Instagram/Facebook
-      // Postiz handles the social auth and redirects back to /api/auth/postiz-callback
-      const popup = window.open(targetUrl, `postiz-connect-${platform}`, 'width=720,height=820,left=200,top=100');
-      if (!popup) {
-        // Popup blocked — fall back to same-tab redirect
-        window.location.href = targetUrl;
-        return;
-      }
-      // Poll until popup closes, then refresh connections
-      const poll = window.setInterval(async () => {
-        if (!popup.closed) return;
-        window.clearInterval(poll);
-        btn.disabled = false;
-        btn.textContent = '+ Connect';
-        await loadPostizConnections();
-        renderConnections();
-      }, 900);
-    } catch (error) {
-      alert(`${platform} connection needs Postiz setup: ${error.message}`);
-      btn.disabled = false;
-      btn.textContent = '+ Connect';
+
+    // Use our direct OAuth for Facebook and Instagram
+    if (DIRECT_OAUTH_PLATFORMS[platform]) {
+      window.location.href = DIRECT_OAUTH_PLATFORMS[platform];
+      return;
     }
+
+    // Other platforms — show coming soon for now
+    alert(`${platform} connection is coming soon.`);
   });
 });
 
@@ -1818,11 +1799,21 @@ function renderConnections() {
   renderAvailableAccounts && renderAvailableAccounts();
 }
 
-function disconnectAccount(platform, idx) {
+async function disconnectAccount(platform, idx) {
   const list = readScopedJson('connections', []);
   const platformAccounts = list.filter((c) => (c.platform || '').toLowerCase() === platform.toLowerCase());
   const toRemove = platformAccounts[idx];
   if (!toRemove) return;
+
+  // If it has a Supabase id, delete from server too
+  if (toRemove.id) {
+    try {
+      await fetch(`/api/social/accounts/${toRemove.id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('Could not delete account from server:', err);
+    }
+  }
+
   const updated = list.filter((c) => c !== toRemove);
   writeScopedJson('connections', updated);
   renderConnections();
@@ -1837,27 +1828,44 @@ async function loadPostizConnections() {
   try {
     const response = await fetch('/api/social/accounts');
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || 'Unable to load Postiz accounts.');
+    if (!response.ok) return readConnections();
     const accounts = Array.isArray(payload.accounts) ? payload.accounts : [];
     if (!accounts.length) return readConnections();
-    const manual = readConnections().filter((connection) => connection.authProvider !== 'postiz');
-    const postizConnections = accounts.map((account) => ({
-      platform: account.platform,
-      username: account.displayName || account.username || account.name || account.platform,
-      displayName: account.displayName || account.username || account.name || account.platform,
-      userId: account.accountId,
-      accountId: account.accountId,
-      authProvider: 'postiz',
-      profileUrl: account.profileUrl,
+
+    // Keep any manually-added connections that aren't from our OAuth
+    const manual = readConnections().filter((c) => c.authProvider === 'manual');
+
+    // Map Supabase snake_case fields to our connection shape
+    const oauthConnections = accounts.map((account) => ({
+      id: account.id,                          // Supabase row id (for delete)
+      platform: platformLabel(account.platform),
+      username: account.account_name || account.platform,
+      displayName: account.account_name || account.platform,
+      accountId: account.account_id,
+      authProvider: 'oauth',
+      expiresAt: account.expires_at,
       savedAt: Date.now(),
     }));
-    const nextConnections = [...manual, ...postizConnections];
+
+    const nextConnections = [...manual, ...oauthConnections];
     writeConnections(nextConnections);
     return nextConnections;
   } catch (error) {
-    console.warn('Postiz accounts unavailable', error);
+    console.warn('Could not load connected accounts:', error);
     return readConnections();
   }
+}
+
+function platformLabel(platform) {
+  const map = {
+    facebook: 'Facebook', facebook_page: 'Facebook',
+    instagram: 'Instagram',
+    linkedin: 'LinkedIn',
+    tiktok: 'TikTok',
+    pinterest: 'Pinterest',
+    youtube: 'YouTube',
+  };
+  return map[platform] || (platform ? platform.charAt(0).toUpperCase() + platform.slice(1) : 'Unknown');
 }
 
 async function renderConnections() {

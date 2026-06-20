@@ -11,6 +11,7 @@ const {
   getScheduledCalendarPosts,
   getSocialAnalytics,
 } = require('./api/postizClient');
+const socialAuth = require('./api/socialAuth');
 require('dotenv').config();
 const apiEnvPath = path.join(__dirname, 'API.env');
 if (fs.existsSync(apiEnvPath)) {
@@ -3882,6 +3883,26 @@ Generate a professional, strategic brand positioning report based on this inform
       return sendJson(res, 400, { message: err.message || 'Failed to delete report' });
     }
   }
+
+  // ── SOCIAL MEDIA OAUTH ROUTES ──────────────────────────────────────────
+  const path0 = req.url.split('?')[0];
+
+  if (path0 === '/auth/facebook' && req.method === 'GET') {
+    return socialAuth.handleFacebookConnect(req, res, getSession);
+  }
+
+  if (path0 === '/auth/facebook/callback' && req.method === 'GET') {
+    return socialAuth.handleFacebookCallback(req, res, sessions, sendJson);
+  }
+
+  if (path0 === '/api/social/accounts' && req.method === 'GET') {
+    return socialAuth.handleGetAccounts(req, res, getSession, sendJson);
+  }
+
+  if (path0.startsWith('/api/social/accounts/') && req.method === 'DELETE') {
+    return socialAuth.handleDeleteAccount(req, res, getSession, sendJson);
+  }
+  // ── END SOCIAL MEDIA ROUTES ────────────────────────────────────────────
 
   if (serveStatic(req, res)) return;
 
