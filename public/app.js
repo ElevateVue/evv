@@ -1709,9 +1709,31 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
 });
 
 window.addEventListener('message', (event) => {
-  if (event.origin !== window.location.origin || event.data?.type !== 'postiz-connected') return;
-  renderConnections();
+  if (event.origin !== window.location.origin) return;
+  const { type, platform, name, message } = event.data || {};
+
+  if (type === 'social-connected') {
+    loadPostizConnections().then(() => renderConnections());
+    const label = (platform || 'Account').charAt(0).toUpperCase() + (platform || '').slice(1);
+    showToast(`✓ ${label}${name ? ' (' + name + ')' : ''} connected!`, 'success');
+  }
+
+  if (type === 'social-error') {
+    showToast(message || 'Connection failed', 'error');
+  }
+
+  // Legacy Postiz support
+  if (type === 'postiz-connected') renderConnections();
 });
+
+function showToast(text, kind) {
+  const el = document.createElement('div');
+  const bg = kind === 'success' ? '#1a7f37' : '#d1242f';
+  el.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);background:${bg};color:#fff;padding:12px 24px;border-radius:8px;font-size:15px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.4);white-space:nowrap`;
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
 
 // Fetch live integrations from Postiz via server and merge into local connections list
 async function loadPostizConnections() {

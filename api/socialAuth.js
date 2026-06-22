@@ -167,9 +167,22 @@ async function handleFacebookCallback(req, res, sessions, sendJson) {
       }
     }
 
-    const connectedName = encodeURIComponent(userInfo.name || 'Facebook');
-    res.writeHead(302, { Location: `/connect.html?connected=facebook&name=${connectedName}` });
-    res.end();
+    const displayName = userInfo.name || 'Facebook';
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(`<!DOCTYPE html><html><body style="font-family:sans-serif;text-align:center;padding:60px;background:#0d1117;color:#fff">
+      <div style="font-size:48px;margin-bottom:16px">✓</div>
+      <h2 style="color:#4ade80">Connected successfully!</h2>
+      <p style="opacity:0.7">${displayName} — Facebook &amp; Instagram accounts linked.</p>
+      <p style="opacity:0.4;font-size:13px">This window will close automatically...</p>
+      <script>
+        if(window.opener && !window.opener.closed){
+          window.opener.postMessage({type:'social-connected',platform:'facebook',name:${JSON.stringify(displayName)}},window.location.origin);
+          setTimeout(()=>window.close(),1200);
+        } else {
+          window.location.href='/connect.html';
+        }
+      </script>
+    </body></html>`);
   } catch (err) {
     console.error('[Facebook OAuth]', err.message);
     res.writeHead(302, { Location: '/connect.html?error=' + encodeURIComponent(err.message) });
