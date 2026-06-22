@@ -2460,7 +2460,14 @@ const server = http.createServer(async (req, res) => {
     sessions.push({ token, user, createdAt: Date.now() });
     saveSessions(sessions);
     registerClientSignIn(user);
-    return sendJson(res, 200, { token, user });
+    const isSecure = req.headers['x-forwarded-proto'] === 'https';
+    const cookieFlags = `HttpOnly; Path=/; SameSite=Lax; Max-Age=604800${isSecure ? '; Secure' : ''}`;
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Set-Cookie': `session=${token}; ${cookieFlags}`,
+    });
+    return res.end(JSON.stringify({ token, user }));
   }
 
   // All API routes except login and health require a valid session
