@@ -28,16 +28,26 @@ function httpsGet(url) {
 // ── ROUTE HANDLERS ────────────────────────────────────────────────────────────
 
 // GET /auth/facebook  — redirects user to Facebook login
-async function handleFacebookConnect(req, res, getSession) {
+async function handleFacebookConnect(req, res, getSession, sessions) {
   if (!META_APP_ID) {
     res.writeHead(302, { Location: '/connect.html?error=' + encodeURIComponent('Facebook App ID not configured') });
     return res.end();
   }
 
-  const session = getSession(req);
+  // Session can come from cookie OR from ?t= query param (needed when opened as popup)
+  const urlObj = new URL(req.url, 'http://localhost');
+  const queryToken = urlObj.searchParams.get('t') || '';
+  const session = getSession(req) || (queryToken ? sessions.find((s) => s.token === queryToken) : null);
+
   if (!session) {
-    res.writeHead(302, { Location: '/landing.html' });
-    return res.end();
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    return res.end(`<!DOCTYPE html><html><body style="font-family:sans-serif;text-align:center;padding:60px;background:#111;color:#fff">
+      <h2>Session expired</h2><p>Please log in first, then try connecting again.</p>
+      <script>
+        if(window.opener){window.opener.postMessage({type:'social-error',message:'Please log in first'},window.location.origin);window.close();}
+        else{window.location.href='/landing.html';}
+      </script>
+    </body></html>`);
   }
 
   const baseUrl = getBaseUrl(req);

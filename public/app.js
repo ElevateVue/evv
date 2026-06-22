@@ -1682,7 +1682,8 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
     const platform = btn.dataset.platform;
 
     if (DIRECT_OAUTH_PLATFORMS[platform]) {
-      const url = DIRECT_OAUTH_PLATFORMS[platform];
+      const token = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}')?.token || ''; } catch { return ''; } })();
+      const url = DIRECT_OAUTH_PLATFORMS[platform] + (token ? `?t=${encodeURIComponent(token)}` : '');
       const w = 720, h = 820;
       const left = Math.round(window.screenX + (window.outerWidth - w) / 2);
       const top = Math.round(window.screenY + (window.outerHeight - h) / 2);

@@ -3888,7 +3888,7 @@ Generate a professional, strategic brand positioning report based on this inform
   const path0 = req.url.split('?')[0];
 
   if (path0 === '/auth/facebook' && req.method === 'GET') {
-    return socialAuth.handleFacebookConnect(req, res, getSession);
+    return socialAuth.handleFacebookConnect(req, res, getSession, sessions);
   }
 
   if (path0 === '/auth/facebook/callback' && req.method === 'GET') {
