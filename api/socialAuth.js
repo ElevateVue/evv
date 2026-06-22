@@ -5,12 +5,9 @@ const META_APP_ID = process.env.FACEBOOK_META_APP_ID || '';
 const META_APP_SECRET = process.env.FACEBOOK_META_APP_SECRET || process.env.INSTAGRAM_APP_SECRET || '';
 
 function getBaseUrl(req) {
-  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
-  // Only use PUBLIC_APP_URL in production (not on localhost)
-  if (process.env.PUBLIC_APP_URL && !host.startsWith('localhost')) {
-    return process.env.PUBLIC_APP_URL.replace(/\/+$/, '');
-  }
+  // Always derive from the actual incoming request so redirect_uri matches exactly
   const proto = req.headers['x-forwarded-proto'] || 'http';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
   return `${proto}://${host}`;
 }
 
