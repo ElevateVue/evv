@@ -5,13 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { google } = require('googleapis');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const {
-  getSocialAuthLinks,
-  scheduleSocialPost,
-  getScheduledCalendarPosts,
-  getSocialAnalytics,
-} = require('./api/postizClient');
-const socialAuth = require('./api/socialAuth');
+
 require('dotenv').config();
 const apiEnvPath = path.join(__dirname, 'API.env');
 if (fs.existsSync(apiEnvPath)) {
@@ -19,6 +13,8 @@ if (fs.existsSync(apiEnvPath)) {
   // API.env is only used for local development defaults
   require('dotenv').config({ path: apiEnvPath, override: false });
 }
+
+const socialAuth = require('./api/socialAuth');
 
 // Load GA4 service account
 let ga4ServiceAccount = null;
@@ -145,11 +141,8 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 const RESEND_NEWSLETTER_REPLY_TO = process.env.RESEND_NEWSLETTER_REPLY_TO || '';
 const POSTIZ_API_KEY = process.env.POSTIZ_API_KEY || '';
+const POSTIZ_API_BASE_URL = process.env.POSTIZ_API_BASE_URL || 'https://api.postiz.com/public/v1';
 const POSTIZ_CUSTOMER_ID = process.env.POSTIZ_CUSTOMER_ID || '';
-const POSTIZ_API_BASE = (process.env.POSTIZ_API_BASE_URL || 'https://api.postiz.com/public/v1').trim().replace(/\/+$/, '');
-const POSTIZ_TIMEZONE = process.env.POSTIZ_TIMEZONE || 'Asia/Dubai';
-const POSTIZ_CLIENT_ID = process.env.POSTIZ_CLIENT_ID || '';
-const POSTIZ_CLIENT_SECRET = process.env.POSTIZ_CLIENT_SECRET || '';
 const PUBLIC_APP_URL = String(process.env.PUBLIC_APP_URL || '').replace(/\/+$/, '');
 const ADMIN_EMAILS = String(process.env.ADMIN_EMAILS || '')
   .split(',')
@@ -264,14 +257,6 @@ function formatIsoDate(value) {
   return `${year}-${month}-${day}`;
 }
 
-function postizPlatform(value = '') {
-  const platform = String(value || '').trim().toLowerCase();
-  if (platform === 'twitter') return 'x';
-  if (platform === 'google business' || platform === 'googlebusinessprofile' || platform === 'googlebusiness') return 'gmb';
-  if (platform === 'linkedin page' || platform === 'linkedinpage') return 'linkedin-page';
-  return platform.replace(/\s+/g, '');
-}
-
 function displayPlatform(value = '') {
   const platform = String(value || '').trim().toLowerCase();
   const labels = {
@@ -292,104 +277,6 @@ function displayPlatform(value = '') {
   return labels[platform] || String(value || 'Social').trim() || 'Social';
 }
 
-function extractPostizList(payload, key) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.[key])) return payload[key];
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.items)) return payload.items;
-  if (Array.isArray(payload?.posts)) return payload.posts;
-  return [];
-}
-
-function getPostizBaseCandidates() {
-  const configuredBase = String(process.env.POSTIZ_API_BASE_URL || POSTIZ_API_BASE || '').trim().replace(/\/+$/, '');
-  const candidates = new Set();
-  if (configuredBase) {
-    candidates.add(configuredBase);
-    if (configuredBase.includes('/api/public/v1')) {
-      candidates.add(configuredBase.replace('/api/public/v1', '/api/v1'));
-    } else if (configuredBase.includes('/api/v1')) {
-      candidates.add(configuredBase.replace('/api/v1', '/api/public/v1'));
-    }
-  }
-  if (!candidates.size) candidates.add('https://api.postiz.com/public/v1');
-  return Array.from(candidates);
-}
-
-function buildPostizUrl(endpoint, query = {}, baseUrl = POSTIZ_API_BASE) {
-  const url = new URL(`${baseUrl}${endpoint}`);
-  Object.entries(query || {}).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === '') return;
-    url.searchParams.set(key, String(value));
-  });
-  return url;
-}
-
-async function executePostizRequest(url, method, body) {
-  const payload = method === 'GET' || !body ? '' : JSON.stringify(body);
-  const transport = url.protocol === 'http:' ? http : https;
-
-  return new Promise((resolve, reject) => {
-    const request = transport.request(url, {
-      method,
-      headers: {
-        Authorization: POSTIZ_API_KEY,
-        'Content-Type': 'application/json',
-        ...(payload ? { 'Content-Length': Buffer.byteLength(payload) } : {}),
-      },
-    }, (response) => {
-      let raw = '';
-      response.on('data', (chunk) => { raw += chunk; });
-      response.on('end', () => {
-        let parsed;
-        try {
-          parsed = raw ? JSON.parse(raw) : {};
-        } catch {
-          parsed = { raw };
-        }
-        if (response.statusCode && response.statusCode >= 400) {
-          const message = parsed.error || parsed.message || raw || response.statusMessage || `HTTP ${response.statusCode}`;
-          return reject(Object.assign(new Error(message), { statusCode: response.statusCode, raw }));
-        }
-        resolve(parsed);
-      });
-    });
-    request.on('error', reject);
-    if (payload) request.write(payload);
-    request.end();
-  });
-}
-
-async function postizFetch(endpoint, method = 'GET', body = null) {
-  if (!POSTIZ_API_KEY) throw new Error('Postiz API key is required in API.env as POSTIZ_API_KEY');
-  const query = method === 'GET' ? body || {} : {};
-  let lastError = null;
-
-  for (const baseUrl of getPostizBaseCandidates()) {
-    const url = buildPostizUrl(endpoint, query, baseUrl);
-    try {
-      const result = await executePostizRequest(url, method, body);
-      return result;
-    } catch (error) {
-      lastError = error;
-      const statusCode = Number(error?.statusCode || 0);
-      if (statusCode && statusCode !== 404 && statusCode !== 405) {
-        break;
-      }
-    }
-  }
-
-  throw new Error(lastError?.message || `Postiz request failed for ${endpoint}`);
-}
-
-async function resolvePostizCustomerId(preferredCustomerId = '') {
-  const customerId = String(preferredCustomerId || POSTIZ_CUSTOMER_ID || '').trim();
-  if (customerId) return customerId;
-  const groups = await postizFetch('/groups', 'GET').catch(() => []);
-  const group = extractPostizList(groups, 'groups')[0];
-  return group?.id || '';
-}
-
 function normalizeScheduledFor(value) {
   const text = String(value || '').trim();
   if (!text) return '';
@@ -397,274 +284,10 @@ function normalizeScheduledFor(value) {
   return text;
 }
 
-function withPostizReturnUrl(authUrl, returnUrl) {
-  const cleanReturnUrl = String(returnUrl || '').trim();
-  if (!cleanReturnUrl) return authUrl;
-  try {
-    const url = new URL(authUrl);
-    const state = url.searchParams.get('state');
-    if (!state) return authUrl;
-    const first = state.indexOf('-');
-    const second = first >= 0 ? state.indexOf('-', first + 1) : -1;
-    const third = second >= 0 ? state.indexOf('-', second + 1) : -1;
-    if (third < 0) return authUrl;
-    url.searchParams.set('state', `${state.slice(0, third + 1)}${encodeURIComponent(cleanReturnUrl)}`);
-    return url.toString();
-  } catch {
-    return authUrl;
-  }
-}
-
-function postizMediaItems(body = {}) {
-  const items = Array.isArray(body.mediaItems) ? body.mediaItems : [];
-  const media = items.map((item) => ({
-    id: item.id || crypto.randomBytes(6).toString('hex'),
-    path: item.path || item.url,
-  })).filter((item) => item.path);
-  if (body.mediaUrl) {
-    media.push({
-      id: crypto.randomBytes(6).toString('hex'),
-      path: body.mediaUrl,
-    });
-  }
-  return media;
-}
-
-function postizSettings(platform, body = {}) {
-  const type = postizPlatform(platform);
-  if (type === 'instagram' || type === 'instagram-standalone') {
-    return { __type: type, post_type: /story/i.test(body.postType || '') ? 'story' : 'post', is_trial_reel: false, collaborators: [] };
-  }
-  if (type === 'x') return { __type: 'x', who_can_reply_post: 'everyone', community: '' };
-  if (type === 'linkedin' || type === 'linkedin-page') return { __type: type, post_as_images_carousel: false };
-  if (type === 'facebook') return { __type: 'facebook' };
-  if (type === 'youtube') return { __type: 'youtube', title: String(body.title || 'Scheduled video').slice(0, 100), type: 'public', selfDeclaredMadeForKids: 'no' };
-  if (type === 'tiktok') {
-    return {
-      __type: 'tiktok',
-      privacy_level: 'PUBLIC_TO_EVERYONE',
-      duet: true,
-      stitch: true,
-      comment: true,
-      autoAddMusic: 'no',
-      brand_content_toggle: false,
-      brand_organic_toggle: false,
-      video_made_with_ai: false,
-      content_posting_method: 'DIRECT_POST',
-    };
-  }
-  if (type === 'gmb') return { __type: 'gmb', topicType: 'STANDARD' };
-  return { __type: type };
-}
-
-function buildPostizSchedulePayload(body = {}, normalizedPlatforms = []) {
-  const content = body.content || body.caption || body.transcript || '';
-  const scheduledFor = normalizeScheduledFor(body.scheduledFor || body.scheduledAt);
-  const media = postizMediaItems(body);
-  return {
-    type: body.publishNow ? 'now' : scheduledFor ? 'schedule' : 'draft',
-    date: scheduledFor || undefined,
-    shortLink: false,
-    tags: [],
-    posts: normalizedPlatforms.map((item) => ({
-      integration: { id: item.accountId },
-      value: [{ content, image: media }],
-      settings: postizSettings(item.platform, body),
-    })),
-  };
-}
-
-function normalizePostizAnalyticsPost(item = {}) {
-  const analytics = item.analytics || {};
-  const platformAnalytics = Array.isArray(item.platformAnalytics) ? item.platformAnalytics : [];
-  const firstPlatform = platformAnalytics[0] || {};
-  const platform = displayPlatform(item.platform || firstPlatform.platform || item.platforms?.[0]?.platform);
-  const reactions = coerceNumber(analytics.reactions || analytics.likes);
-  const likes = coerceNumber(analytics.likes);
-  const comments = coerceNumber(analytics.comments);
-  const shares = coerceNumber(analytics.shares);
-  const saves = coerceNumber(analytics.saves);
-  const clicks = coerceNumber(analytics.clicks);
-  const views = coerceNumber(analytics.views);
-  const reach = coerceNumber(analytics.reach || analytics.impressions);
-  const title = String(item.title || item.content || item.message || 'Postiz post').trim();
-
-  return {
-    id: item.postId || item._id || item.latePostId || crypto.randomBytes(8).toString('hex'),
-    postizPostId: item.postId || item._id || item.latePostId || null,
-    platform,
-    title: title.length > 90 ? `${title.slice(0, 87)}...` : title,
-    transcript: String(item.content || item.message || '').trim(),
-    engagement: {
-      likes,
-      comments,
-      shares,
-      reactions,
-      saves,
-      clicks,
-      views,
-      reach,
-      follows: 0,
-      interactions: likes + comments + shares + reactions + saves,
-    },
-    status: item.status || 'published',
-    postedAt: item.publishedAt || item.scheduledFor || Date.now(),
-    raw: item,
-  };
-}
-
-function buildPlatformDashboardsFromPostiz(posts = [], followerStats = null) {
-  const dashboards = {};
-  posts.forEach((post) => {
-    const platform = post.platform || 'Social';
-    dashboards[platform] = dashboards[platform] || {
-      platform,
-      filename: 'Postiz live analytics',
-      uploadedAt: new Date().toISOString(),
-      rows: [],
-      postizRows: [],
-      metricoolRows: [],
-    };
-    dashboards[platform].rows.push({
-      date: formatIsoDate(post.postedAt || Date.now()),
-      metrics: {
-        Impressions: coerceNumber(post.engagement?.reach),
-        Reach: coerceNumber(post.engagement?.reach),
-        Interactions: coerceNumber(post.engagement?.interactions),
-        Clicks: coerceNumber(post.engagement?.clicks),
-        Reactions: coerceNumber(post.engagement?.reactions),
-        Comments: coerceNumber(post.engagement?.comments),
-        Shares: coerceNumber(post.engagement?.shares),
-        Views: coerceNumber(post.engagement?.views),
-      },
-      raw: post.raw || post,
-    });
-  });
-
-  const accounts = Array.isArray(followerStats?.accounts) ? followerStats.accounts : [];
-  accounts.forEach((account) => {
-    const platform = displayPlatform(account.platform);
-    dashboards[platform] = dashboards[platform] || {
-      platform,
-      filename: 'Postiz live analytics',
-      uploadedAt: new Date().toISOString(),
-      rows: [],
-      postizRows: [],
-      metricoolRows: [],
-    };
-    dashboards[platform].rows.push({
-      date: formatIsoDate(Date.now()),
-      metrics: {
-        Follows: coerceNumber(account.currentFollowers),
-        Followers: coerceNumber(account.currentFollowers),
-        'Follower Growth': coerceNumber(account.growth),
-      },
-      raw: account,
-    });
-  });
-  return dashboards;
-}
-
 function analyticsSeriesValue(series = {}) {
   const points = Array.isArray(series.data) ? series.data : [];
   if (!points.length) return coerceNumber(series.total || series.value || 0);
   return points.reduce((total, point) => total + coerceNumber(point.total || point.value), 0);
-}
-
-function rowsFromPostizAnalytics(integration = {}, analytics = []) {
-  const platform = displayPlatform(integration.identifier || integration.providerIdentifier);
-  const byDate = new Map();
-  analytics.forEach((series) => {
-    const label = String(series.label || '').trim();
-    const points = Array.isArray(series.data) ? series.data : [];
-    points.forEach((point) => {
-      const date = formatIsoDate(point.date || Date.now());
-      if (!date) return;
-      if (!byDate.has(date)) byDate.set(date, { date, metrics: {}, raw: { integration, analytics } });
-      byDate.get(date).metrics[label] = coerceNumber(point.total || point.value);
-    });
-  });
-  if (!byDate.size && analytics.length) {
-    const metrics = {};
-    analytics.forEach((series) => {
-      if (series.label) metrics[series.label] = analyticsSeriesValue(series);
-    });
-    byDate.set(formatIsoDate(Date.now()), { date: formatIsoDate(Date.now()), metrics, raw: { integration, analytics } });
-  }
-  return { platform, rows: Array.from(byDate.values()) };
-}
-
-function buildPostizPost(item = {}) {
-  const integration = item.integration || {};
-  const platform = displayPlatform(integration.providerIdentifier || integration.identifier || item.platform);
-  const title = String(item.title || item.content || item.value?.[0]?.content || 'Postiz post').trim();
-  const postedAt = item.publishDate || item.date || item.scheduledFor || item.createdAt || Date.now();
-  return {
-    id: item.id || crypto.randomBytes(8).toString('hex'),
-    postizPostId: item.id || null,
-    platform,
-    title: title.length > 90 ? `${title.slice(0, 87)}...` : title,
-    transcript: String(item.content || item.value?.[0]?.content || '').trim(),
-    engagement: { likes: 0, comments: 0, shares: 0, reactions: 0, saves: 0, clicks: 0, views: 0, reach: 0, follows: 0, interactions: 0 },
-    status: item.state || item.status || 'scheduled',
-    postedAt,
-    raw: item,
-  };
-}
-
-async function fetchPostizWorkspaceMetrics(query = {}) {
-  const customer = await resolvePostizCustomerId(query.customer || query.group || query.profileId);
-  const integrations = extractPostizList(await postizFetch('/integrations', 'GET', { group: customer }), 'integrations');
-  const groups = extractPostizList(await postizFetch('/groups', 'GET').catch(() => []), 'groups');
-  const days = String(query.days || query.date || 30);
-  const wantedPlatform = postizPlatform(query.platform || '');
-  const visibleIntegrations = integrations.filter((item) => {
-    if (item.disabled) return false;
-    if (!wantedPlatform) return true;
-    return postizPlatform(item.identifier || item.providerIdentifier) === wantedPlatform;
-  });
-  const analytics = {};
-  const platformDashboards = {};
-  const followerStats = { accounts: [] };
-  for (const integration of visibleIntegrations) {
-    const rows = await postizFetch(`/analytics/${encodeURIComponent(integration.id)}`, 'GET', { date: days }).catch((error) => ({ error: error.message }));
-    analytics[integration.id] = rows;
-    const series = Array.isArray(rows) ? rows : [];
-    const dashboard = rowsFromPostizAnalytics(integration, series);
-    platformDashboards[dashboard.platform] = platformDashboards[dashboard.platform] || {
-      platform: dashboard.platform,
-      filename: 'Postiz live analytics',
-      uploadedAt: new Date().toISOString(),
-      rows: [],
-      postizRows: [],
-      metricoolRows: [],
-    };
-    platformDashboards[dashboard.platform].rows.push(...dashboard.rows);
-    const followerSeries = series.find((item) => /follower/i.test(item.label || ''));
-    followerStats.accounts.push({
-      platform: integration.identifier || integration.providerIdentifier,
-      displayName: integration.name || integration.profile,
-      currentFollowers: followerSeries ? analyticsSeriesValue(followerSeries) : 0,
-      raw: integration,
-    });
-  }
-  const now = new Date();
-  const startDate = query.startDate || query.fromDate || new Date(now.getTime() - Number(days) * 86400000).toISOString();
-  const endDate = query.endDate || query.toDate || now.toISOString();
-  const postsResult = await postizFetch('/posts', 'GET', { startDate, endDate, customer }).catch(() => ({ posts: [] }));
-  const posts = extractPostizList(postsResult, 'posts').map(buildPostizPost);
-  const workspace = createEmptyWorkspace();
-  workspace.posts = posts;
-  workspace.platformDashboards = platformDashboards;
-  recalcMetrics(workspace);
-  return {
-    metrics: workspace.metrics,
-    perPlatform: workspace.perPlatform,
-    platformDashboards: workspace.platformDashboards,
-    dailyData: buildDailyData(workspace),
-    posts,
-    postiz: { analytics, integrations, groups, followerStats, posts: postsResult, customer },
-  };
 }
 
 function buildSeedPosts() {
@@ -2615,29 +2238,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (parsedUrl.pathname === '/api/social/accounts' && req.method === 'GET') {
-    try {
-      const customer = await resolvePostizCustomerId(parsedUrl.searchParams.get('customer') || parsedUrl.searchParams.get('profileId') || '');
-      const wantedPlatform = postizPlatform(parsedUrl.searchParams.get('platform') || '');
-      const result = await postizFetch('/integrations', 'GET', { group: customer });
-      const accounts = extractPostizList(result, 'integrations')
-        .filter((account) => !wantedPlatform || postizPlatform(account.identifier || account.providerIdentifier) === wantedPlatform)
-        .map((account) => ({
-        id: account.id,
-        accountId: account.id,
-        platform: displayPlatform(account.identifier || account.providerIdentifier),
-        platformKey: postizPlatform(account.identifier || account.providerIdentifier),
-        username: account.profile || account.name || '',
-        displayName: account.name || account.profile || '',
-        name: account.name || account.profile || '',
-        profileUrl: account.profileUrl || account.picture || '',
-        isActive: account.disabled !== true,
-        profileId: account.customer?.id || customer || '',
-        raw: account,
-      }));
-      return sendJson(res, 200, { accounts, hasAnalyticsAccess: true, raw: result });
-    } catch (err) {
-      return sendJson(res, 502, { error: `Postiz accounts lookup failed: ${err.message}` });
-    }
+    return socialAuth.handleGetAccounts(req, res, getSession, sendJson);
   }
 
   // ── Postiz connect-link: asks self-hosted Postiz for the social OAuth URL ──────
