@@ -1781,16 +1781,19 @@ async function loadPostizConnections() {
   try {
     const response = await fetch('/api/social/accounts', { credentials: 'same-origin' });
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok) return readConnections();
-    const accounts = Array.isArray(payload.accounts) ? payload.accounts : [];
-    if (!accounts.length) return readConnections();
 
-    // Keep any manually-added connections that aren't from our OAuth
+    console.log('[Social] /api/social/accounts status:', response.status, payload);
+
+    if (!response.ok) {
+      console.warn('[Social] Server error:', payload);
+      return readConnections();
+    }
+
+    const accounts = Array.isArray(payload.accounts) ? payload.accounts : [];
     const manual = readConnections().filter((c) => c.authProvider === 'manual');
 
-    // Map Supabase snake_case fields to our connection shape
     const oauthConnections = accounts.map((account) => ({
-      id: account.id,                          // Supabase row id (for delete)
+      id: account.id,
       platform: platformLabel(account.platform),
       username: account.account_name || account.platform,
       displayName: account.account_name || account.platform,
@@ -1804,7 +1807,7 @@ async function loadPostizConnections() {
     writeConnections(nextConnections);
     return nextConnections;
   } catch (error) {
-    console.warn('Could not load connected accounts:', error);
+    console.warn('[Social] Could not load connected accounts:', error);
     return readConnections();
   }
 }
