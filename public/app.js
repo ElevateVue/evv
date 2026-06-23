@@ -1671,6 +1671,36 @@ async function startFacebookConnection() {
   }
 }
 
+function showConnectConfirm(platform) {
+  return new Promise((resolve) => {
+    const info = {
+      Facebook:  { icon: '🔵', what: 'Facebook Pages you manage', note: 'You\'ll log in with your personal Facebook account. We only access your Pages, not your personal profile.' },
+      Instagram: { icon: '📸', what: 'Instagram Business/Creator accounts linked to your Facebook Pages', note: 'Your Instagram must be a Business or Creator account connected to a Facebook Page.' },
+    };
+    const { icon, what, note } = info[platform] || { icon: '🔗', what: platform, note: '' };
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `
+      <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;color:#fff">
+        <div style="font-size:40px;margin-bottom:12px">${icon}</div>
+        <h3 style="margin:0 0 8px;font-size:20px">Connect ${platform}</h3>
+        <p style="opacity:0.7;font-size:14px;margin:0 0 16px;line-height:1.5">This will give Orbit access to your <strong>${what}</strong>.</p>
+        ${note ? `<div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px;font-size:13px;opacity:0.6;margin-bottom:20px;text-align:left">${note}</div>` : ''}
+        <p style="opacity:0.5;font-size:12px;margin:0 0 24px">A popup will open for you to log in securely on ${platform === 'Instagram' ? 'Facebook' : platform}'s website.</p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button id="confirmCancel" style="padding:10px 24px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;cursor:pointer;font-size:14px">Cancel</button>
+          <button id="confirmProceed" style="padding:10px 24px;border-radius:8px;border:none;background:#6366f1;color:#fff;cursor:pointer;font-size:14px;font-weight:600">Connect ${platform}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#confirmProceed').onclick = () => { overlay.remove(); resolve(true); };
+    overlay.querySelector('#confirmCancel').onclick = () => { overlay.remove(); resolve(false); };
+    overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); resolve(false); } };
+  });
+}
+
 // Platforms handled by our own OAuth (direct, no 3rd party)
 const DIRECT_OAUTH_PLATFORMS = {
   'Instagram': '/auth/facebook',
@@ -1682,6 +1712,10 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
     const platform = btn.dataset.platform;
 
     if (DIRECT_OAUTH_PLATFORMS[platform]) {
+      // Show confirmation before opening OAuth popup
+      const confirmed = await showConnectConfirm(platform);
+      if (!confirmed) return;
+
       const token = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}')?.token || ''; } catch { return ''; } })();
       const url = DIRECT_OAUTH_PLATFORMS[platform] + (token ? `?t=${encodeURIComponent(token)}` : '');
       const w = 720, h = 820;
@@ -1690,16 +1724,14 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
       const popup = window.open(url, `connect-${platform}`, `width=${w},height=${h},left=${left},top=${top},scrollbars=yes`);
 
       if (!popup) {
-        // Popup blocked — fall back to same tab
         window.location.href = url;
         return;
       }
 
-      // When popup closes, reload connected accounts
       const poll = setInterval(() => {
         if (!popup.closed) return;
         clearInterval(poll);
-        loadPostizConnections().then(() => renderConnections());
+        renderConnections();
       }, 800);
       return;
     }
@@ -1708,14 +1740,19 @@ document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
   });
 });
 
-window.addEventListener('message', (event) => {
+window.addEventListener('message', async (event) => {
   if (event.origin !== window.location.origin) return;
   const { type, platform, name, message } = event.data || {};
 
   if (type === 'social-connected') {
-    loadPostizConnections().then(() => renderConnections());
+    await loadPostizConnections();
+    renderConnections();
+    renderAvailableAccounts && renderAvailableAccounts();
     const label = (platform || 'Account').charAt(0).toUpperCase() + (platform || '').slice(1);
     showToast(`✓ ${label}${name ? ' (' + name + ')' : ''} connected!`, 'success');
+    if (window.location.pathname === '/connect.html') {
+      window.location.reload();
+    }
   }
 
   if (type === 'social-error') {
@@ -1735,128 +1772,6 @@ function showToast(text, kind) {
   setTimeout(() => el.remove(), 4000);
 }
 
-// Fetch live integrations from Postiz via server and merge into local connections list
-async function loadPostizConnections() {
-  try {
-    const sessionToken = (function () {
-      try { return JSON.parse(localStorage.getItem('user') || 'null')?.token || ''; } catch { return ''; }
-    })();
-    const res = await fetch(`/api/auth/postiz-integrations?sessionToken=${encodeURIComponent(sessionToken)}`, {
-      headers: { 'x-session-token': sessionToken },
-    });
-    if (!res.ok) return;
-    const { integrations } = await res.json().catch(() => ({ integrations: [] }));
-    if (!Array.isArray(integrations) || !integrations.length) return;
-
-    const platformMap = {
-      instagram: 'Instagram', 'instagram-standalone': 'Instagram',
-      facebook: 'Facebook', linkedin: 'LinkedIn', 'linkedin-page': 'LinkedIn',
-      tiktok: 'TikTok', x: 'Twitter', twitter: 'Twitter',
-      youtube: 'YouTube', threads: 'Threads', pinterest: 'Pinterest',
-    };
-
-    const existing = readScopedJson('connections', []);
-    integrations.forEach((integration) => {
-      const rawPlatform = (integration.identifier || integration.providerIdentifier || '').toLowerCase();
-      const platform = platformMap[rawPlatform] || rawPlatform;
-      if (!platform) return;
-      // Match by integration ID so the same account isn't duplicated on refresh
-      const alreadyExists = existing.find((c) => c.integrationId === integration.id);
-      if (!alreadyExists) {
-        existing.push({
-          platform,
-          username: integration.name || integration.profile || integration.username || '',
-          integrationId: integration.id,
-          authProvider: 'postiz',
-          connectedAt: new Date().toISOString(),
-        });
-      }
-    });
-    writeScopedJson('connections', existing);
-  } catch (_) {}
-}
-
-function renderConnections() {
-  const list = readScopedJson('connections', []);
-
-  // Group accounts by platform (multiple accounts allowed per platform)
-  const byPlatform = {};
-  list.forEach((c) => {
-    const key = (c.platform || 'Unknown').toLowerCase();
-    byPlatform[key] = byPlatform[key] || [];
-    byPlatform[key].push(c);
-  });
-
-  // Update each platform card
-  document.querySelectorAll('.connect-user').forEach((el) => {
-    const platform = el.dataset.platform;
-    const accounts = byPlatform[platform.toLowerCase()] || [];
-
-    if (accounts.length === 0) {
-      el.innerHTML = '<span style="font-size:13px;opacity:0.5">Not connected</span>';
-      return;
-    }
-
-    el.innerHTML = accounts.map((acc, idx) => `
-      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
-        <span style="color:#4ade80;font-size:12px;font-weight:500">● Connected</span>
-        <span style="font-size:13px;opacity:0.85;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${acc.username || acc.email || 'Account ' + (idx + 1)}</span>
-        <button class="disconnect-btn" data-platform="${platform}" data-index="${idx}"
-          style="background:transparent;border:1px solid rgba(255,80,80,0.4);color:#ff6b6b;border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;flex-shrink:0"
-          title="Disconnect this account">✕ Remove</button>
-      </div>`).join('');
-  });
-
-  // Wire up disconnect buttons
-  document.querySelectorAll('.disconnect-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const platform = btn.dataset.platform;
-      const idx = parseInt(btn.dataset.index, 10);
-      disconnectAccount(platform, idx);
-    });
-  });
-
-  // Update connect button text — show "+ Add Another" if already has accounts
-  document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
-    const platform = btn.dataset.platform;
-    const accounts = byPlatform[(platform || '').toLowerCase()] || [];
-    if (accounts.length > 0) {
-      btn.textContent = '+ Add Another';
-      btn.disabled = false;
-      btn.style.opacity = '1';
-    } else {
-      btn.textContent = '+ Connect';
-      btn.disabled = false;
-      btn.style.opacity = '1';
-    }
-  });
-
-  const statConnected = document.getElementById('statConnected');
-  statConnected && (statConnected.textContent = list.length);
-  renderAvailableAccounts && renderAvailableAccounts();
-}
-
-async function disconnectAccount(platform, idx) {
-  const list = readScopedJson('connections', []);
-  const platformAccounts = list.filter((c) => (c.platform || '').toLowerCase() === platform.toLowerCase());
-  const toRemove = platformAccounts[idx];
-  if (!toRemove) return;
-
-  // If it has a Supabase id, delete from server too
-  if (toRemove.id) {
-    try {
-      await fetch(`/api/social/accounts/${toRemove.id}`, { method: 'DELETE' });
-    } catch (err) {
-      console.warn('Could not delete account from server:', err);
-    }
-  }
-
-  const updated = list.filter((c) => c !== toRemove);
-  writeScopedJson('connections', updated);
-  renderConnections();
-}
-
 // On page load, pull live integrations then render
 if (document.querySelector('.connect-btn, .connect-trigger')) {
   loadPostizConnections().then(() => renderConnections());
@@ -1864,7 +1779,7 @@ if (document.querySelector('.connect-btn, .connect-trigger')) {
 
 async function loadPostizConnections() {
   try {
-    const response = await fetch('/api/social/accounts');
+    const response = await fetch('/api/social/accounts', { credentials: 'same-origin' });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) return readConnections();
     const accounts = Array.isArray(payload.accounts) ? payload.accounts : [];
