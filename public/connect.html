@@ -45,21 +45,7 @@
         showBanner('Connection failed: ' + decodeURIComponent(errMsg), '#d1242f');
       }
 
-      // Legacy Postiz callback support
-      const postizConnected = params.get('postiz_connected');
-      const postizPlatform = params.get('platform') || 'account';
-      const postizError = params.get('postiz_error');
-      if (postizConnected === '1') {
-        window.history.replaceState({}, '', '/connect.html');
-        if (window.opener && !window.opener.closed) {
-          window.opener.postMessage({ type: 'postiz-connected', platform: postizPlatform }, window.location.origin);
-          window.close();
-        }
-        showBanner('✓ ' + postizPlatform.charAt(0).toUpperCase() + postizPlatform.slice(1) + ' connected!', '#1a7f37');
-      }
-      if (postizError) {
-        showBanner('Connection failed: ' + decodeURIComponent(postizError), '#d1242f');
-      }
+      // Legacy callback support removed. Only direct Meta OAuth is used now.
     })();
   </script>
 </head>
@@ -78,28 +64,73 @@
     </header>
     <main>
       <section class="panel">
-        <div class="panel-head"><div><h1>Connect Platforms</h1><p>Link your social media accounts to start tracking metrics</p></div></div>
-        <div class="grid connect-grid">
-          <div class="card connect-card instagram-card">
-            <div class="connect-meta"><div class="platform-badge instagram"><img src="/ig.png" alt="Instagram logo" class="platform-icon" /></div><div><div class="connect-title">Instagram</div><div class="connect-user" data-platform="Instagram"></div></div></div>
-            <button class="pill-btn connect-btn instagram rainbow-border" data-platform="Instagram">+ Connect</button>
+        <div class="panel-head"><div><h1>Connect Platforms</h1><p>Link your social media accounts to start posting and tracking metrics</p></div></div>
+        <div class="plat-grid" style="margin-top:24px">
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af)"><img src="/ig.png" alt=""></div>
+              <span class="plat-name">Instagram</span>
+            </div>
+            <div class="plat-body" data-platform="Instagram"></div>
           </div>
-          <div class="card connect-card facebook-card">
-            <div class="connect-meta"><div class="platform-badge facebook"><img src="/fb.png" alt="Facebook logo" class="platform-icon" /></div><div><div class="connect-title">Facebook</div><div class="connect-user" data-platform="Facebook"></div></div></div>
-            <button class="pill-btn connect-btn facebook rainbow-border" data-platform="Facebook">+ Connect</button>
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:#1877f2"><img src="/fb.png" alt=""></div>
+              <span class="plat-name">Facebook</span>
+            </div>
+            <div class="plat-body" data-platform="Facebook"></div>
           </div>
-          <div class="card connect-card linkedin-card">
-            <div class="connect-meta"><div class="platform-badge linkedin"><img src="/linkedin.png" alt="LinkedIn logo" class="platform-icon" /></div><div><div class="connect-title">LinkedIn</div><div class="connect-user" data-platform="LinkedIn"></div></div></div>
-            <button class="pill-btn connect-btn linkedin rainbow-border" data-platform="LinkedIn">+ Connect</button>
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:#0a66c2"><img src="/linkedin.png" alt=""></div>
+              <span class="plat-name">LinkedIn</span>
+            </div>
+            <div class="plat-body" data-platform="LinkedIn"></div>
           </div>
-          <div class="card connect-card tiktok-card">
-            <div class="connect-meta"><div class="platform-badge tiktok"><img src="/tiktok.png" alt="TikTok logo" class="platform-icon" /></div><div><div class="connect-title">TikTok</div><div class="connect-user" data-platform="TikTok"></div></div></div>
-            <button class="pill-btn connect-btn tiktok rainbow-border" data-platform="TikTok">+ Connect</button>
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:#010101"><img src="/tiktok.png" alt=""></div>
+              <span class="plat-name">TikTok</span>
+            </div>
+            <div class="plat-body" data-platform="TikTok"></div>
           </div>
-          <div class="card connect-card snapchat-card">
-            <div class="connect-meta"><div class="platform-badge snapchat"><img src="/snap.png" alt="Snapchat logo" class="platform-icon" /></div><div><div class="connect-title">Snapchat</div><div class="connect-user" data-platform="Snapchat"></div></div></div>
-            <button class="pill-btn connect-btn snapchat rainbow-border" data-platform="Snapchat">+ Connect</button>
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:#e60023"><img src="/pinterest.png" alt=""></div>
+              <span class="plat-name">Pinterest</span>
+            </div>
+            <div class="plat-body" data-platform="Pinterest"></div>
           </div>
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:#ff0000"><img src="/youtube.png" alt=""></div>
+              <span class="plat-name">YouTube</span>
+            </div>
+            <div class="plat-body" data-platform="YouTube"></div>
+          </div>
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:#000;border:1px solid rgba(255,255,255,0.15)"><img src="/x.png" alt=""></div>
+              <span class="plat-name">X (Twitter)</span>
+            </div>
+            <div class="plat-body" data-platform="X"></div>
+          </div>
+
+          <div class="plat-card">
+            <div class="plat-header">
+              <div class="plat-icon" style="background:#fffc00"><img src="/snap.png" alt=""></div>
+              <span class="plat-name">Snapchat</span>
+            </div>
+            <div class="plat-body" data-platform="Snapchat"></div>
+          </div>
+
         </div>
       </section>
     </main>
@@ -113,7 +144,7 @@
       <label>User ID (optional)</label><input id="modalUserId" placeholder="@handle or profile id" />
       <label>Profile Picture (optional)</label><input id="modalAvatar" type="file" accept="image/*" />
       <label>Password</label><input id="modalPass" type="password" placeholder="Not used in this local scheduling flow" />
-      <span class="hint">Use Postiz OAuth from the Connect buttons to authorize real publishing and analytics.</span>
+      <span class="hint">Use the Meta Connect buttons to authorize real publishing and analytics.</span>
       <button class="btn-outline full" type="submit">Save Account</button>
     </form>
   </div>

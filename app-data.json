@@ -3,6 +3,112 @@
     "sabiha.habeeb1972@gmail.com": {
       "posts": [
         {
+          "id": "post-1783186438091",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someo",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "Instagram, Facebook",
+          "platforms": [
+            "Instagram",
+            "Facebook"
+          ],
+          "accounts": [
+            "Instagram",
+            "Facebook"
+          ],
+          "platformAccounts": [
+            {
+              "platform": "Instagram",
+              "accountId": "17841439270562681",
+              "accountName": "Instagram"
+            },
+            {
+              "platform": "Facebook",
+              "accountId": "1140674272467922",
+              "accountName": "Facebook"
+            }
+          ],
+          "accountIds": [
+            "17841439270562681",
+            "1140674272467922"
+          ],
+          "postType": "Feed Post",
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783186438080-50fe4ebc8708.png",
+          "mediaUrls": [
+            "https://evv-client-portal-production.up.railway.app/uploads/1783186438080-50fe4ebc8708.png"
+          ],
+          "mediaType": "image",
+          "scheduledAt": "2026-07-04T21:34",
+          "postedAt": "2026-07-04T21:34",
+          "status": "failed",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T17:33:58.092Z",
+          "publishAttempts": 1,
+          "lastPublishAttemptAt": "2026-07-04T17:34:47.240Z",
+          "publishError": "Publishing failed: Instagram:17841439270562681 Only photo or video can be accepted as media type.; Facebook:1140674272467922 Missing or invalid image file"
+        },
+        {
+          "id": "post-1783184691415",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someo",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "Facebook, Instagram",
+          "platforms": [
+            "Facebook",
+            "Instagram"
+          ],
+          "accounts": [
+            "Facebook",
+            "Instagram"
+          ],
+          "platformAccounts": [
+            {
+              "platform": "Facebook",
+              "accountId": "122102362070588192",
+              "accountName": "Facebook"
+            },
+            {
+              "platform": "Instagram",
+              "accountId": "17841439270562681",
+              "accountName": "Instagram"
+            }
+          ],
+          "accountIds": [
+            "122102362070588192",
+            "17841439270562681"
+          ],
+          "postType": "Feed Post",
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783184691406-9faf2ed7d282.png",
+          "mediaUrls": [
+            "https://evv-client-portal-production.up.railway.app/uploads/1783184691406-9faf2ed7d282.png"
+          ],
+          "mediaType": "image",
+          "scheduledAt": "2026-07-04T21:05",
+          "postedAt": "2026-07-04T21:05",
+          "status": "failed",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T17:04:51.416Z",
+          "publishAttempts": 1,
+          "lastPublishAttemptAt": "2026-07-04T17:05:46.980Z",
+          "publishError": "Publishing failed: Facebook:122102362070588192 (#200) This endpoint is deprecated since the required permission publish_actions is deprecated; Instagram:17841439270562681 Only photo or video can be accepted as media type."
+        },
+        {
           "id": "p29",
           "platform": "Instagram",
           "title": "flowers ",
@@ -562,6 +668,22 @@
         "engagementRate": 2.01
       },
       "perPlatform": {
+        "Instagram, Facebook": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        },
+        "Facebook, Instagram": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        },
         "Instagram": {
           "reach": 21036,
           "interactions": 422,
@@ -2764,7 +2886,7 @@
         "completedAt": null
       },
       "strategyReports": {},
-      "updatedAt": "2026-06-03T16:48:01.844Z"
+      "updatedAt": "2026-07-04T17:33:58.092Z"
     },
     "queenofall8747@gmail.com": {
       "posts": [
@@ -4702,7 +4824,23 @@
         "started": false,
         "completed": false,
         "currentStep": 0,
-        "answers": {},
+        "answers": {
+          "fullName": "",
+          "businessName": "",
+          "businessDescription": "",
+          "industries": [],
+          "industryOther": "",
+          "location": "",
+          "businessStage": "",
+          "personalityTraits": [],
+          "personalityOther": "",
+          "toneFormality": 5,
+          "preferredPhrases": "",
+          "restrictedPhrases": "",
+          "uniqueValueProposition": "",
+          "brandColors": [],
+          "logo": null
+        },
         "updatedAt": null,
         "completedAt": null
       },
@@ -4710,5 +4848,5 @@
       "updatedAt": "2026-06-10T19:15:27.929Z"
     }
   },
-  "updatedAt": "2026-06-10T19:15:27.929Z"
+  "updatedAt": "2026-07-04T17:35:03.233Z"
 }

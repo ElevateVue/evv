@@ -260,20 +260,23 @@
       socialAccounts = Array.isArray(response.accounts) ? response.accounts : [];
     } catch (error) {
       socialAccounts = [];
-      console.warn('Unable to load Postiz accounts', error);
+      console.warn('Unable to load connected accounts', error);
     }
     renderAccountOptions();
   }
 
   function renderAccountOptions() {
     if (!schAccount) return;
-    const selectedPlatform = schPlatform?.value || '';
-    const matching = socialAccounts.filter((account) => !selectedPlatform || account.platform === selectedPlatform);
+    const selectedPlatform = String(schPlatform?.value || '').trim().toLowerCase();
+    const matching = socialAccounts.filter((account) => {
+      const accountPlatform = String(account.platform || '').trim().toLowerCase();
+      return !selectedPlatform || accountPlatform === selectedPlatform;
+    });
     schAccount.innerHTML = '';
     if (!matching.length) {
       const option = document.createElement('option');
       option.value = '';
-      option.textContent = socialAccounts.length ? `No ${selectedPlatform} accounts connected` : 'Connect accounts in Postiz first';
+      option.textContent = socialAccounts.length ? `No ${schPlatform?.value || 'selected'} accounts connected` : 'Connect accounts from the Connect page first';
       schAccount.appendChild(option);
       return;
     }
@@ -387,7 +390,7 @@
     }
     try {
       if (!payload.accountId) {
-        alert('Choose a connected Postiz account before scheduling.');
+        alert('Choose a connected account before scheduling.');
         return;
       }
       const res = await api('/api/schedule-post', { method: 'POST', body: JSON.stringify(payload) });

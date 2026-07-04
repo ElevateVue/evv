@@ -1,5 +1,5 @@
 const https = require('https');
-const supabase = require('../lib/supabase');
+const socialStore = require('../lib/socialStore');
 
 const META_APP_ID = process.env.FACEBOOK_META_APP_ID || '';
 const META_APP_SECRET = process.env.FACEBOOK_META_APP_SECRET || process.env.INSTAGRAM_APP_SECRET || '';
@@ -56,6 +56,8 @@ async function handleFacebookConnect(req, res, getSession, sessions) {
     'pages_read_engagement',
     'pages_manage_posts',
     'business_management',
+    'instagram_basic',
+    'instagram_content_publish',
   ].join(',');
 
   // Store email in state so we know who is connecting after redirect
@@ -124,25 +126,25 @@ async function handleFacebookCallback(req, res, sessions, sendJson) {
     const pages = Array.isArray(pagesData.data) ? pagesData.data : [];
 
     // Save the base Facebook account
-    await supabase.from('connected_accounts').upsert({
+    await socialStore.upsertConnectedAccount({
       user_email: userEmail,
       platform: 'facebook',
       account_name: userInfo.name || 'Facebook User',
       account_id: userInfo.id,
       access_token: longToken,
       expires_at: expiresAt,
-    }, { onConflict: 'user_email,platform,account_id' });
+    });
 
     // Save each Facebook Page + linked Instagram Business account
     for (const page of pages) {
-      await supabase.from('connected_accounts').upsert({
+      await socialStore.upsertConnectedAccount({
         user_email: userEmail,
         platform: 'facebook_page',
         account_name: page.name,
         account_id: page.id,
         access_token: page.access_token,
         expires_at: null,
-      }, { onConflict: 'user_email,platform,account_id' });
+      });
 
       // Check if this Facebook Page has a linked Instagram Business account
       const igData = await httpsGet(
@@ -155,14 +157,14 @@ async function handleFacebookCallback(req, res, sessions, sendJson) {
           `https://graph.facebook.com/v19.0/${igId}?fields=id,name,username&access_token=${page.access_token}`
         ).catch(() => ({}));
 
-        await supabase.from('connected_accounts').upsert({
+        await socialStore.upsertConnectedAccount({
           user_email: userEmail,
           platform: 'instagram',
           account_name: igInfo.username ? `@${igInfo.username}` : (igInfo.name || 'Instagram'),
           account_id: igId,
           access_token: page.access_token,
           expires_at: null,
-        }, { onConflict: 'user_email,platform,account_id' });
+        });
       }
     }
 
@@ -174,11 +176,12 @@ async function handleFacebookCallback(req, res, sessions, sendJson) {
       <p style="opacity:0.7">${displayName} — Facebook &amp; Instagram accounts linked.</p>
       <p style="opacity:0.4;font-size:13px">This window will close automatically...</p>
       <script>
-        if(window.opener && !window.opener.closed){
-          window.opener.postMessage({type:'social-connected',platform:'facebook',name:${JSON.stringify(displayName)}},window.location.origin);
+        const payload = { type:'social-connected', platform:'facebook', name:${JSON.stringify(displayName)} };
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage(payload, window.location.origin);
           setTimeout(()=>window.close(),1200);
         } else {
-          window.location.href='/connect.html';
+          window.location.href='/connect.html?connected=facebook&name=' + encodeURIComponent(${JSON.stringify(displayName)});
         }
       </script>
     </body></html>`);
@@ -194,14 +197,9 @@ async function handleGetAccounts(req, res, getSession, sendJson) {
   const session = getSession(req);
   if (!session) return sendJson(res, 401, { error: 'Not authenticated' });
 
-  const { data, error } = await supabase
-    .from('connected_accounts')
-    .select('id, platform, account_name, account_id, expires_at, created_at')
-    .eq('user_email', session.user.email);
-
-  if (error) return sendJson(res, 500, { error: error.message });
+  const accounts = await socialStore.selectConnectedAccounts(session.user.email);
   res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ accounts: data || [] }));
+  res.end(JSON.stringify({ accounts }));
 }
 
 // DELETE /api/social/accounts/:id  — disconnects an account
@@ -210,13 +208,9 @@ async function handleDeleteAccount(req, res, getSession, sendJson) {
   if (!session) return sendJson(res, 401, { error: 'Not authenticated' });
 
   const id = req.url.split('/').pop();
-  const { error } = await supabase
-    .from('connected_accounts')
-    .delete()
-    .eq('id', id)
-    .eq('user_email', session.user.email);
+  const deleted = await socialStore.deleteConnectedAccount(id, session.user.email);
+  if (!deleted) return sendJson(res, 404, { error: 'Account not found' });
 
-  if (error) return sendJson(res, 500, { error: error.message });
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ success: true }));
 }

@@ -186,6 +186,38 @@ main { padding:24px 28px 36px; display:flex; flex-direction:column; gap:20px; fl
 .actions { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .connect-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 
+/* ── Platform connect cards (new layout) ──────────────────────────── */
+.plat-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:14px; }
+.plat-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+.plat-header { display:flex; align-items:center; gap:10px; }
+.plat-icon { width:26px; height:26px; border-radius:7px; display:grid; place-items:center; overflow:hidden; flex-shrink:0; font-size:13px; font-weight:800; }
+.plat-icon img { width:100%; height:100%; object-fit:cover; }
+.plat-name { font-size:13px; font-weight:700; }
+.plat-body { display:flex; flex-direction:column; gap:7px; }
+.plat-connect-btn { display:flex; align-items:center; justify-content:space-between; width:100%; padding:9px 12px; border-radius:10px; border:none; cursor:pointer; font-size:12px; font-weight:600; color:#fff; transition:filter .15s,transform .15s; text-align:left; }
+.plat-connect-btn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+.plat-connect-btn .plat-btn-icon { width:18px; height:18px; object-fit:contain; opacity:0.9; flex-shrink:0; }
+.plat-connect-btn .plat-btn-letter { width:18px; height:18px; display:grid; place-items:center; font-weight:800; font-size:12px; flex-shrink:0; }
+.plat-connect-btn.instagram { background:linear-gradient(135deg,#f58529,#dd2a7b,#8134af,#515bd4); }
+.plat-connect-btn.facebook  { background:#1877f2; }
+.plat-connect-btn.linkedin  { background:#0a66c2; }
+.plat-connect-btn.tiktok    { background:linear-gradient(135deg,#010101 40%,#69c9d0); }
+.plat-connect-btn.pinterest { background:#e60023; }
+.plat-connect-btn.youtube   { background:#ff0000; }
+.plat-connect-btn.x         { background:#000; border:1px solid rgba(255,255,255,0.12); }
+.plat-connect-btn.snapchat  { background:#fffc00; color:#111; }
+.plat-connect-btn.coming-soon { background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.3); cursor:default; border:1px solid rgba(255,255,255,0.07); }
+.plat-connect-btn.coming-soon:hover { filter:none; transform:none; }
+.plat-account-chip { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:10px; padding:7px 10px; }
+.plat-acct-avatar { width:26px; height:26px; border-radius:50%; background:var(--accent,#6a8bff); display:grid; place-items:center; font-size:11px; font-weight:800; flex-shrink:0; color:#fff; }
+.plat-acct-info { flex:1; min-width:0; }
+.plat-acct-name { font-size:12px; font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.plat-acct-type { font-size:10px; color:var(--muted); display:block; }
+.plat-acct-remove { background:none; border:none; cursor:pointer; color:var(--muted); font-size:15px; padding:0 2px; line-height:1; flex-shrink:0; }
+.plat-acct-remove:hover { color:#ff6b6b; }
+.plat-add-btn { display:flex; align-items:center; justify-content:center; gap:5px; width:100%; padding:7px; border-radius:10px; border:1px dashed rgba(255,255,255,0.14); background:none; cursor:pointer; color:var(--muted); font-size:12px; transition:border-color .15s,color .15s; }
+.plat-add-btn:hover { border-color:#6a8bff; color:#6a8bff; }
+
 .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; }
 .stat-card { display:flex; align-items:center; gap:14px; }
 .stat-icon { width:44px; height:44px; border-radius:14px; display:grid; place-items:center; font-size:20px; }
@@ -1069,10 +1101,6 @@ main { padding:24px 28px 36px; display:flex; flex-direction:column; gap:20px; fl
 .recent-report-row:last-child { border-bottom:none; }
 .recent-report-title { font-weight:700; }
 .recent-report-meta { color:#8fa0c2; font-size:13px; }
-.postiz-metric-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin:12px 0 18px; }
-.postiz-metric { background:#101722; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px; }
-.postiz-metric span { color:#8fa0c2; font-size:12px; font-weight:700; text-transform:uppercase; }
-.postiz-metric strong { color:#f2f5ff; font-size:22px; line-height:1; }
 
 /* Modal (platform connect) */
 .modal-backdrop,

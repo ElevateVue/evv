@@ -11,16 +11,16 @@
     "view": "client",
     "initials": "D",
     "firstSeen": 1777387666187,
-    "lastActive": 1781474990163,
-    "totalVisits": 278,
-    "lastPage": "Connect",
+    "lastActive": 1783186439619,
+    "totalVisits": 370,
+    "lastPage": "Content Calendar",
     "pageUsage": {
       "featurehub.html": {
         "name": "Feature Hub",
         "category": "Overview",
-        "visits": 80,
+        "visits": 90,
         "firstVisited": 1777387666187,
-        "lastVisited": 1781474017122
+        "lastVisited": 1783186381217
       },
       "clienthub.html": {
         "name": "Client Hub",
@@ -39,23 +39,23 @@
       "post-queue.html": {
         "name": "Post Queue",
         "category": "Publishing",
-        "visits": 6,
+        "visits": 7,
         "firstVisited": 1777847034530,
-        "lastVisited": 1779400273735
+        "lastVisited": 1782913802031
       },
       "upload.html": {
         "name": "Scheduling",
         "category": "Publishing",
-        "visits": 15,
+        "visits": 44,
         "firstVisited": 1777848388888,
-        "lastVisited": 1779572368913
+        "lastVisited": 1783186438130
       },
       "connect.html": {
         "name": "Connect",
         "category": "Connections",
-        "visits": 24,
+        "visits": 65,
         "firstVisited": 1777848538804,
-        "lastVisited": 1781474990163
+        "lastVisited": 1783186382939
       },
       "strategy.html": {
         "name": "Strategy",
@@ -67,9 +67,9 @@
       "report.html": {
         "name": "Report",
         "category": "Insights",
-        "visits": 9,
+        "visits": 10,
         "firstVisited": 1777927842017,
-        "lastVisited": 1780505219670
+        "lastVisited": 1782913137789
       },
       "brand.html": {
         "name": "Brand",
@@ -109,9 +109,9 @@
       "content-calendar.html": {
         "name": "Content Calendar",
         "category": "Workspace",
-        "visits": 11,
+        "visits": 21,
         "firstVisited": 1779298666170,
-        "lastVisited": 1780506139911
+        "lastVisited": 1783186439619
       },
       "ghost-writer.html": {
         "name": "Ghost Writer",
@@ -143,497 +143,480 @@
       }
     },
     "pagesUsed": [
+      "Content Calendar",
+      "Scheduling",
       "Connect",
       "Feature Hub",
-      "Content Calendar",
-      "Ghost Writer",
+      "Post Queue",
       "Report",
+      "Ghost Writer",
       "Dashboard",
       "Strategy",
-      "Scheduling",
       "Brand",
       "Hook Library",
       "Drop Ideas",
       "Creative Brief Builder",
       "Ad Copy Grader",
       "Comparison Metrics",
-      "Post Queue",
       "Content Lab",
       "FeatureHub",
       "Client Hub"
     ],
     "toolsUsed": [
+      "Content Calendar",
+      "Scheduling",
       "Connect",
       "Feature Hub",
-      "Content Calendar",
-      "Ghost Writer",
+      "Post Queue",
       "Report",
+      "Ghost Writer",
       "Dashboard",
       "Strategy",
-      "Scheduling",
       "Brand",
       "Hook Library",
       "Drop Ideas",
       "Creative Brief Builder",
       "Ad Copy Grader",
       "Comparison Metrics",
-      "Post Queue",
       "Content Lab",
       "FeatureHub",
       "Client Hub"
     ],
     "totalToolsUsed": 18,
     "recentTools": [
-      "Connect",
-      "Feature Hub",
       "Content Calendar",
-      "Ghost Writer"
+      "Scheduling",
+      "Connect",
+      "Feature Hub"
     ],
     "metrics": {
-      "connections": 0,
-      "queuedPosts": 0,
+      "connections": 2,
+      "queuedPosts": 9,
       "reports": 2,
       "feedback": 1,
       "hashtagSets": 0,
       "uploads": 1,
-      "totalSavedItems": 4
+      "totalSavedItems": 15
     },
     "onboarding": null,
-    "signInCount": 35,
-    "lastSignInAt": 1781474016676,
+    "signInCount": 46,
+    "lastSignInAt": 1783186380950,
     "activity": [
       {
-        "id": "evt-1781474990163-8b438d",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781474990164,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781474299543-a23800",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781474299543,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781474259398-12e5fb",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781474259398,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781474023967-562110",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781474023967,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781474017122-f4135c",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1781474017123,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781474016677-5ae342",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1781474016677,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1781135129051-dd6dd5",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781135129051,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781135127423-6f1c97",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1781135127424,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781135127010-b1525b",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1781135127011,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1781134815449-5b098d",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781134815449,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781134813201-eddcf1",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1781134813201,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781134812915-c65f7f",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1781134812915,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1781134393657-0fa6fe",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781134393657,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781134046312-d8168d",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781134046312,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781133407239-5b9c36",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781133407239,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781133405645-a609d2",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1781133405645,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781133405241-45c1e8",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1781133405241,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1781125626614-c2b970",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1781125626614,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781125624963-80ab45",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1781125624963,
-        "meta": {}
-      },
-      {
-        "id": "evt-1781125624579-5a9752",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1781125624580,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1780695200875-7e78a2",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1780695200875,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780695199123-5d4cd1",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1780695199123,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780695198747-afcfe2",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1780695198747,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1780695028659-1f3fb3",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1780695028659,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780694870340-c683ad",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1780694870340,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780694822355-7e11ab",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1780694822355,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780694820129-bbed66",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1780694820129,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780694819806-97bdcd",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1780694819806,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1780506139911-94cbe7",
+        "id": "evt-1783186439619-9a71a3",
         "type": "page_view",
         "label": "Content Calendar",
         "detail": "",
         "pageFile": "content-calendar.html",
         "pageName": "Content Calendar",
-        "timestamp": 1780506139911,
+        "timestamp": 1783186439619,
         "meta": {}
       },
       {
-        "id": "evt-1780506121332-92da3f",
+        "id": "evt-1783186438130-d500ad",
+        "type": "edit_queue",
+        "label": "Updated post queue",
+        "detail": "9 queued post(s)",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783186438130,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783186385918-274f28",
         "type": "page_view",
-        "label": "Content Calendar",
+        "label": "Scheduling",
         "detail": "",
-        "pageFile": "content-calendar.html",
-        "pageName": "Content Calendar",
-        "timestamp": 1780506121332,
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783186385918,
         "meta": {}
       },
       {
-        "id": "evt-1780505291456-035fbd",
+        "id": "evt-1783186382939-ec1e9d",
         "type": "page_view",
-        "label": "Content Calendar",
+        "label": "Connect",
         "detail": "",
-        "pageFile": "content-calendar.html",
-        "pageName": "Content Calendar",
-        "timestamp": 1780505291456,
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783186382939,
         "meta": {}
       },
       {
-        "id": "evt-1780505287770-c50bcb",
-        "type": "page_view",
-        "label": "Ghost Writer",
-        "detail": "",
-        "pageFile": "ghost-writer.html",
-        "pageName": "Ghost Writer",
-        "timestamp": 1780505287770,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780505231661-6c44fd",
-        "type": "page_view",
-        "label": "Content Calendar",
-        "detail": "",
-        "pageFile": "content-calendar.html",
-        "pageName": "Content Calendar",
-        "timestamp": 1780505231661,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780505219670-ad2cd1",
-        "type": "page_view",
-        "label": "Report",
-        "detail": "",
-        "pageFile": "report.html",
-        "pageName": "Report",
-        "timestamp": 1780505219670,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780504866064-3d7dd8",
-        "type": "generate_report",
-        "label": "Generated report",
-        "detail": "Facebook Report - 30/04/2026 to 30/05/2026",
-        "pageFile": "report.html",
-        "pageName": "Report",
-        "timestamp": 1780504866064,
-        "meta": {
-          "platform": "Facebook"
-        }
-      },
-      {
-        "id": "evt-1780504843701-a0059d",
-        "type": "page_view",
-        "label": "Report",
-        "detail": "",
-        "pageFile": "report.html",
-        "pageName": "Report",
-        "timestamp": 1780504843701,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780504830636-f7a6fa",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780504830636,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780504428902-204a65",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780504428902,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780504425573-aa02e6",
+        "id": "evt-1783186381217-3485fd",
         "type": "page_view",
         "label": "Feature Hub",
         "detail": "",
         "pageFile": "featurehub.html",
         "pageName": "Feature Hub",
-        "timestamp": 1780504425573,
+        "timestamp": 1783186381217,
         "meta": {}
       },
       {
-        "id": "evt-1780504425310-48e148",
+        "id": "evt-1783186380951-40a80d",
         "type": "login",
         "label": "Signed in",
         "detail": "Client session started",
         "pageFile": "",
         "pageName": "",
-        "timestamp": 1780504425310,
+        "timestamp": 1783186380951,
         "meta": {
           "role": "client",
           "view": "client"
         }
+      },
+      {
+        "id": "evt-1783184693405-add899",
+        "type": "page_view",
+        "label": "Content Calendar",
+        "detail": "",
+        "pageFile": "content-calendar.html",
+        "pageName": "Content Calendar",
+        "timestamp": 1783184693405,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184691437-7a6e9a",
+        "type": "edit_queue",
+        "label": "Updated post queue",
+        "detail": "8 queued post(s)",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783184691437,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184649110-b39b7b",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783184649111,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184624239-9b6645",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783184624239,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184470355-65e817",
+        "type": "page_view",
+        "label": "Content Calendar",
+        "detail": "",
+        "pageFile": "content-calendar.html",
+        "pageName": "Content Calendar",
+        "timestamp": 1783184470355,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184468356-d787eb",
+        "type": "edit_queue",
+        "label": "Updated post queue",
+        "detail": "7 queued post(s)",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783184468356,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184419740-bbf736",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783184419740,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184416104-9ad892",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783184416104,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184414524-96c7a4",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1783184414524,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783184414175-a1afce",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1783184414175,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
+      {
+        "id": "evt-1783182389804-1ac634",
+        "type": "page_view",
+        "label": "Content Calendar",
+        "detail": "",
+        "pageFile": "content-calendar.html",
+        "pageName": "Content Calendar",
+        "timestamp": 1783182389804,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182387994-58bb0d",
+        "type": "edit_queue",
+        "label": "Updated post queue",
+        "detail": "6 queued post(s)",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783182387994,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182327280-daee43",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783182327280,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182324563-50a1bb",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783182324563,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182190647-177874",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783182190647,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182187655-254d4c",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783182187655,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182046669-010942",
+        "type": "page_view",
+        "label": "Content Calendar",
+        "detail": "",
+        "pageFile": "content-calendar.html",
+        "pageName": "Content Calendar",
+        "timestamp": 1783182046669,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182043617-b05134",
+        "type": "edit_queue",
+        "label": "Updated post queue",
+        "detail": "5 queued post(s)",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783182043617,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783182003623-5074a9",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783182003623,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181963042-da4243",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783181963042,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181945557-0b4d22",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783181945557,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181927141-00b3e1",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783181927141,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181879632-a5e668",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783181879632,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181878193-17fa58",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1783181878193,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181877853-27246e",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1783181877853,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
+      {
+        "id": "evt-1783181254752-55a733",
+        "type": "page_view",
+        "label": "Content Calendar",
+        "detail": "",
+        "pageFile": "content-calendar.html",
+        "pageName": "Content Calendar",
+        "timestamp": 1783181254752,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181251141-48c65e",
+        "type": "edit_queue",
+        "label": "Updated post queue",
+        "detail": "4 queued post(s)",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783181251141,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181198843-c0053a",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783181198843,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181195182-e43fe7",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783181195182,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783181192548-1e6141",
+        "type": "page_view",
+        "label": "Content Calendar",
+        "detail": "",
+        "pageFile": "content-calendar.html",
+        "pageName": "Content Calendar",
+        "timestamp": 1783181192548,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783178442425-94abd6",
+        "type": "page_view",
+        "label": "Content Calendar",
+        "detail": "",
+        "pageFile": "content-calendar.html",
+        "pageName": "Content Calendar",
+        "timestamp": 1783178442425,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783178439589-cedb02",
+        "type": "edit_queue",
+        "label": "Updated post queue",
+        "detail": "3 queued post(s)",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783178439589,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783178380205-ab9a9f",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1783178380205,
+        "meta": {}
+      },
+      {
+        "id": "evt-1783178361842-28e4ba",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1783178361842,
+        "meta": {}
       }
     ],
     "activitySummary": {
-      "pageViews": 31,
-      "edits": 0,
-      "actions": 1,
-      "signIns": 35
+      "pageViews": 30,
+      "edits": 7,
+      "actions": 7,
+      "signIns": 46
     }
   },
   "queenofall8747@gmail.com": {
@@ -648,16 +631,16 @@
     "view": "client",
     "initials": "D",
     "firstSeen": 1778090053031,
-    "lastActive": 1780699740598,
-    "totalVisits": 36,
-    "lastPage": "Dashboard",
+    "lastActive": 1782230503343,
+    "totalVisits": 50,
+    "lastPage": "Connect",
     "pageUsage": {
       "featurehub.html": {
         "name": "Feature Hub",
         "category": "Overview",
-        "visits": 4,
+        "visits": 8,
         "firstVisited": 1778090053491,
-        "lastVisited": 1780695301803
+        "lastVisited": 1782229649793
       },
       "dashboard-overview.html": {
         "name": "Dashboard",
@@ -676,16 +659,16 @@
       "connect.html": {
         "name": "Connect",
         "category": "Connections",
-        "visits": 4,
+        "visits": 13,
         "firstVisited": 1780695303434,
-        "lastVisited": 1780696194500
+        "lastVisited": 1782230503343
       },
       "upload.html": {
         "name": "Scheduling",
         "category": "Publishing",
-        "visits": 9,
+        "visits": 10,
         "firstVisited": 1780696196823,
-        "lastVisited": 1780699670765
+        "lastVisited": 1782166527322
       },
       "content-calendar.html": {
         "name": "Content Calendar",
@@ -703,43 +686,235 @@
       }
     },
     "pagesUsed": [
-      "Dashboard",
-      "Post Queue",
-      "Scheduling",
-      "Content Calendar",
       "Connect",
       "Feature Hub",
+      "Scheduling",
+      "Dashboard",
+      "Post Queue",
+      "Content Calendar",
       "Report"
     ],
     "toolsUsed": [
-      "Dashboard",
-      "Post Queue",
-      "Scheduling",
-      "Content Calendar",
       "Connect",
       "Feature Hub",
+      "Scheduling",
+      "Dashboard",
+      "Post Queue",
+      "Content Calendar",
       "Report"
     ],
     "totalToolsUsed": 7,
     "recentTools": [
-      "Dashboard",
-      "Post Queue",
+      "Connect",
+      "Feature Hub",
       "Scheduling",
-      "Content Calendar"
+      "Dashboard"
     ],
     "metrics": {
-      "connections": 1,
-      "queuedPosts": 2,
+      "connections": 0,
+      "queuedPosts": 0,
       "reports": 1,
       "feedback": 0,
       "hashtagSets": 0,
       "uploads": 0,
-      "totalSavedItems": 4
+      "totalSavedItems": 1
     },
     "onboarding": null,
-    "signInCount": 4,
-    "lastSignInAt": 1780695301480,
+    "signInCount": 8,
+    "lastSignInAt": 1782229649321,
     "activity": [
+      {
+        "id": "evt-1782230503343-b4f588",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782230503343,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782229651742-283a7c",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782229651742,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782229649793-b3b9d1",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1782229649793,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782229649322-571268",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1782229649322,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
+      {
+        "id": "evt-1782166579784-8840f6",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782166579784,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782166527323-472b22",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1782166527323,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782166476361-a01c99",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782166476361,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782166475225-ade099",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1782166475225,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782166474528-9c2253",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1782166474528,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
+      {
+        "id": "evt-1782166215182-320757",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1782166215182,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782166214794-ca1f15",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1782166214794,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
+      {
+        "id": "evt-1782165601847-3976a5",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782165601847,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782164940914-59f5f8",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782164940914,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782164764635-1e5f3d",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782164764635,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782163988859-a7ef29",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782163988859,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782161378892-a46f23",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1782161378892,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782161377391-863375",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1782161377392,
+        "meta": {}
+      },
+      {
+        "id": "evt-1782161376761-29a396",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1782161376761,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
       {
         "id": "evt-1780699740599-62f2bf",
         "type": "page_view",
@@ -959,209 +1134,13 @@
         "pageName": "Connect",
         "timestamp": 1780696189358,
         "meta": {}
-      },
-      {
-        "id": "evt-1780696076400-5c9bde",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1780696076400,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780695303434-fea321",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1780695303434,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780695301803-643754",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1780695301803,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780695301480-5eab7f",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1780695301480,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1780526666043-12e2ee",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780526666043,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780526656743-e0044b",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1780526656743,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780526656061-694940",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1780526656061,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1780525903573-679604",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1780525903574,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780525899763-f629b6",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1780525899763,
-        "meta": {}
-      },
-      {
-        "id": "evt-1780525899265-85127a",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1780525899265,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1778090782319-5e5d3e",
-        "type": "page_view",
-        "label": "Report",
-        "detail": "",
-        "pageFile": "report.html",
-        "pageName": "Report",
-        "timestamp": 1778090782319,
-        "meta": {}
-      },
-      {
-        "id": "evt-1778090407111-07317d",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1778090407111,
-        "meta": {}
-      },
-      {
-        "id": "evt-1778090224522-7ee82f",
-        "type": "generate_report",
-        "label": "Generated report",
-        "detail": "Instagram Report - 31/03/2026 to 29/04/2026",
-        "pageFile": "report.html",
-        "pageName": "Report",
-        "timestamp": 1778090224522,
-        "meta": {
-          "platform": "Instagram"
-        }
-      },
-      {
-        "id": "evt-1778090172569-ecb723",
-        "type": "page_view",
-        "label": "Report",
-        "detail": "",
-        "pageFile": "report.html",
-        "pageName": "Report",
-        "timestamp": 1778090172569,
-        "meta": {}
-      },
-      {
-        "id": "evt-1778090083710-1e6bc5",
-        "type": "upload_analytics",
-        "label": "Uploaded analytics file",
-        "detail": "Instagram Analytics Template - For the Tool.csv",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1778090083710,
-        "meta": {
-          "files": 1
-        }
-      },
-      {
-        "id": "evt-1778090056268-71ca57",
-        "type": "page_view",
-        "label": "Dashboard",
-        "detail": "",
-        "pageFile": "dashboard-overview.html",
-        "pageName": "Dashboard",
-        "timestamp": 1778090056268,
-        "meta": {}
-      },
-      {
-        "id": "evt-1778090053492-ab781b",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1778090053492,
-        "meta": {}
-      },
-      {
-        "id": "evt-1778090053032-2fcb79",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1778090053032,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
       }
     ],
     "activitySummary": {
-      "pageViews": 32,
+      "pageViews": 34,
       "edits": 2,
-      "actions": 4,
-      "signIns": 4
+      "actions": 2,
+      "signIns": 8
     }
   },
   "codex-smoke@example.com": {

@@ -1109,8 +1109,6 @@ async function loadMetrics() {
     perPlatformMetrics = data.perPlatform || {};
     updateDashboardUploadHero(data.lastUploadName || readScopedString('lastUploadName'));
     if (uploadStatus) uploadStatus.textContent = data.lastUploadName ? `Using ${data.lastUploadName}` : '';
-    renderPostizLiveSummary(data);
-    renderPostizAgencySummary(data);
     const cards = document.querySelectorAll('.metric-card');
     const map = ['reach', 'interactions', 'clicks', 'reactions', 'views', 'follows', 'engagementRate'];
     cards.forEach((card, idx) => {
@@ -1372,111 +1370,6 @@ function getConnectionDisplayName(connection = {}) {
   return connection.displayName || connection.username || connection.name || connection.email || connection.platform || 'Connected account';
 }
 
-function handlePostizPopupReturn() {
-  const params = new URLSearchParams(window.location.search);
-  const connectedPlatform = params.get('connected');
-  if (!connectedPlatform) return;
-  try {
-    window.opener?.postMessage({ type: 'postiz-connected', platform: connectedPlatform }, window.location.origin);
-  } catch {
-    // The opener may be unavailable if the page was opened directly.
-  }
-  if (window.opener && !window.opener.closed) {
-    window.close();
-  } else {
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-}
-
-function renderPostizLiveSummary(data = {}) {
-  const container = document.getElementById('postizLiveSummary');
-  if (!container) return;
-  const postiz = data.postiz || {};
-  const analytics = postiz.analytics || {};
-  const metrics = data.metrics || {};
-  const accounts = Array.isArray(postiz.integrations) ? postiz.integrations : [];
-  const followerAccounts = Array.isArray(postiz.followerStats?.accounts) ? postiz.followerStats.accounts : [];
-  const postCount = Number(postiz.posts?.posts?.length || data.posts?.length || 0);
-
-  if (postiz.error) {
-    container.innerHTML = `<div class="empty-report">${escapeHtml(postiz.error)}</div>`;
-    return;
-  }
-
-  if (!accounts.length && !postCount && !followerAccounts.length) {
-    container.innerHTML = '<div class="empty-report">No Postiz accounts are connected yet. Use Connect Platforms first.</div>';
-    return;
-  }
-
-  const metricCards = [
-    ['Reach', metrics.reach],
-    ['Interactions', metrics.interactions],
-    ['Clicks', metrics.clicks],
-    ['Reactions', metrics.reactions],
-    ['Views', metrics.views],
-    ['Follows', metrics.follows],
-    ['Avg Engagement', `${formatNumber(metrics.engagementRate || 0)}%`],
-  ].map(([label, value]) => `
-    <div class="postiz-metric">
-      <span>${escapeHtml(label)}</span>
-      <strong>${typeof value === 'string' ? value : formatNumber(value || 0)}</strong>
-    </div>
-  `).join('');
-
-  const accountRows = accounts.slice(0, 8).map((account) => {
-    const label = account.name || account.profile || getConnectionDisplayName(account);
-    const platform = account.identifier || account.providerIdentifier || account.platform || '';
-    return `<div class="recent-report-row"><div><div class="recent-report-title">${escapeHtml(label)}</div><div class="recent-report-meta">${escapeHtml(platform)}</div></div><span class="badge">Connected</span></div>`;
-  }).join('');
-  const followerRows = followerAccounts.slice(0, 4).map((account) => {
-    const label = getConnectionDisplayName(account);
-    return `<div class="recent-report-row"><div><div class="recent-report-title">${escapeHtml(label)}</div><div class="recent-report-meta">${escapeHtml(account.platform || '')} follows</div></div><strong>${formatNumber(account.currentFollowers || 0)}</strong></div>`;
-  }).join('');
-
-  container.innerHTML = `
-    <div class="recent-report-row">
-      <div>
-        <div class="recent-report-title">${formatNumber(postCount)} Postiz posts tracked</div>
-        <div class="recent-report-meta">${accounts.length ? `${formatNumber(accounts.length)} connected channel${accounts.length === 1 ? '' : 's'}` : 'Analytics access active'}</div>
-      </div>
-    </div>
-    <div class="postiz-metric-grid">${metricCards}</div>
-    ${accountRows}
-    ${followerRows}
-  `;
-}
-
-function renderPostizAgencySummary(data = {}) {
-  const container = document.getElementById('postizAgencySummary');
-  if (!container) return;
-  const postiz = data.postiz || {};
-  const groups = Array.isArray(postiz.groups) ? postiz.groups : [];
-  const integrations = Array.isArray(postiz.integrations) ? postiz.integrations : [];
-  if (postiz.error) {
-    container.innerHTML = `<div class="empty-report">${escapeHtml(postiz.error)}</div>`;
-    return;
-  }
-  if (!groups.length && !integrations.length) {
-    container.innerHTML = '<div class="empty-report">No Postiz agency customers or channels returned yet.</div>';
-    return;
-  }
-  const groupRows = groups.slice(0, 6).map((group) => {
-    const count = integrations.filter((item) => item.customer?.id === group.id).length;
-    return `<div class="recent-report-row"><div><div class="recent-report-title">${escapeHtml(group.name || 'Customer')}</div><div class="recent-report-meta">${escapeHtml(group.id || '')}</div></div><strong>${formatNumber(count)}</strong></div>`;
-  }).join('');
-  const ungrouped = integrations.filter((item) => !item.customer?.id).length;
-  container.innerHTML = `
-    <div class="postiz-metric-grid">
-      <div class="postiz-metric"><span>Customers</span><strong>${formatNumber(groups.length)}</strong></div>
-      <div class="postiz-metric"><span>Channels</span><strong>${formatNumber(integrations.length)}</strong></div>
-      <div class="postiz-metric"><span>Ungrouped</span><strong>${formatNumber(ungrouped)}</strong></div>
-    </div>
-    ${groupRows}
-  `;
-}
-
-handlePostizPopupReturn();
-
 function openModal(platform) {
   const savedConnection = readConnections().find((connection) => connection.platform === platform);
   modalPlatform.textContent = platform;
@@ -1674,16 +1567,19 @@ async function startFacebookConnection() {
 function showConnectConfirm(platform) {
   return new Promise((resolve) => {
     const info = {
-      Facebook:  { icon: '🔵', what: 'Facebook Pages you manage', note: 'You\'ll log in with your personal Facebook account. We only access your Pages, not your personal profile.' },
-      Instagram: { icon: '📸', what: 'Instagram Business/Creator accounts linked to your Facebook Pages', note: 'Your Instagram must be a Business or Creator account connected to a Facebook Page.' },
+      Facebook:  { img: '/fb.png',  what: 'Facebook Pages you manage', note: 'You\'ll log in with your personal Facebook account. We only access your Pages, not your personal profile.' },
+      Instagram: { img: '/ig.png',  what: 'Instagram Business/Creator accounts linked to your Facebook Pages', note: 'Your Instagram must be a Business or Creator account connected to a Facebook Page.' },
     };
-    const { icon, what, note } = info[platform] || { icon: '🔗', what: platform, note: '' };
+    const { img, what, note } = info[platform] || { img: null, what: platform, note: '' };
+    const iconHtml = img
+      ? `<img src="${img}" style="width:56px;height:56px;object-fit:contain;border-radius:14px;margin-bottom:12px" alt="">`
+      : `<div style="font-size:36px;margin-bottom:12px">🔗</div>`;
 
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center';
     overlay.innerHTML = `
       <div style="background:#1a1d2e;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;color:#fff">
-        <div style="font-size:40px;margin-bottom:12px">${icon}</div>
+        ${iconHtml}
         <h3 style="margin:0 0 8px;font-size:20px">Connect ${platform}</h3>
         <p style="opacity:0.7;font-size:14px;margin:0 0 16px;line-height:1.5">This will give Orbit access to your <strong>${what}</strong>.</p>
         ${note ? `<div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px;font-size:13px;opacity:0.6;margin-bottom:20px;text-align:left">${note}</div>` : ''}
@@ -1701,42 +1597,130 @@ function showConnectConfirm(platform) {
   });
 }
 
+function showManualConnectModal(platform) {
+  return new Promise((resolve) => {
+    const cfg = PLAT_CONFIG[platform] || {};
+    const iconHtml = cfg.icon
+      ? `<img src="${cfg.icon}" style="width:40px;height:40px;object-fit:contain;border-radius:10px" alt="">`
+      : `<div style="width:40px;height:40px;border-radius:10px;background:#6366f1;display:grid;place-items:center;font-weight:800;font-size:18px;color:#fff">${platform.slice(0,1)}</div>`;
+
+    const platformNotes = {
+      Instagram: 'Instagram must be a Business or Creator account linked to a Facebook Page.',
+      LinkedIn:  'Enter your LinkedIn profile username or email.',
+      TikTok:    'Enter your TikTok @username.',
+      Pinterest: 'Enter your Pinterest @username.',
+      YouTube:   'Enter your YouTube channel name or handle.',
+      X:         'Enter your X (Twitter) @username.',
+      Snapchat:  'Enter your Snapchat username.',
+    };
+    const note = platformNotes[platform] || `Enter your ${platform} username.`;
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:32px;max-width:440px;width:90%;color:#111;position:relative">
+        <button id="manualClose" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:#1a1a2e;color:#c8ff00;font-size:18px;cursor:pointer;display:grid;place-items:center;line-height:1">×</button>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+          ${iconHtml}
+          <h3 style="margin:0;font-size:18px;font-weight:700">Connect your ${platform} account</h3>
+        </div>
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px">${platform} user</label>
+        <input id="manualUsername" type="text" placeholder="@username"
+          style="width:100%;padding:12px;border:2px solid #111;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:14px;outline:none">
+        <div style="background:#eef2ff;border-radius:8px;padding:12px;font-size:13px;color:#444;display:flex;gap:8px;align-items:flex-start;margin-bottom:20px">
+          <span style="flex-shrink:0;margin-top:1px">⚠️</span>
+          <span>${note}</span>
+        </div>
+        <div style="display:flex;justify-content:flex-end">
+          <button id="manualSave" style="padding:11px 28px;border-radius:8px;border:none;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Connect</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const usernameInput = overlay.querySelector('#manualUsername');
+    usernameInput.focus();
+
+    overlay.querySelector('#manualSave').onclick = () => {
+      const val = usernameInput.value.trim();
+      if (!val) { usernameInput.style.borderColor = '#e53e3e'; return; }
+      overlay.remove();
+      resolve(val);
+    };
+    overlay.querySelector('#manualClose').onclick = () => { overlay.remove(); resolve(null); };
+    overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); resolve(null); } };
+    usernameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') overlay.querySelector('#manualSave').click(); });
+  });
+}
+
 // Platforms handled by our own OAuth (direct, no 3rd party)
 const DIRECT_OAUTH_PLATFORMS = {
   'Instagram': '/auth/facebook',
   'Facebook': '/auth/facebook',
 };
 
+// Config for each platform card
+const PLAT_CONFIG = {
+  Instagram: { cls:'instagram', icon:'/ig.png',       supported:true  },
+  Facebook:  { cls:'facebook',  icon:'/fb.png',       supported:true  },
+  LinkedIn:  { cls:'linkedin',  icon:'/linkedin.png', supported:false },
+  TikTok:    { cls:'tiktok',    icon:'/tiktok.png',   supported:false },
+  Pinterest: { cls:'pinterest', icon:'/pinterest.png', supported:false },
+  YouTube:   { cls:'youtube',   icon:'/youtube.png',   supported:false },
+  X:         { cls:'x',         icon:'/x.png',         supported:false },
+  Snapchat:  { cls:'snapchat',  icon:'/snap.png',     supported:false },
+};
+
+async function handlePlatformConnect(platform) {
+  if (DIRECT_OAUTH_PLATFORMS[platform]) {
+    const confirmed = await showConnectConfirm(platform);
+    if (!confirmed) return;
+    const token = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}')?.token || ''; } catch { return ''; } })();
+    const url = DIRECT_OAUTH_PLATFORMS[platform] + (token ? `?t=${encodeURIComponent(token)}` : '');
+    const w = 720, h = 820;
+    const left = Math.round(window.screenX + (window.outerWidth - w) / 2);
+    const top = Math.round(window.screenY + (window.outerHeight - h) / 2);
+    const popup = window.open(url, `connect-${platform}`, `width=${w},height=${h},left=${left},top=${top},scrollbars=yes`);
+    if (!popup) { window.location.href = url; return; }
+    const poll = setInterval(() => { if (!popup.closed) return; clearInterval(poll); renderConnections(); }, 800);
+    return;
+  }
+
+  // Manual username entry for platforms without OAuth yet
+  const username = await showManualConnectModal(platform);
+  if (!username) return;
+  const id = `${platform.toLowerCase()}-manual-${Date.now()}`;
+  const conn = { id, platform, username, displayName: username, accountId: username, authProvider: 'manual', savedAt: Date.now() };
+  writeConnections([...readConnections(), conn]);
+  renderConnections();
+  showToast(`✓ ${platform} account saved!`, 'success');
+}
+
+// Event delegation for dynamically rendered connect / add-more buttons
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-connect-platform]');
+  if (!btn) return;
+  await handlePlatformConnect(btn.dataset.connectPlatform);
+});
+
+// Event delegation for disconnect (×) buttons
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-remove-id]');
+  if (!btn) return;
+  if (!confirm('Disconnect this account?')) return;
+  const id = btn.dataset.removeId;
+  // Remove from localStorage first (manual accounts)
+  writeConnections(readConnections().filter((c) => c.id !== id));
+  // Also try server delete (OAuth accounts)
+  fetch(`/api/social/accounts/${id}`, { method:'DELETE', credentials:'same-origin' }).catch(() => {});
+  renderConnections();
+});
+
+// Keep legacy static connect-btn / connect-trigger support (other pages)
 document.querySelectorAll('.connect-btn, .connect-trigger').forEach((btn) => {
   btn.addEventListener('click', async () => {
     const platform = btn.dataset.platform;
-
-    if (DIRECT_OAUTH_PLATFORMS[platform]) {
-      // Show confirmation before opening OAuth popup
-      const confirmed = await showConnectConfirm(platform);
-      if (!confirmed) return;
-
-      const token = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}')?.token || ''; } catch { return ''; } })();
-      const url = DIRECT_OAUTH_PLATFORMS[platform] + (token ? `?t=${encodeURIComponent(token)}` : '');
-      const w = 720, h = 820;
-      const left = Math.round(window.screenX + (window.outerWidth - w) / 2);
-      const top = Math.round(window.screenY + (window.outerHeight - h) / 2);
-      const popup = window.open(url, `connect-${platform}`, `width=${w},height=${h},left=${left},top=${top},scrollbars=yes`);
-
-      if (!popup) {
-        window.location.href = url;
-        return;
-      }
-
-      const poll = setInterval(() => {
-        if (!popup.closed) return;
-        clearInterval(poll);
-        renderConnections();
-      }, 800);
-      return;
-    }
-
-    alert(`${platform} connection is coming soon.`);
+    if (!platform) return;
+    await handlePlatformConnect(platform);
   });
 });
 
@@ -1745,22 +1729,16 @@ window.addEventListener('message', async (event) => {
   const { type, platform, name, message } = event.data || {};
 
   if (type === 'social-connected') {
-    await loadPostizConnections();
+    await loadSocialConnections();
     renderConnections();
     renderAvailableAccounts && renderAvailableAccounts();
     const label = (platform || 'Account').charAt(0).toUpperCase() + (platform || '').slice(1);
     showToast(`✓ ${label}${name ? ' (' + name + ')' : ''} connected!`, 'success');
-    if (window.location.pathname === '/connect.html') {
-      window.location.reload();
-    }
   }
 
   if (type === 'social-error') {
     showToast(message || 'Connection failed', 'error');
   }
-
-  // Legacy Postiz support
-  if (type === 'postiz-connected') renderConnections();
 });
 
 function showToast(text, kind) {
@@ -1772,12 +1750,12 @@ function showToast(text, kind) {
   setTimeout(() => el.remove(), 4000);
 }
 
-// On page load, pull live integrations then render
-if (document.querySelector('.connect-btn, .connect-trigger')) {
-  loadPostizConnections().then(() => renderConnections());
+// On page load, pull connected social accounts then render
+if (document.querySelector('.connect-btn, .connect-trigger, .plat-body')) {
+  loadSocialConnections().then(() => renderConnections());
 }
 
-async function loadPostizConnections() {
+async function loadSocialConnections() {
   try {
     const response = await fetch('/api/social/accounts', { credentials: 'same-origin' });
     const payload = await response.json().catch(() => ({}));
@@ -1786,22 +1764,37 @@ async function loadPostizConnections() {
 
     if (!response.ok) {
       console.warn('[Social] Server error:', payload);
+      if (response.status === 401) {
+        showToast('Session expired. Please refresh or log in again to restore connected accounts.', 'error');
+      }
       return readConnections();
     }
 
     const accounts = Array.isArray(payload.accounts) ? payload.accounts : [];
     const manual = readConnections().filter((c) => c.authProvider === 'manual');
 
-    const oauthConnections = accounts.map((account) => ({
-      id: account.id,
-      platform: platformLabel(account.platform),
-      username: account.account_name || account.platform,
-      displayName: account.account_name || account.platform,
-      accountId: account.account_id,
-      authProvider: 'oauth',
-      expiresAt: account.expires_at,
-      savedAt: Date.now(),
-    }));
+    const oauthConnections = accounts
+      .map((account) => {
+        const rawPlatform = String(account.platform || '').trim().toLowerCase();
+        if (!account.account_id || rawPlatform === 'facebook') return null;
+        const normalizedPlatform =
+          rawPlatform === 'facebook_page' ? 'Facebook' :
+          rawPlatform === 'instagram' ? 'Instagram' :
+          platformLabel(account.platform);
+
+        return {
+          id: account.id,
+          platform: normalizedPlatform,
+          platformLabel: normalizedPlatform,
+          username: account.account_name || account.platform,
+          displayName: account.account_name || account.platform,
+          accountId: account.account_id,
+          authProvider: 'oauth',
+          expiresAt: account.expires_at,
+          savedAt: Date.now(),
+        };
+      })
+      .filter(Boolean);
 
     const nextConnections = [...manual, ...oauthConnections];
     writeConnections(nextConnections);
@@ -1813,48 +1806,89 @@ async function loadPostizConnections() {
 }
 
 function platformLabel(platform) {
+  const key = String(platform || '').trim().toLowerCase();
   const map = {
-    facebook: 'Facebook', facebook_page: 'Facebook',
+    facebook: 'Facebook profile',
+    facebook_page: 'Facebook Page',
     instagram: 'Instagram',
     linkedin: 'LinkedIn',
     tiktok: 'TikTok',
     pinterest: 'Pinterest',
     youtube: 'YouTube',
   };
-  return map[platform] || (platform ? platform.charAt(0).toUpperCase() + platform.slice(1) : 'Unknown');
+  return map[key] || (platform ? String(platform).charAt(0).toUpperCase() + String(platform).slice(1) : 'Unknown');
+}
+
+function renderPlatCards(list) {
+  const grouped = list.reduce((g, c) => {
+    const p = c.platform || '';
+    if (p) (g[p] = g[p] || []).push(c);
+    return g;
+  }, {});
+
+  document.querySelectorAll('.plat-body').forEach((el) => {
+    const platform = el.dataset.platform;
+    const cfg = PLAT_CONFIG[platform] || { cls: (platform || '').toLowerCase(), supported: false };
+    const found = grouped[platform] || [];
+    el.innerHTML = '';
+
+    if (found.length) {
+      found.forEach((conn) => {
+        const initial = (conn.displayName || conn.username || platform).slice(0, 1).toUpperCase();
+        const chip = document.createElement('div');
+        chip.className = 'plat-account-chip';
+        chip.innerHTML = `
+          <div class="plat-acct-avatar">${escapeHtml(initial)}</div>
+          <div class="plat-acct-info">
+            <span class="plat-acct-name">${escapeHtml(conn.displayName || conn.username || platform)}</span>
+            <span class="plat-acct-type">${conn.authProvider === 'oauth' ? 'Connected account' : 'Saved account'}</span>
+          </div>
+          <button class="plat-acct-remove" data-remove-id="${escapeHtml(conn.id || '')}" aria-label="Disconnect">×</button>`;
+        el.appendChild(chip);
+      });
+      const addBtn = document.createElement('button');
+      addBtn.className = 'plat-add-btn';
+      addBtn.dataset.connectPlatform = platform;
+      addBtn.textContent = '+ Add another account';
+      el.appendChild(addBtn);
+    } else {
+      const iconHtml = cfg.icon
+        ? `<img src="${escapeHtml(cfg.icon)}" class="plat-btn-icon" alt="">`
+        : `<span class="plat-btn-letter">${escapeHtml(cfg.letter || platform.slice(0, 1))}</span>`;
+      const btn = document.createElement('button');
+      btn.className = `plat-connect-btn ${cfg.cls}`;
+      btn.dataset.connectPlatform = platform;
+      btn.innerHTML = `<span>Connect a ${escapeHtml(platform)} account</span>${iconHtml}`;
+      el.appendChild(btn);
+    }
+  });
 }
 
 async function renderConnections() {
-  const list = await loadPostizConnections();
-  const groupedConnections = list.reduce((groups, connection) => {
-    const platform = connection.platform || '';
-    if (!platform) return groups;
-    if (!groups[platform]) groups[platform] = [];
-    groups[platform].push(connection);
-    return groups;
-  }, {});
+  // Render immediately from cache so UI appears instantly
+  renderPlatCards(readConnections());
+
+  // Fetch fresh data from server in background
+  const list = await loadSocialConnections();
+  renderPlatCards(list);
+  const grouped = list.reduce((g, c) => { const p = c.platform || ''; if (p) (g[p] = g[p] || []).push(c); return g; }, {});
+
+  // ── Legacy .connect-user elements (other pages) ─────────────────────
   document.querySelectorAll('.connect-user').forEach((el) => {
     const platform = el.dataset.platform;
-    const found = groupedConnections[platform] || [];
+    const found = grouped[platform] || [];
     const btn = getConnectionButton(platform);
     if (found.length) {
-      const preview = found.slice(0, 2).map((connection) => getConnectionDisplayName(connection)).join(', ');
+      const preview = found.slice(0, 2).map((c) => getConnectionDisplayName(c)).join(', ');
       const suffix = found.length > 2 ? ` +${found.length - 2} more` : '';
       el.innerHTML = `<span class="connected-badge">Connected</span> <span>${escapeHtml(preview)}${escapeHtml(suffix)}</span>`;
-      if (btn) {
-        btn.textContent = '+ Connect another';
-        btn.disabled = false;
-        btn.style.opacity = '1';
-      }
-      return;
-    }
-    el.innerHTML = '<span class="muted">Not connected</span>';
-    if (btn) {
-      btn.textContent = '+ Connect';
-      btn.disabled = false;
-      btn.style.opacity = '1';
+      if (btn) { btn.textContent = '+ Connect another'; btn.disabled = false; }
+    } else {
+      el.innerHTML = '<span class="muted">Not connected</span>';
+      if (btn) { btn.textContent = '+ Connect'; btn.disabled = false; }
     }
   });
+
   const statConnected = document.getElementById('statConnected');
   statConnected && (statConnected.textContent = list.length);
 }
@@ -4421,12 +4455,13 @@ accountSearch?.addEventListener('input', () => {
 function renderAvailableAccounts() {
   if (!accountList) return;
 
-  const allConnections = readConnections();
+  const allConnections = readConnections().filter((connection) => connection.platform !== 'facebook');
   const selectedPlatforms = new Set(getSelectedPlatforms());
   const query = accountSearch?.value.trim().toLowerCase() || '';
   const matchingConnections = allConnections.filter((connection) => {
-    const matchesPlatform = !selectedPlatforms.size || selectedPlatforms.has(connection.platform);
-    const haystack = `${connection.platform} ${connection.username || ''} ${connection.userId || ''}`.toLowerCase();
+    const platformKey = String(connection.platform || '').trim().toLowerCase();
+    const matchesPlatform = !selectedPlatforms.size || selectedPlatforms.has(platformKey) || selectedPlatforms.has(connection.platform);
+    const haystack = `${connection.platformLabel || connection.platform} ${connection.username || ''} ${connection.userId || ''}`.toLowerCase();
     const matchesQuery = !query || haystack.includes(query);
     return matchesPlatform && matchesQuery;
   });
@@ -4448,13 +4483,13 @@ function renderAvailableAccounts() {
     accountButton.type = 'button';
     accountButton.className = 'account-item';
     accountButton.innerHTML = `
-      <span class="account-avatar">${(connection.platform || '?').slice(0, 1)}</span>
+      <span class="account-avatar">${(connection.platformLabel || connection.platform || '?').slice(0, 1)}</span>
       <span class="account-meta">
         <span class="account-name">${getConnectionDisplayName(connection)}</span>
-        <span class="account-sub">${connection.platform}</span>
+        <span class="account-sub">${connection.platformLabel || connection.platform}</span>
       </span>
     `;
-    accountButton.addEventListener('click', () => addAccountChip(getConnectionDisplayName(connection)));
+    accountButton.addEventListener('click', () => addAccountChip(connection));
     accountList.appendChild(accountButton);
   });
 }
@@ -4484,11 +4519,11 @@ function addAccountChip(connection) {
 
 async function getAvailableConnections() {
   try {
-    if (typeof loadPostizConnections === 'function') {
-      return await loadPostizConnections();
+    if (typeof loadSocialConnections === 'function') {
+      return await loadSocialConnections();
     }
   } catch {
-    // Local saved connections keep the selector usable if Postiz is temporarily unavailable.
+    // Local saved connections keep the selector usable if social integration is temporarily unavailable.
   }
   return readConnections();
 }
@@ -4510,11 +4545,12 @@ async function renderAvailableAccounts() {
   if (!accountList) return;
 
   const allConnections = await getAvailableConnections();
-  const selectedPlatforms = new Set(getSelectedPlatforms());
+  const selectedPlatforms = new Set(Array.from(getSelectedPlatforms()).map((platform) => String(platform || '').trim().toLowerCase()));
   const query = accountSearch?.value.trim().toLowerCase() || '';
   const selectedAccountIds = new Set(Array.from(accountChips?.children || []).map((chip) => chip.dataset.accountId));
   const matchingConnections = allConnections.filter((connection) => {
-    const matchesPlatform = !selectedPlatforms.size || selectedPlatforms.has(connection.platform);
+    const connectionPlatform = String(connection.platform || '').trim().toLowerCase();
+    const matchesPlatform = !selectedPlatforms.size || selectedPlatforms.has(connectionPlatform);
     const haystack = `${connection.platform} ${connection.displayName || ''} ${connection.username || ''} ${connection.name || ''}`.toLowerCase();
     const matchesQuery = !query || haystack.includes(query);
     const accountId = connection.accountId || connection.userId || accountDisplayLabel(connection);

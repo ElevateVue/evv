@@ -15,6 +15,8 @@ if (fs.existsSync(apiEnvPath)) {
 }
 
 const socialAuth = require('./api/socialAuth');
+const socialStore = require('./lib/socialStore');
+const socialPost = require('./api/socialPost');
 
 // Load GA4 service account
 let ga4ServiceAccount = null;
@@ -140,9 +142,6 @@ const AI_SUGGESTIONS_PROVIDER = process.env.AI_SUGGESTIONS_PROVIDER || 'deepseek
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 const RESEND_NEWSLETTER_REPLY_TO = process.env.RESEND_NEWSLETTER_REPLY_TO || '';
-const POSTIZ_API_KEY = process.env.POSTIZ_API_KEY || '';
-const POSTIZ_API_BASE_URL = process.env.POSTIZ_API_BASE_URL || 'https://api.postiz.com/public/v1';
-const POSTIZ_CUSTOMER_ID = process.env.POSTIZ_CUSTOMER_ID || '';
 const PUBLIC_APP_URL = String(process.env.PUBLIC_APP_URL || '').replace(/\/+$/, '');
 const ADMIN_EMAILS = String(process.env.ADMIN_EMAILS || '')
   .split(',')
@@ -276,6 +275,242 @@ function displayPlatform(value = '') {
   };
   return labels[platform] || String(value || 'Social').trim() || 'Social';
 }
+
+const META_GRAPH_API_VERSION = 'v25.0';
+const publishingLocks = new Set();
+
+function buildFormBody(params = {}) {
+  return Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+    .join('&');
+}
+
+function graphApiRequest({ path, method = 'POST', params = {}, accessToken }) {
+  return new Promise((resolve, reject) => {
+    const urlPath = `/${META_GRAPH_API_VERSION}/${path}`;
+    const bodyParams = { ...params, access_token: accessToken };
+    const payload = method === 'GET' ? null : buildFormBody(bodyParams);
+    const query = method === 'GET' ? `?${buildFormBody(bodyParams)}` : '';
+    const requestOptions = {
+      hostname: 'graph.facebook.com',
+      path: `${urlPath}${query}`,
+      method,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(payload || ''),
+      },
+    };
+
+    const req = https.request(requestOptions, (res) => {
+      let raw = '';
+      res.on('data', (chunk) => { raw += chunk; });
+      res.on('end', () => {
+        try {
+          const parsed = raw ? JSON.parse(raw) : {};
+          if (res.statusCode && res.statusCode >= 400) {
+            return reject(new Error(parsed.error?.message || `Graph API request failed with status ${res.statusCode}`));
+          }
+          if (parsed.error) {
+            return reject(new Error(parsed.error.message || 'Graph API returned an error'));
+          }
+          resolve(parsed);
+        } catch (err) {
+          reject(new Error(`Invalid Graph API response: ${raw.slice(0, 200)}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    if (payload) req.write(payload);
+    req.end();
+  });
+}
+
+async function getConnectedAccount(userEmail, accountId) {
+  if (!userEmail || !accountId) return null;
+  return socialStore.getConnectedAccount(userEmail, accountId);
+}
+
+async function publishFacebookPage(pageId, accessToken, { caption, mediaUrls = [], mediaType = 'image' }) {
+  console.log('[PublishFacebookPage] pageId:', pageId, 'mediaUrls:', mediaUrls, 'mediaType:', mediaType);
+  if (!pageId || !accessToken) throw new Error('Facebook page credentials are missing.');
+  const hasMedia = mediaUrls.length > 0;
+  const firstUrl = mediaUrls[0] || '';
+  if (!hasMedia) {
+    return graphApiRequest({ path: `${pageId}/feed`, params: { message: caption || '' }, accessToken });
+  }
+
+  const normalizedType = String(mediaType || '').trim().toLowerCase();
+  if (normalizedType === 'video' || normalizedType === 'reel') {
+    return graphApiRequest({ path: `${pageId}/videos`, params: { file_url: firstUrl, description: caption || '' }, accessToken });
+  }
+
+  if (mediaUrls.length === 1) {
+    return graphApiRequest({ path: `${pageId}/photos`, params: { url: firstUrl, caption: caption || '' }, accessToken });
+  }
+
+  // Multiple image upload as attached_media
+  const uploaded = [];
+  for (const mediaUrl of mediaUrls) {
+    const photo = await graphApiRequest({ path: `${pageId}/photos`, params: { url: mediaUrl, published: 'false' }, accessToken });
+    if (photo?.id) uploaded.push(photo.id);
+  }
+
+  if (!uploaded.length) throw new Error('Failed to upload Facebook images.');
+
+  const feedParams = { message: caption || '' };
+  uploaded.forEach((id, index) => {
+    feedParams[`attached_media[${index}]`] = JSON.stringify({ media_fbid: id });
+  });
+  return graphApiRequest({ path: `${pageId}/feed`, params: feedParams, accessToken });
+}
+
+async function publishInstagramMedia(igUserId, accessToken, { caption, mediaUrls = [], mediaType = 'image' }) {
+  console.log('[PublishInstagramMedia] igUserId:', igUserId, 'mediaUrls:', mediaUrls, 'mediaType:', mediaType);
+  if (!igUserId || !accessToken) throw new Error('Instagram account credentials are missing.');
+  if (!mediaUrls.length) throw new Error('Instagram publishing requires media.');
+
+  const normalizedType = String(mediaType || '').trim().toLowerCase();
+  if (mediaUrls.length > 1) {
+    const childIds = [];
+    for (const mediaUrl of mediaUrls) {
+      const child = await graphApiRequest({
+        path: `${igUserId}/media`,
+        params: { image_url: mediaUrl, media_type: 'IMAGE', caption: caption || '' },
+        accessToken,
+      });
+      if (!child?.id) throw new Error('Failed to create Instagram carousel media item.');
+      childIds.push(child.id);
+    }
+    const container = await graphApiRequest({
+      path: `${igUserId}/media`,
+      params: { media_type: 'CAROUSEL', children: childIds.join(','), caption: caption || '' },
+      accessToken,
+    });
+    return graphApiRequest({ path: `${igUserId}/media_publish`, params: { creation_id: container.id }, accessToken });
+  }
+
+  const mediaUrl = mediaUrls[0];
+  if (normalizedType === 'video' || normalizedType === 'reel') {
+    const typeValue = normalizedType === 'reel' ? 'REELS' : 'VIDEO';
+    const container = await graphApiRequest({
+      path: `${igUserId}/media`,
+      params: { media_type: typeValue, video_url: mediaUrl, caption: caption || '' },
+      accessToken,
+    });
+    return graphApiRequest({ path: `${igUserId}/media_publish`, params: { creation_id: container.id }, accessToken });
+  }
+
+  const container = await graphApiRequest({
+    path: `${igUserId}/media`,
+    params: { image_url: mediaUrl, caption: caption || '' },
+    accessToken,
+  });
+  return graphApiRequest({ path: `${igUserId}/media_publish`, params: { creation_id: container.id }, accessToken });
+}
+
+function normalizePlatformLabel(platform) {
+  const label = String(platform || '').trim().toLowerCase();
+  if (label === 'facebook' || label === 'facebook profile') return 'Facebook';
+  if (label === 'facebook_page' || label === 'facebook page') return 'Facebook';
+  if (label === 'instagram') return 'Instagram';
+  return String(platform || '').trim();
+}
+
+async function publishSocialPost(userEmail, post) {
+  if (!post || !userEmail) throw new Error('Post or user is missing for publish.');
+  const accountEntries = Array.isArray(post.platformAccounts) ? post.platformAccounts : [];
+  if (!accountEntries.length) throw new Error('No connected social accounts were saved for this post.');
+
+  const caption = String(post.transcript || post.title || '').trim();
+  const mediaUrls = Array.isArray(post.mediaUrls) && post.mediaUrls.length
+    ? post.mediaUrls.map((item) => String(item || '').trim()).filter(Boolean)
+    : (post.mediaUrl ? [String(post.mediaUrl).trim()] : []);
+  const mediaType = String(post.mediaType || 'image').trim().toLowerCase();
+
+  console.log('[Publish] user:', userEmail, 'accounts:', accountEntries.map((a) => `${a.platform}:${a.accountId}`));
+
+  const results = [];
+  for (const account of accountEntries) {
+    const normalizedPlatform = normalizePlatformLabel(account.platform);
+    console.log('[Publish] attempting account:', normalizedPlatform, account.accountId);
+    let connection = await getConnectedAccount(userEmail, account.accountId);
+    if (!connection) {
+      console.warn('[Publish] connection not found for user, trying fallback by account id', account.accountId);
+      connection = await socialStore.getConnectedAccountById(account.accountId);
+    }
+    if (!connection) {
+      console.warn('[Publish] missing connection for', normalizedPlatform, account.accountId);
+      results.push({ accountId: account.accountId, platform: normalizedPlatform, status: 'missing_connection' });
+      continue;
+    }
+
+    try {
+      if (normalizedPlatform === 'Facebook') {
+        const publishResult = await publishFacebookPage(connection.account_id, connection.access_token, { caption, mediaUrls, mediaType });
+        results.push({ accountId: account.accountId, platform: 'Facebook', success: true, result: publishResult });
+      } else if (normalizedPlatform === 'Instagram') {
+        const publishResult = await publishInstagramMedia(connection.account_id, connection.access_token, { caption, mediaUrls, mediaType });
+        results.push({ accountId: account.accountId, platform: 'Instagram', success: true, result: publishResult });
+      } else {
+        results.push({ accountId: account.accountId, platform: normalizedPlatform, status: 'unsupported_platform' });
+      }
+    } catch (err) {
+      results.push({ accountId: account.accountId, platform: normalizedPlatform, success: false, error: err.message });
+    }
+  }
+
+  const anySuccess = results.some((item) => item.success);
+  if (!anySuccess) {
+    const errors = results.map((item) => `${item.platform}:${item.accountId} ${item.error || item.status}`).join('; ');
+    throw new Error(`Publishing failed: ${errors}`);
+  }
+
+  return results;
+}
+
+async function publishScheduledPost(userEmail, post, workspace) {
+  const postId = post.id || 'unknown';
+  if (!workspace) return;
+  post.publishAttempts = (post.publishAttempts || 0) + 1;
+  post.lastPublishAttemptAt = new Date().toISOString();
+  try {
+    const results = await publishSocialPost(userEmail, post);
+    post.status = 'posted';
+    post.postedAt = Date.now();
+    post.publishResults = results;
+    post.publishError = null;
+    post.publishedAt = new Date().toISOString();
+    recalcMetrics(workspace);
+    saveAppState();
+    return post;
+  } catch (err) {
+    post.status = 'failed';
+    post.publishError = err.message;
+    saveAppState();
+    throw err;
+  }
+}
+
+async function runDueScheduledPosts() {
+  const now = Date.now();
+  for (const [identity, workspace] of Object.entries(appState.users)) {
+    if (!workspace || !Array.isArray(workspace.posts)) continue;
+    for (const post of workspace.posts) {
+      if (post.status !== 'scheduled') continue;
+      const scheduledMs = parsePostedAt(post.scheduledAt);
+      if (!scheduledMs || scheduledMs > now) continue;
+      if (publishingLocks.has(post.id)) continue;
+      publishingLocks.add(post.id);
+      publishScheduledPost(identity, post, workspace)
+        .catch((err) => console.error(`[Scheduler] Failed to publish post ${post.id}:`, err.message))
+        .finally(() => publishingLocks.delete(post.id));
+    }
+  }
+}
+
+setInterval(runDueScheduledPosts, 60 * 1000);
 
 function normalizeScheduledFor(value) {
   const text = String(value || '').trim();
@@ -2182,14 +2417,26 @@ const server = http.createServer(async (req, res) => {
 
   if (req.url.startsWith('/api/posts/') && req.url.endsWith('/publish') && req.method === 'POST') {
     const workspace = ensureWorkspace(getSession(req)?.user, true);
+    const session = getSession(req);
     const id = req.url.split('/')[3];
     const post = workspace.posts.find((p) => p.id === id);
     if (!post) return sendJson(res, 404, { message: 'not found' });
-    post.status = 'posted';
-    post.postedAt = Date.now();
-    recalcMetrics(workspace);
-    saveAppState();
-    return sendJson(res, 200, { post });
+
+    try {
+      const publishedPost = await publishSocialPost(session?.user?.email, post);
+      post.status = 'posted';
+      post.postedAt = Date.now();
+      post.publishResults = publishedPost;
+      post.publishError = null;
+      recalcMetrics(workspace);
+      saveAppState();
+      return sendJson(res, 200, { post, publishResults: publishedPost });
+    } catch (err) {
+      post.status = 'failed';
+      post.publishError = err.message;
+      saveAppState();
+      return sendJson(res, 500, { message: err.message, details: err.message });
+    }
   }
 
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
@@ -2198,155 +2445,76 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 200, { ok: true, time: new Date().toISOString() });
   }
 
-  if (parsedUrl.pathname === '/api/postiz/auth-links' && req.method === 'GET') {
-    try {
-      const links = await getSocialAuthLinks();
-      return sendJson(res, 200, { links });
-    } catch (err) {
-      return sendJson(res, 502, { error: `Postiz auth links failed: ${err.message}` });
-    }
-  }
-
-  if (parsedUrl.pathname === '/api/postiz/schedule' && req.method === 'POST') {
-    try {
-      const postData = await parseBody(req);
-      const result = await scheduleSocialPost(postData);
-      return sendJson(res, 200, { success: true, result });
-    } catch (err) {
-      return sendJson(res, 502, { error: `Postiz scheduling failed: ${err.message}` });
-    }
-  }
-
-  if (parsedUrl.pathname === '/api/postiz/calendar' && req.method === 'GET') {
-    try {
-      const posts = await getScheduledCalendarPosts(Object.fromEntries(parsedUrl.searchParams.entries()));
-      return sendJson(res, 200, { posts });
-    } catch (err) {
-      return sendJson(res, 502, { error: `Postiz calendar lookup failed: ${err.message}` });
-    }
-  }
-
-  if (parsedUrl.pathname === '/api/postiz/analytics' && req.method === 'GET') {
-    try {
-      const channelId = parsedUrl.searchParams.get('channelId') || parsedUrl.searchParams.get('integrationId') || '';
-      const dateRange = parsedUrl.searchParams.get('dateRange') || parsedUrl.searchParams.get('date') || '30';
-      const analytics = await getSocialAnalytics(channelId, dateRange);
-      return sendJson(res, 200, { analytics });
-    } catch (err) {
-      return sendJson(res, 502, { error: `Postiz analytics lookup failed: ${err.message}` });
-    }
-  }
-
   if (parsedUrl.pathname === '/api/social/accounts' && req.method === 'GET') {
     return socialAuth.handleGetAccounts(req, res, getSession, sendJson);
   }
 
-  // ── Postiz connect-link: asks self-hosted Postiz for the social OAuth URL ──────
-  // Self-hosted Postiz exposes GET /social/{platform} which returns the direct
-  // Instagram/Facebook/etc OAuth URL. We proxy it here so the frontend just gets
-  // a connectUrl to open in a popup — no Postiz Cloud involved at all.
-  if (parsedUrl.pathname === '/api/auth/connect-link' && req.method === 'GET') {
-    try {
-      const rawPlatform = (parsedUrl.searchParams.get('platform') || 'instagram').toLowerCase();
-      const platformMap = {
-        instagram: 'instagram', facebook: 'facebook', linkedin: 'linkedin',
-        tiktok: 'tiktok', twitter: 'x', x: 'x', youtube: 'youtube',
-        threads: 'threads', pinterest: 'pinterest', snapchat: 'snapchat',
-      };
-      const postizPlatformId = platformMap[rawPlatform] || rawPlatform;
-
-      // Call self-hosted Postiz to get the real social OAuth URL
-      const socialUrl = new URL(`${POSTIZ_API_BASE}/social/${encodeURIComponent(postizPlatformId)}`);
-      const transport = socialUrl.protocol === 'http:' ? http : https;
-
-      const result = await new Promise((resolve, reject) => {
-        const r = transport.request(socialUrl, {
-          method: 'GET',
-          headers: { Authorization: POSTIZ_API_KEY, 'Content-Type': 'application/json' },
-        }, (res2) => {
-          let raw = '';
-          res2.on('data', (c) => { raw += c; });
-          res2.on('end', () => { try { resolve(JSON.parse(raw)); } catch { resolve({ raw }); } });
-        });
-        r.on('error', reject);
-        r.end();
-      });
-
-      let connectUrl = result?.url || result?.authUrl || result?.auth_url || result?.connectUrl || '';
-      if (!connectUrl) {
-        return sendJson(res, 502, {
-          error: `Self-hosted Postiz did not return a connect URL for ${postizPlatformId}. Railway is calling: ${socialUrl.toString()}`,
-          raw: result,
-        });
-      }
-
-      // Strip invalid/deprecated scopes from the OAuth URL before returning to client.
-      // Postiz may include instagram_basic, instagram_content_publish etc. which Meta rejects.
-      const VALID_SCOPES = {
-        instagram: ['pages_show_list', 'pages_read_engagement', 'business_management', 'pages_manage_posts'],
-        facebook:  ['pages_show_list', 'pages_read_engagement', 'business_management', 'pages_manage_posts'],
-      };
-      if (VALID_SCOPES[postizPlatformId]) {
-        try {
-          const oauthUrl = new URL(connectUrl);
-          oauthUrl.searchParams.set('scope', VALID_SCOPES[postizPlatformId].join(','));
-          connectUrl = oauthUrl.toString();
-        } catch (_) { /* leave connectUrl unchanged if URL parse fails */ }
-      }
-
-      return sendJson(res, 200, { connectUrl, platform: postizPlatformId });
-    } catch (err) {
-      return sendJson(res, 502, { error: `Connect link failed: ${err.message}` });
-    }
-  }
-
-  // ── Return saved Postiz integrations for current session ─────────────────────
-  if (parsedUrl.pathname === '/api/auth/postiz-integrations' && req.method === 'GET') {
-    const sessionToken = req.headers['x-session-token'] || parsedUrl.searchParams.get('sessionToken') || '';
-    const session = sessions.find((s) => s.token === sessionToken);
-    const integrations = session?.postizIntegrations || [];
-    const token = session?.postizToken || '';
-    return sendJson(res, 200, { integrations, hasToken: Boolean(token) });
-  }
-
   if (parsedUrl.pathname === '/api/schedule-post' && req.method === 'POST') {
     try {
-      const body = await parseBody(req);
-      const platforms = Array.isArray(body.platforms) && body.platforms.length
-        ? body.platforms
-        : [{ platform: postizPlatform(body.platform), accountId: body.accountId || body.socialAccountId }];
-      const normalizedPlatforms = platforms
-        .map((item) => ({ platform: postizPlatform(item.platform), accountId: item.accountId || item.id }))
-        .filter((item) => item.platform && item.accountId);
+      const session = getSession(req);
+      if (!session) return sendJson(res, 401, { error: 'Not authenticated' });
 
-      if (!normalizedPlatforms.length) {
-        return sendJson(res, 400, { error: 'Choose at least one connected Postiz social account before scheduling.' });
+      const body = await parseBody(req);
+      const selectedAccounts = Array.isArray(body.platforms)
+        ? body.platforms.filter((item) => item && item.platform)
+        : [];
+      if (!selectedAccounts.length) {
+        return sendJson(res, 400, { error: 'Choose at least one connected account before scheduling.' });
       }
 
-      const payload = buildPostizSchedulePayload(body, normalizedPlatforms);
-      const content = body.content || body.caption || body.transcript || '';
+      const content = String(body.caption || body.content || body.title || '').trim();
+      if (!content) return sendJson(res, 400, { error: 'Post content is required.' });
 
-      const result = await postizFetch('/posts', 'POST', payload);
-      const postizPost = result.post || result.data?.post || result.data || result;
-      const workspace = ensureWorkspace(getSession(req)?.user, true);
-      const platformLabel = Array.from(new Set(normalizedPlatforms.map((item) => displayPlatform(item.platform)))).join(', ');
-      const localPost = {
-        id: postizPost._id || postizPost.id || `postiz-${Date.now()}`,
-        postizPostId: postizPost._id || postizPost.id || null,
-        platform: platformLabel || displayPlatform(normalizedPlatforms[0].platform),
-        title: body.title || String(content || 'Scheduled post').slice(0, 80),
+      const mediaUrl = String(body.mediaUrl || '').trim();
+      const scheduledAt = body.scheduledFor ? new Date(body.scheduledFor).toISOString() : null;
+
+      // Platforms the user selected (lowercase for Supabase lookup)
+      const platformKeys = selectedAccounts.map((a) => (a.platform || '').toLowerCase());
+
+      const { post, results, scheduled } = await socialPost.saveAndMaybePublish({
+        userEmail: session.user.email,
+        content,
+        mediaUrl,
+        platforms: platformKeys,
+        scheduledAt,
+      });
+
+      // Also save to local workspace for dashboard display
+      const workspace = ensureWorkspace(session.user, true);
+      workspace.posts.unshift({
+        id: post.id,
+        title: content.slice(0, 80),
         transcript: content,
-        postType: body.postType || 'text',
+        platform: platformKeys.join(', ') || 'Social',
+        platforms: platformKeys,
+        mediaUrl,
+        scheduledAt: post.scheduled_at,
+        status: post.status,
         engagement: { likes: 0, comments: 0, shares: 0, reactions: 0, clicks: 0, views: 0, reach: 0, follows: 0 },
-        status: payload.type === 'now' ? 'publishing' : payload.type,
-        postedAt: payload.date || postizPost.publishDate || Date.now(),
-        raw: { request: payload, postiz: result },
-      };
-      workspace.posts.unshift(localPost);
+        createdAt: post.created_at,
+      });
       recalcMetrics(workspace);
       saveAppState();
-      return sendJson(res, 200, { success: true, result, post: localPost });
+
+      const publishedCount = (results || []).filter((r) => r.status === 'published').length;
+      const errors = (results || []).filter((r) => r.status === 'error').map((r) => `${r.platform}: ${r.error}`);
+
+      if (scheduled) {
+        return sendJson(res, 200, { success: true, message: `Post scheduled for ${new Date(scheduledAt).toLocaleString()}.`, post });
+      }
+      if (publishedCount === 0 && errors.length) {
+        return sendJson(res, 502, { error: `Posting failed: ${errors.join('; ')}` });
+      }
+      return sendJson(res, 200, {
+        success: true,
+        published: publishedCount,
+        errors,
+        message: `Published to ${publishedCount} platform(s).${errors.length ? ' Errors: ' + errors.join('; ') : ''}`,
+        post,
+        results,
+      });
     } catch (err) {
+      console.error('[SchedulePost]', err.message);
       return sendJson(res, 502, { error: `Scheduling failed: ${err.message}` });
     }
   }
@@ -3191,30 +3359,6 @@ const server = http.createServer(async (req, res) => {
 
   if (parsedUrl.pathname === '/api/metrics' && req.method === 'GET') {
     const workspace = ensureWorkspace(getSession(req)?.user, true);
-    if (POSTIZ_API_KEY) {
-      try {
-        const live = await fetchPostizWorkspaceMetrics(Object.fromEntries(parsedUrl.searchParams.entries()));
-        return sendJson(res, 200, {
-          metrics: live.metrics,
-          lastUploadName: 'Postiz live analytics',
-          perPlatform: live.perPlatform,
-          platformDashboards: live.platformDashboards,
-          dailyData: live.dailyData,
-          postiz: live.postiz,
-          fallbackMetrics: workspace?.metrics || createEmptyMetrics(),
-          fallbackPerPlatform: workspace?.perPlatform || {},
-        });
-      } catch (err) {
-        return sendJson(res, 200, {
-          metrics: workspace?.metrics || createEmptyMetrics(),
-          lastUploadName: workspace?.lastUploadName || null,
-          perPlatform: workspace?.perPlatform || {},
-          platformDashboards: workspace?.platformDashboards || {},
-          dailyData: buildDailyData(workspace),
-          postiz: { error: err.message },
-        });
-      }
-    }
     return sendJson(res, 200, {
       metrics: workspace?.metrics || createEmptyMetrics(),
       lastUploadName: workspace?.lastUploadName || null,
@@ -3518,5 +3662,21 @@ Generate a professional, strategic brand positioning report based on this inform
   res.end('Not found');
 });
 
-const port = process.env.PORT || 3000;
-server.listen(port, () => console.log(`Server running on http://localhost:${port}`));
+const port = Number(process.env.PORT || 3000);
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    const fallbackPort = port + 1;
+    console.warn(`Port ${port} is already in use. Trying port ${fallbackPort} instead...`);
+    server.listen(fallbackPort);
+    return;
+  }
+  console.error('Server error:', err);
+  process.exit(1);
+});
+server.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+  // Check for due scheduled posts every 60 seconds
+  setInterval(() => {
+    socialPost.runDuePosts().catch((err) => console.error('[Scheduler]', err.message));
+  }, 60 * 1000);
+});
