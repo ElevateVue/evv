@@ -3,43 +3,16 @@
     "sabiha.habeeb1972@gmail.com": {
       "posts": [
         {
-          "id": "post-1783186438091",
-          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someo",
-          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
-          "platform": "Instagram, Facebook",
+          "id": "0d050f07-f5da-43da-80bf-d9d88d56179a",
+          "title": ";as..",
+          "transcript": ";as..",
+          "platform": "instagram",
           "platforms": [
-            "Instagram",
-            "Facebook"
+            "instagram"
           ],
-          "accounts": [
-            "Instagram",
-            "Facebook"
-          ],
-          "platformAccounts": [
-            {
-              "platform": "Instagram",
-              "accountId": "17841439270562681",
-              "accountName": "Instagram"
-            },
-            {
-              "platform": "Facebook",
-              "accountId": "1140674272467922",
-              "accountName": "Facebook"
-            }
-          ],
-          "accountIds": [
-            "17841439270562681",
-            "1140674272467922"
-          ],
-          "postType": "Feed Post",
-          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783186438080-50fe4ebc8708.png",
-          "mediaUrls": [
-            "https://evv-client-portal-production.up.railway.app/uploads/1783186438080-50fe4ebc8708.png"
-          ],
-          "mediaType": "image",
-          "scheduledAt": "2026-07-04T21:34",
-          "postedAt": "2026-07-04T21:34",
-          "status": "failed",
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783608754/etgrese1ca7cwyrqpzcg.png",
+          "scheduledAt": "2026-07-09T14:53:00+00:00",
+          "status": "publishing",
           "engagement": {
             "likes": 0,
             "comments": 0,
@@ -50,49 +23,19 @@
             "reach": 0,
             "follows": 0
           },
-          "createdAt": "2026-07-04T17:33:58.092Z",
-          "publishAttempts": 1,
-          "lastPublishAttemptAt": "2026-07-04T17:34:47.240Z",
-          "publishError": "Publishing failed: Instagram:17841439270562681 Only photo or video can be accepted as media type.; Facebook:1140674272467922 Missing or invalid image file"
+          "createdAt": "2026-07-09T14:52:35.652775+00:00"
         },
         {
-          "id": "post-1783184691415",
-          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someo",
-          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
-          "platform": "Facebook, Instagram",
+          "id": "9070f133-f841-4b26-9e1d-85c34a6981ad",
+          "title": "aslxlasx,",
+          "transcript": "aslxlasx,",
+          "platform": "instagram",
           "platforms": [
-            "Facebook",
-            "Instagram"
+            "instagram"
           ],
-          "accounts": [
-            "Facebook",
-            "Instagram"
-          ],
-          "platformAccounts": [
-            {
-              "platform": "Facebook",
-              "accountId": "122102362070588192",
-              "accountName": "Facebook"
-            },
-            {
-              "platform": "Instagram",
-              "accountId": "17841439270562681",
-              "accountName": "Instagram"
-            }
-          ],
-          "accountIds": [
-            "122102362070588192",
-            "17841439270562681"
-          ],
-          "postType": "Feed Post",
-          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783184691406-9faf2ed7d282.png",
-          "mediaUrls": [
-            "https://evv-client-portal-production.up.railway.app/uploads/1783184691406-9faf2ed7d282.png"
-          ],
-          "mediaType": "image",
-          "scheduledAt": "2026-07-04T21:05",
-          "postedAt": "2026-07-04T21:05",
-          "status": "failed",
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783608625/pwkmx2x6yaaxra7iq5t8.png",
+          "scheduledAt": "2026-07-09T14:51:00+00:00",
+          "status": "publishing",
           "engagement": {
             "likes": 0,
             "comments": 0,
@@ -103,10 +46,427 @@
             "reach": 0,
             "follows": 0
           },
-          "createdAt": "2026-07-04T17:04:51.416Z",
-          "publishAttempts": 1,
-          "lastPublishAttemptAt": "2026-07-04T17:05:46.980Z",
-          "publishError": "Publishing failed: Facebook:122102362070588192 (#200) This endpoint is deprecated since the required permission publish_actions is deprecated; Instagram:17841439270562681 Only photo or video can be accepted as media type."
+          "createdAt": "2026-07-09T14:50:26.779648+00:00"
+        },
+        {
+          "id": "23f2c3ad-69ad-4682-95d2-1892e02e8c13",
+          "title": ";smc;lcmas.xmas",
+          "transcript": ";smc;lcmas.xmas",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783608443/dzl42nmrvejcp3g4amcd.png",
+          "scheduledAt": "2026-07-09T14:48:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-09T14:48:08.3089+00:00"
+        },
+        {
+          "id": "a60feba1-acde-4875-9e08-b3726efc0266",
+          "title": ";smc;lcmas.xmas",
+          "transcript": ";smc;lcmas.xmas",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783608443/dzl42nmrvejcp3g4amcd.png",
+          "scheduledAt": "2026-07-09T14:48:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-09T14:47:24.204078+00:00"
+        },
+        {
+          "id": "66a8957a-9635-4f69-873e-0328da5e6903",
+          "title": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, i",
+          "transcript": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783608302/h8eyh12bcmzwvw6mfvdc.png",
+          "scheduledAt": "2026-07-09T14:45:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-09T14:45:03.674533+00:00"
+        },
+        {
+          "id": "f31f6eec-3afa-48fe-8681-f7a41ecfe425",
+          "title": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, i",
+          "transcript": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "facebook, instagram",
+          "platforms": [
+            "facebook",
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783459123/zfa9s5hdymajukisv08e.png",
+          "scheduledAt": "2026-07-07T21:19:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-07T21:18:44.881661+00:00"
+        },
+        {
+          "id": "5f0b85bd-e0ab-4baf-8960-b05345d9b094",
+          "title": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, i",
+          "transcript": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "facebook, instagram",
+          "platforms": [
+            "facebook",
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783450975/tl0yhzifmaodroojepwc.png",
+          "scheduledAt": "2026-07-07T19:03:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-07T19:03:09.098345+00:00"
+        },
+        {
+          "id": "9a5901db-02de-45f4-9b20-0a70c7223ef5",
+          "title": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, i",
+          "transcript": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "facebook, instagram",
+          "platforms": [
+            "facebook",
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783450975/tl0yhzifmaodroojepwc.png",
+          "scheduledAt": "2026-07-07T19:03:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-07T19:02:56.599908+00:00"
+        },
+        {
+          "id": "dde5401c-0752-4b4f-ad48-83c43c0a3463",
+          "title": "pinterest- a page you find your dream\n\nHere is the part worth paying attention t",
+          "transcript": "pinterest- a page you find your dream\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783359156/fedqoadctojdqig4dhfi.png",
+          "scheduledAt": "2026-07-06T17:33:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-06T17:32:37.833926+00:00"
+        },
+        {
+          "id": "829c6198-c3bd-47fa-98cf-c8ddf54c0f8a",
+          "title": "pinterest- a page you find your dream\n\nHere is the part worth paying attention t",
+          "transcript": "pinterest- a page you find your dream\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783359156/fedqoadctojdqig4dhfi.png",
+          "scheduledAt": "2026-07-06T17:33:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-06T17:32:37.101194+00:00"
+        },
+        {
+          "id": "39b83c04-1c6d-4be1-a677-039a4b2ed1b6",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this folater, share it with someone,\\ who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783197349/hrogi6hxl1ifbp2u8pk6.png",
+          "scheduledAt": "2026-07-04T20:36:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T20:35:50.128018+00:00"
+        },
+        {
+          "id": "a35c46fa-4159-4dfa-bd2a-178b001d5a4c",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this folater, share it with someone,\\ who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1783197339/jqt0ddhkdyfluysahg0h.png",
+          "scheduledAt": "2026-07-04T20:36:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T20:35:40.300586+00:00"
+        },
+        {
+          "id": "ba6a9a4c-304e-4574-b65d-7379dfdfc583",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783197136161-1a819f25fdf3.png",
+          "scheduledAt": "2026-07-04T20:32:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T20:32:16.837014+00:00"
+        },
+        {
+          "id": "47cea28c-2324-4474-bf15-5780bd7661b1",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783196948424-93740b777429.png",
+          "scheduledAt": "2026-07-04T20:30:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T20:29:12.754425+00:00"
+        },
+        {
+          "id": "e4f4eb66-7a8d-464b-97fc-c3ecb0aea001",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783196948424-93740b777429.png",
+          "scheduledAt": "2026-07-04T20:30:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T20:29:09.107431+00:00"
+        },
+        {
+          "id": "6704524e-6765-41f5-be23-a5c334b15104",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783192148209-0cdfba44e14a.png",
+          "scheduledAt": "2026-07-04T19:10:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T19:09:24.805021+00:00"
+        },
+        {
+          "id": "2da58936-ebe8-4d13-96b4-56dafff57581",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783192148209-0cdfba44e14a.png",
+          "scheduledAt": "2026-07-04T19:10:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T19:09:08.810828+00:00"
+        },
+        {
+          "id": "46695540-5afc-4c22-b42d-dfbbd23aaf67",
+          "title": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or ",
+          "transcript": "flower\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "facebook, instagram",
+          "platforms": [
+            "facebook",
+            "instagram"
+          ],
+          "mediaUrl": "",
+          "scheduledAt": "2026-07-04T19:06:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T19:05:49.975569+00:00"
+        },
+        {
+          "id": "ad383254-4690-4173-b771-d920077d7b0f",
+          "title": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, i",
+          "transcript": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "facebook, instagram",
+          "platforms": [
+            "facebook",
+            "instagram"
+          ],
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783191881947-41146263c552.png",
+          "scheduledAt": "2026-07-04T19:05:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T19:04:44.672272+00:00"
+        },
+        {
+          "id": "d14c820c-e874-47c2-b4d7-15e90bf987bb",
+          "title": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, i",
+          "transcript": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "facebook, instagram",
+          "platforms": [
+            "facebook",
+            "instagram"
+          ],
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783191881947-41146263c552.png",
+          "scheduledAt": "2026-07-04T19:05:00+00:00",
+          "status": "publishing",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T19:04:42.582315+00:00"
         },
         {
           "id": "p29",
@@ -668,7 +1028,7 @@
         "engagementRate": 2.01
       },
       "perPlatform": {
-        "Instagram, Facebook": {
+        "instagram": {
           "reach": 0,
           "interactions": 0,
           "clicks": 0,
@@ -676,7 +1036,7 @@
           "views": 0,
           "follows": 0
         },
-        "Facebook, Instagram": {
+        "facebook, instagram": {
           "reach": 0,
           "interactions": 0,
           "clicks": 0,
@@ -2862,34 +3222,146 @@
         }
       ],
       "onboarding": {
-        "started": false,
-        "completed": false,
-        "currentStep": 0,
+        "started": true,
+        "completed": true,
+        "currentStep": 11,
         "answers": {
-          "fullName": "",
-          "businessName": "",
-          "businessDescription": "",
-          "industries": [],
+          "fullName": "sabiha",
+          "businessName": "orbit",
+          "businessDescription": "A marketing website which has all the marketing tools it needs",
+          "industries": [
+            "Retail & E-commerce"
+          ],
           "industryOther": "",
-          "location": "",
-          "businessStage": "",
-          "personalityTraits": [],
+          "location": "UAE",
+          "businessStage": "Just launched (<1 yr)",
+          "personalityTraits": [
+            "Bold",
+            "Warm",
+            "Edgy"
+          ],
           "personalityOther": "",
-          "toneFormality": 5,
-          "preferredPhrases": "",
+          "toneFormality": 6,
+          "preferredPhrases": "Elevate-Vue and orbit",
           "restrictedPhrases": "",
-          "uniqueValueProposition": "",
+          "uniqueValueProposition": "To Bring all the customer/Cilent Marketing needs at one place",
           "brandColors": [],
           "logo": null
         },
-        "updatedAt": null,
-        "completedAt": null
+        "updatedAt": "2026-07-07T21:09:38.971Z",
+        "completedAt": "2026-07-07T21:09:38.971Z"
       },
       "strategyReports": {},
-      "updatedAt": "2026-07-04T17:33:58.092Z"
+      "updatedAt": "2026-07-09T14:52:48.920Z"
     },
     "queenofall8747@gmail.com": {
       "posts": [
+        {
+          "id": "post-1783190412168",
+          "title": "brand streatrgy\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it w",
+          "transcript": "brand streatrgy\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "Facebook, Instagram",
+          "platforms": [
+            "Facebook",
+            "Instagram"
+          ],
+          "accounts": [
+            "Facebook",
+            "Instagram"
+          ],
+          "platformAccounts": [
+            {
+              "platform": "Facebook",
+              "accountId": "1140674272467922",
+              "accountName": "Facebook"
+            },
+            {
+              "platform": "Instagram",
+              "accountId": "17841439270562681",
+              "accountName": "Instagram"
+            }
+          ],
+          "accountIds": [
+            "1140674272467922",
+            "17841439270562681"
+          ],
+          "postType": "Feed Post",
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783190412156-b5ac7f8ee1ce.png",
+          "mediaUrls": [
+            "https://evv-client-portal-production.up.railway.app/uploads/1783190412156-b5ac7f8ee1ce.png"
+          ],
+          "mediaType": "image",
+          "scheduledAt": "2026-07-04T22:41",
+          "postedAt": "2026-07-04T22:41",
+          "status": "failed",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T18:40:12.168Z",
+          "publishAttempts": 1,
+          "lastPublishAttemptAt": "2026-07-04T18:41:47.969Z",
+          "publishError": "Publishing failed: Facebook:1140674272467922 Missing or invalid image file; Instagram:17841439270562681 Only photo or video can be accepted as media type."
+        },
+        {
+          "id": "post-1783189774913",
+          "title": "brand streatrgy\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it w",
+          "transcript": "brand streatrgy\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "Facebook, Instagram",
+          "platforms": [
+            "Facebook",
+            "Instagram"
+          ],
+          "accounts": [
+            "Facebook",
+            "Instagram"
+          ],
+          "platformAccounts": [
+            {
+              "platform": "Facebook",
+              "accountId": "1140674272467922",
+              "accountName": "Facebook"
+            },
+            {
+              "platform": "Instagram",
+              "accountId": "17841439270562681",
+              "accountName": "Instagram"
+            }
+          ],
+          "accountIds": [
+            "1140674272467922",
+            "17841439270562681"
+          ],
+          "postType": "Feed Post",
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783189774902-6c29dd9fe6fb.png",
+          "mediaUrls": [
+            "https://evv-client-portal-production.up.railway.app/uploads/1783189774902-6c29dd9fe6fb.png"
+          ],
+          "mediaType": "image",
+          "scheduledAt": "2026-07-04T22:30",
+          "postedAt": "2026-07-04T22:30",
+          "status": "failed",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T18:29:34.913Z",
+          "publishAttempts": 1,
+          "lastPublishAttemptAt": "2026-07-04T18:30:47.633Z",
+          "publishError": "Publishing failed: Facebook:1140674272467922 Missing or invalid image file; Instagram:17841439270562681 Only photo or video can be accepted as media type."
+        },
         {
           "id": "6a2351d27dd1bc0187c8b0e6",
           "postizPostId": "6a2351d27dd1bc0187c8b0e6",
@@ -3645,6 +4117,14 @@
         "engagementRate": 2.01
       },
       "perPlatform": {
+        "Facebook, Instagram": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        },
         "Instagram": {
           "reach": 21036,
           "interactions": 422,
@@ -4156,7 +4636,7 @@
         "completedAt": null
       },
       "strategyReports": {},
-      "updatedAt": "2026-06-05T22:46:46.007Z"
+      "updatedAt": "2026-07-04T18:40:12.168Z"
     },
     "codex-smoke@example.com": {
       "posts": [],
@@ -4846,7 +5326,112 @@
       },
       "strategyReports": {},
       "updatedAt": "2026-06-10T19:15:27.929Z"
+    },
+    "ashwin@admin.com": {
+      "posts": [
+        {
+          "id": "post-1783189252875",
+          "title": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it wi",
+          "transcript": "orbit new logo\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
+          "platform": "Facebook, Instagram",
+          "platforms": [
+            "Facebook",
+            "Instagram"
+          ],
+          "accounts": [
+            "Facebook",
+            "Instagram"
+          ],
+          "platformAccounts": [
+            {
+              "platform": "Facebook",
+              "accountId": "1140674272467922",
+              "accountName": "Facebook"
+            },
+            {
+              "platform": "Instagram",
+              "accountId": "17841439270562681",
+              "accountName": "Instagram"
+            }
+          ],
+          "accountIds": [
+            "1140674272467922",
+            "17841439270562681"
+          ],
+          "postType": "Feed Post",
+          "mediaUrl": "https://evv-client-portal-production.up.railway.app/uploads/1783189252852-2360f617b38d.png",
+          "mediaUrls": [
+            "https://evv-client-portal-production.up.railway.app/uploads/1783189252852-2360f617b38d.png"
+          ],
+          "mediaType": "image",
+          "scheduledAt": "2026-07-04T22:21",
+          "postedAt": "2026-07-04T22:21",
+          "status": "failed",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-07-04T18:20:52.875Z",
+          "publishAttempts": 1,
+          "lastPublishAttemptAt": "2026-07-04T18:21:47.582Z",
+          "publishError": "Publishing failed: Facebook:1140674272467922 Missing or invalid image file; Instagram:17841439270562681 Only photo or video can be accepted as media type."
+        }
+      ],
+      "metrics": {
+        "reach": 0,
+        "interactions": 0,
+        "clicks": 0,
+        "reactions": 0,
+        "views": 0,
+        "follows": 0,
+        "engagementRate": 0
+      },
+      "perPlatform": {
+        "Facebook, Instagram": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        }
+      },
+      "platformDashboards": {},
+      "lastUploadName": null,
+      "reports": [],
+      "onboarding": {
+        "started": false,
+        "completed": false,
+        "currentStep": 0,
+        "answers": {
+          "fullName": "",
+          "businessName": "",
+          "businessDescription": "",
+          "industries": [],
+          "industryOther": "",
+          "location": "",
+          "businessStage": "",
+          "personalityTraits": [],
+          "personalityOther": "",
+          "toneFormality": 5,
+          "preferredPhrases": "",
+          "restrictedPhrases": "",
+          "uniqueValueProposition": "",
+          "brandColors": [],
+          "logo": null
+        },
+        "updatedAt": null,
+        "completedAt": null
+      },
+      "strategyReports": {},
+      "updatedAt": "2026-07-04T18:21:08.617Z"
     }
   },
-  "updatedAt": "2026-07-04T17:35:03.233Z"
+  "updatedAt": "2026-07-09T14:52:48.920Z"
 }

@@ -124,6 +124,9 @@ async function handleFacebookCallback(req, res, sessions, sendJson) {
     // Get pages this user manages
     const pagesData = await httpsGet(`https://graph.facebook.com/v19.0/me/accounts?access_token=${longToken}`);
     const pages = Array.isArray(pagesData.data) ? pagesData.data : [];
+    console.log(`[Facebook OAuth] User: ${userInfo.name} (${userInfo.id})`);
+    console.log(`[Facebook OAuth] Pages found: ${pages.length}`, pages.map((p) => `${p.name} (${p.id})`));
+    if (pagesData.error) console.error('[Facebook OAuth] /me/accounts error:', pagesData.error);
 
     // Save the base Facebook account
     await socialStore.upsertConnectedAccount({
@@ -151,6 +154,7 @@ async function handleFacebookCallback(req, res, sessions, sendJson) {
         `https://graph.facebook.com/v19.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`
       ).catch(() => ({}));
 
+      console.log(`[Facebook OAuth] Page "${page.name}" Instagram check:`, igData?.instagram_business_account || 'none');
       const igId = igData?.instagram_business_account?.id;
       if (igId) {
         const igInfo = await httpsGet(

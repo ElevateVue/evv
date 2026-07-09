@@ -111,6 +111,11 @@
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   }
 
+  function getPostDate(post) {
+    const value = post.scheduledAt || post.scheduledFor || post.postedAt || null;
+    return value ? new Date(value) : null;
+  }
+
   function buildFallbackHashtags(text) {
     const words = String(text || '')
       .toLowerCase()
@@ -128,6 +133,121 @@
     const normalizedHashtags = hashtagText || buildFallbackHashtags(fallbackText || cleanCaption);
     if (/(^|\s)#\w+/.test(cleanCaption)) return cleanCaption;
     return `${cleanCaption}\n\n${normalizedHashtags}`.trim();
+  }
+
+  // View state: month | week | day
+  let currentView = 'month';
+
+  function setView(view, posts) {
+    currentView = view;
+    document.querySelectorAll('#viewToggle button').forEach((b) => b.classList.remove('active'));
+    const btn = document.querySelector(`#viewToggle button[data-view="${view}"]`);
+    if (btn) btn.classList.add('active');
+    if (view === 'month') renderMonthView(posts);
+    else if (view === 'week') renderWeekView(posts);
+    else renderDayView(posts);
+  }
+
+  function renderMonthView(posts = []) {
+    // reuse existing month rendering behavior
+    calendarGrid.innerHTML = '';
+    const today = new Date();
+    const year = today.getFullYear();
+    const monthNames = Array.from({ length: 12 }, (_, month) =>
+      new Date(year, month, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' })
+    );
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    monthNames.forEach((label, month) => {
+      const section = document.createElement('section');
+      section.className = 'content-month';
+      if (month === today.getMonth()) section.id = 'currentMonth';
+
+      const title = document.createElement('h2');
+      title.className = 'content-calendar-month';
+      title.textContent = label;
+      section.appendChild(title);
+
+      const weekdayGrid = document.createElement('div');
+      weekdayGrid.className = 'content-weekdays';
+      weekdays.forEach((day) => {
+        const el = document.createElement('div');
+        el.textContent = day;
+        weekdayGrid.appendChild(el);
+      });
+      section.appendChild(weekdayGrid);
+
+      const grid = document.createElement('div');
+      grid.className = 'content-calendar-grid';
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const startOffset = new Date(year, month, 1).getDay();
+
+      for (let i = 0; i < startOffset; i += 1) {
+        const blank = document.createElement('div');
+        blank.className = 'day blank';
+        grid.appendChild(blank);
+      }
+
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const date = new Date(year, month, day);
+        const iso = toIsoDate(date);
+        const el = document.createElement('div');
+        el.className = 'day';
+        el.dataset.date = iso;
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        if (sameDay(date, today)) el.classList.add('today');
+
+        const dateEl = document.createElement('span');
+        dateEl.className = 'date';
+        dateEl.textContent = String(day);
+        el.appendChild(dateEl);
+
+        // show scheduled or posted posts for this day
+        posts
+          .filter((post) => {
+            const postDate = getPostDate(post);
+            return postDate && sameDay(postDate, date);
+          })
+          .forEach((post) => {
+            const pill = document.createElement('span');
+            pill.className = 'post-pill';
+            const type = post.postType || 'image';
+            pill.style.background = colorMap[type] || '#334155';
+            pill.textContent = '';
+            const label = document.createElement('span');
+            label.className = 'post-pill-text';
+            label.textContent = `${post.mediaName ? 'File: ' : ''}${post.title} (${post.platform})`;
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'post-delete-btn';
+            deleteButton.title = 'Delete post';
+            deleteButton.setAttribute('aria-label', `Delete ${post.title || 'post'}`);
+            deleteButton.textContent = 'x';
+            deleteButton.addEventListener('click', (event) => {
+              event.stopPropagation();
+              deletePost(post.id);
+            });
+            pill.append(label, deleteButton);
+            pill.addEventListener('click', (e) => { e.stopPropagation(); openPostEditor(post); });
+            el.appendChild(pill);
+          });
+
+        el.addEventListener('click', () => openScheduleModal(iso));
+        el.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openScheduleModal(iso);
+          }
+        });
+        grid.appendChild(el);
+      }
+
+      section.appendChild(grid);
+      calendarGrid.appendChild(section);
+    });
+
+    document.getElementById('currentMonth')?.scrollIntoView({ block: 'center' });
   }
 
   async function deletePost(postId) {
@@ -197,7 +317,10 @@
         el.appendChild(dateEl);
 
         posts
-          .filter((post) => post.postedAt && sameDay(new Date(post.postedAt), date))
+          .filter((post) => {
+            const postDate = getPostDate(post);
+            return postDate && sameDay(postDate, date);
+          })
           .forEach((post) => {
             const pill = document.createElement('span');
             pill.className = 'post-pill';
@@ -247,11 +370,164 @@
     if (!calendarGrid) return;
     try {
       const res = await api('/api/posts');
-      renderCalendar(res.posts || []);
+      const posts = res.posts || [];
+      // initialize view toggle buttons
+      document.querySelectorAll('#viewToggle button').forEach((b) => {
+        b.addEventListener('click', () => setView(b.dataset.view, posts));
+      });
+      // render according to current view
+      setView(currentView, posts);
     } catch (err) {
-      renderCalendar([]);
+      setView(currentView, []);
     }
   }
+
+  // week view: show current week with hourly slots and place scheduled posts by time
+  function renderWeekView(posts = []) {
+    calendarGrid.innerHTML = '';
+    const now = new Date();
+    // compute start of current week (Sunday)
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(now.getDate() - now.getDay());
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      return d;
+    });
+
+    const container = document.createElement('div');
+    container.className = 'week-grid';
+
+    // header with day names
+    const header = document.createElement('div'); header.className = 'week-header';
+    header.appendChild(document.createElement('div'));
+    days.forEach((d) => {
+      const h = document.createElement('div');
+      h.className = 'week-day-head';
+      h.textContent = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      header.appendChild(h);
+    });
+    container.appendChild(header);
+
+    // hourly rows
+    const hoursContainer = document.createElement('div'); hoursContainer.className = 'week-hours';
+    for (let hr = 0; hr < 24; hr += 1) {
+      const row = document.createElement('div'); row.className = 'week-row';
+      const timeLabel = document.createElement('div'); timeLabel.className = 'time-label';
+      timeLabel.textContent = `${String(hr).padStart(2, '0')}:00`;
+      row.appendChild(timeLabel);
+      days.forEach((d) => {
+        const cell = document.createElement('div');
+        cell.className = 'time-cell';
+        const cellDate = new Date(d);
+        cellDate.setHours(hr, 0, 0, 0);
+        cell.dataset.datetime = cellDate.toISOString();
+        if (cellDate < new Date()) cell.classList.add('past');
+        cell.title = cellDate < new Date() ? 'Day/time passed' : '';
+        // attach posts matching this slot (scheduledFor)
+        posts.filter((p) => {
+          const postDate = getPostDate(p);
+          return postDate && postDate.getHours() === hr && sameDay(postDate, d);
+        })
+          .forEach((post) => {
+            const pill = document.createElement('div');
+            pill.className = 'post-pill timeline-pill';
+            pill.style.background = colorMap[post.postType || 'image'] || '#334155';
+            pill.textContent = post.title || '(post)';
+            pill.addEventListener('click', (e) => { e.stopPropagation(); openPostEditor(post); });
+            cell.appendChild(pill);
+          });
+        row.appendChild(cell);
+      });
+      hoursContainer.appendChild(row);
+    }
+    container.appendChild(hoursContainer);
+    calendarGrid.appendChild(container);
+  }
+
+  function renderDayView(posts = []) {
+    // show timeline for single day (today)
+    const today = new Date();
+    calendarGrid.innerHTML = '';
+    const container = document.createElement('div'); container.className = 'day-grid';
+    const header = document.createElement('div'); header.className = 'day-header';
+    header.textContent = today.toLocaleDateString();
+    container.appendChild(header);
+    const hours = document.createElement('div'); hours.className = 'day-hours';
+    for (let hr = 0; hr < 24; hr += 1) {
+      const row = document.createElement('div'); row.className = 'day-row';
+      const label = document.createElement('div'); label.className = 'time-label'; label.textContent = `${String(hr).padStart(2, '0')}:00`;
+      const cell = document.createElement('div'); cell.className = 'time-cell';
+      const cellDate = new Date(today); cellDate.setHours(hr, 0, 0, 0);
+      cell.dataset.datetime = cellDate.toISOString();
+      if (cellDate < new Date()) cell.classList.add('past');
+      cell.title = cellDate < new Date() ? 'Day/time passed' : '';
+      posts.filter((p) => {
+        const postDate = getPostDate(p);
+        return postDate && sameDay(postDate, today) && postDate.getHours() === hr;
+      })
+        .forEach((post) => {
+          pill.className = 'post-pill timeline-pill';
+          pill.style.background = colorMap[post.postType || 'image'] || '#334155';
+          pill.textContent = post.title || '(post)';
+          pill.addEventListener('click', (e) => { e.stopPropagation(); openPostEditor(post); });
+          cell.appendChild(pill);
+        });
+      row.appendChild(label); row.appendChild(cell); hours.appendChild(row);
+    }
+    container.appendChild(hours); calendarGrid.appendChild(container);
+  }
+
+  // Post editor modal logic
+  const postEditorModal = document.getElementById('postEditorModal');
+  function openPostEditor(post) {
+    if (!postEditorModal) return;
+    window._activePost = post;
+    document.getElementById('editorUserAvatar').src = post.avatarUrl || '/orbit-logo.svg';
+    document.getElementById('editorUserHandle').textContent = post.handle || (post.username || post.platform || '@unknown');
+    document.getElementById('editorCaption').value = post.caption || post.transcript || '';
+    const dt = getPostDate(post) || new Date();
+    document.getElementById('editorDate').value = toIsoDate(dt);
+    const hh = String(dt.getHours()).padStart(2, '0'); const mm = String(dt.getMinutes()).padStart(2, '0');
+    document.getElementById('editorTime').value = `${hh}:${mm}`;
+    document.getElementById('editorPreviewBox').textContent = `${post.title || ''}\n\n${post.caption || ''}`;
+    // disable editing for past posts
+    const isPast = (post.postedAt && new Date(post.postedAt) < new Date()) || (post.scheduledFor && new Date(post.scheduledFor) < new Date());
+    document.getElementById('editorCaption').disabled = !!isPast;
+    ['editorDeleteBtn','editorDraftBtn','editorPostNowBtn','editorUpdateBtn','insertMediaBtn','designMediaBtn','aiHashtagBtn'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !!isPast;
+    });
+    postEditorModal.style.display = 'flex';
+  }
+
+  document.getElementById('closePostEditor')?.addEventListener('click', () => { if (postEditorModal) postEditorModal.style.display = 'none'; });
+  document.getElementById('editorDeleteBtn')?.addEventListener('click', async () => { const p = window._activePost; if (p) { await deletePost(p.id); if (postEditorModal) postEditorModal.style.display='none'; } });
+  document.getElementById('editorUpdateBtn')?.addEventListener('click', async () => {
+    const p = window._activePost; if (!p) return; try {
+      const date = document.getElementById('editorDate').value; const time = document.getElementById('editorTime').value || '00:00';
+      const scheduledFor = `${date}T${time}:00`;
+      const caption = document.getElementById('editorCaption').value;
+      await api(`/api/posts/${encodeURIComponent(p.id)}`, { method: 'PUT', body: JSON.stringify({ scheduledFor, caption }) });
+      fetchAndRender();
+      if (postEditorModal) postEditorModal.style.display='none';
+    } catch (err) { alert(err.message || 'Failed to update'); }
+  });
+  document.getElementById('editorPostNowBtn')?.addEventListener('click', async () => {
+    const p = window._activePost; if (!p) return; try {
+      await api(`/api/posts/${encodeURIComponent(p.id)}/publish`, { method: 'POST' });
+      fetchAndRender();
+      if (postEditorModal) postEditorModal.style.display='none';
+    } catch (err) { alert(err.message || 'Failed to post now'); }
+  });
+  document.getElementById('aiHashtagBtn')?.addEventListener('click', async () => {
+    const captionEl = document.getElementById('editorCaption'); if (!captionEl) return; const topic = captionEl.value.slice(0,200);
+    try {
+      const res = await api('/api/generate/hashtags', { method: 'POST', body: JSON.stringify({ text: topic }) });
+      captionEl.value = `${captionEl.value}\n\n${Array.isArray(res.tags)?res.tags.join(' '):res.tags||''}`.trim();
+    } catch (err) { alert('Failed to generate hashtags'); }
+  });
 
   async function loadSocialAccounts() {
     if (!schAccount) return;
@@ -295,17 +571,30 @@
     if (schMediaPreview) schMediaPreview.textContent = 'No media selected';
   }
 
+  function updateSchedulePreview() {
+    const preview = document.getElementById('editorPreviewBox');
+    const caption = schCaption?.value || '';
+    const title = schTitle?.value || '';
+    const platform = schPlatform?.value || '';
+    const mediaText = selectedMedia?.mediaName ? `Media: ${selectedMedia.mediaName}` : (schMediaUrl?.value.trim() ? `Media URL: ${schMediaUrl.value.trim()}` : 'No media selected');
+    if (preview) {
+      preview.textContent = `${platform}\n${title ? `Title: ${title}\n` : ''}${mediaText}\n\n${caption}`.trim();
+    }
+  }
+
   function openScheduleModal(isoDate) {
-    if (!modal || !schDate || !schPlatform || !schType || !schTitle || !schTopic || !schCaption) return;
-    schDate.value = isoDate || toIsoDate(new Date());
+    if (!modal || !schDate || !schPlatform || !schType || !schTitle || !schCaption) return;
+    const now = new Date();
+    schDate.value = isoDate || toIsoDate(now);
     schPlatform.value = 'Instagram';
     schType.value = 'image';
     schTitle.value = '';
-    schTopic.value = '';
     if (schMediaUrl) schMediaUrl.value = '';
+    if (document.getElementById('schTime')) document.getElementById('schTime').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     schCaption.value = readSaved('calendarCaption', '');
     resetMedia();
     renderAccountOptions();
+    updateSchedulePreview();
     modal.style.display = 'flex';
   }
 
@@ -323,6 +612,7 @@
 
   document.getElementById('copyCaptionBtn')?.addEventListener('click', (event) => {
     copyText(schCaption?.value || '', event.currentTarget);
+    updateSchedulePreview();
   });
 
   schMedia?.addEventListener('change', () => {
@@ -336,6 +626,7 @@
         mediaData: String(reader.result || ''),
       };
       if (schMediaPreview) schMediaPreview.textContent = `${file.name} (${Math.round(file.size / 1024)} KB)`;
+      updateSchedulePreview();
     };
     reader.readAsDataURL(file);
   });
@@ -359,6 +650,7 @@
       });
       if (schCaption) {
         schCaption.value = combineCaptionAndHashtags(res.caption || '', res.hashtags, topic || schTitle?.value);
+        updateSchedulePreview();
       }
       if (res.notice) alert(res.notice);
     } catch (err) {
@@ -375,6 +667,9 @@
       '',
       `${schTopic?.value || ''} ${schTitle?.value || ''} ${schPlatform?.value || ''}`
     );
+    const timeValue = document.getElementById('schTime')?.value || '09:00';
+    const scheduleDate = schDate?.value;
+    const scheduledFor = scheduleDate ? `${scheduleDate}T${timeValue}:00` : undefined;
     const payload = {
       platform: schPlatform?.value,
       accountId: schAccount?.value,
@@ -382,16 +677,28 @@
       transcript: captionWithHashtags,
       caption: captionWithHashtags,
       postType: schType?.value,
-      scheduledFor: schDate?.value,
+      scheduledFor,
     };
-    if (schMediaUrl?.value.trim()) {
-      payload.mediaUrl = schMediaUrl.value.trim();
-      payload.mediaType = schType?.value === 'video' || schType?.value === 'reel' ? 'video' : 'image';
-    }
     try {
       if (!payload.accountId) {
         alert('Choose a connected account before scheduling.');
         return;
+      }
+      // If a local file was selected, upload to Cloudinary first (takes priority over URL field)
+      if (selectedMedia?.mediaData) {
+        const upRes = await fetch('/api/upload-media', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: selectedMedia.mediaData }),
+          credentials: 'same-origin',
+        });
+        const upJson = await upRes.json();
+        if (!upRes.ok) throw new Error(upJson.error || 'Image upload failed');
+        payload.mediaUrl = upJson.url;
+        payload.mediaType = selectedMedia.mediaType?.startsWith('video') ? 'video' : 'image';
+      } else if (schMediaUrl?.value.trim()) {
+        payload.mediaUrl = schMediaUrl.value.trim();
+        payload.mediaType = schType?.value === 'video' || schType?.value === 'reel' ? 'video' : 'image';
       }
       const res = await api('/api/schedule-post', { method: 'POST', body: JSON.stringify(payload) });
       if (res.post && modal) {

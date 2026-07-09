@@ -15,13 +15,424 @@
       script.onload = callback;
       head.appendChild(script);
     }
-    loadScript(function() {
-      beTracker.t({ hash: "ec15d228c3066c0eeea651e88f835fa9" });
-    });
+    loadScript(function() { beTracker.t({ hash: "ec15d228c3066c0eeea651e88f835fa9" }); });
   </script>
   <script defer src="app.js"></script>
   <script defer src="client-hub-tracker.js"></script>
   <script defer src="footer.js"></script>
+  <style>
+    /* ── Composer layout ── */
+    .composer-wrap {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 20px;
+      margin-top: 20px;
+      align-items: start;
+    }
+    @media (max-width: 960px) { .composer-wrap { grid-template-columns: 1fr; } }
+
+    .composer-card {
+      background: #0d1117;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .composer-profile-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.02);
+    }
+    .composer-profile-row .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4bc9ff, #7c6ad7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+    }
+    .composer-profile-row .profile-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .composer-profile-row .profile-meta .profile-name {
+      font-weight: 700;
+      color: #f8fafc;
+      font-size: 14px;
+    }
+    .composer-profile-row .profile-meta .profile-handle {
+      font-size: 12px;
+      color: #6b7a99;
+    }
+
+    /* ── Platform bar ── */
+    .composer-platforms {
+      display: flex;
+      gap: 6px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      flex-wrap: wrap;
+    }
+    .cplat-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      background: transparent;
+      color: #8fa0c2;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .18s;
+    }
+    .cplat-btn img { width: 16px; height: 16px; border-radius: 3px; }
+    .cplat-btn.active { border-color: rgba(0,217,255,0.4); background: rgba(0,217,255,0.08); color: #00d9ff; }
+    .cplat-btn:hover:not(.active) { border-color: rgba(255,255,255,0.22); color: #d0d7f0; }
+
+    /* ── Editor body ── */
+    .composer-body { padding: 16px; }
+
+    .composer-media-drop {
+      border: 1.5px dashed rgba(255,255,255,0.13);
+      border-radius: 14px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      background: rgba(255,255,255,0.02);
+      transition: border-color .18s;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .composer-media-drop:hover { border-color: rgba(0,217,255,0.3); }
+    .composer-media-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .composer-media-drop .drop-hint { color: #6b7a99; font-size: 13px; text-align: center; pointer-events: none; }
+    .composer-media-drop .drop-icon { font-size: 28px; pointer-events: none; }
+    #composerMediaPreview { width: 100%; max-height: 260px; object-fit: contain; display: none; border-radius: 10px; }
+    .composer-media-drop.has-media .drop-hint,
+    .composer-media-drop.has-media .drop-icon { display: none; }
+    .composer-media-drop.has-media { min-height: unset; padding: 0; }
+
+    /* Caption */
+    .composer-field {
+      margin-bottom: 14px;
+    }
+    .composer-field label {
+      display: block;
+      font-size: 12px;
+      color: #6b7a99;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+    .composer-field input,
+    .composer-field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #e9ecf8;
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+    .composer-title-wrap input {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    #postCaption {
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      color: #e9ecf8;
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+    #postCaption:focus {
+      border-color: rgba(0,217,255,0.45);
+      background: rgba(255,255,255,0.08);
+    }
+    .composer-caption-wrap {
+      border: none;
+      border-radius: 12px;
+      padding: 0;
+      margin-bottom: 14px;
+      background: transparent;
+    }
+    .char-count { text-align: right; font-size: 12px; color: #6b7a99; margin-top: 4px; }
+
+    /* Toolbar row */
+    .composer-toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      flex-wrap: wrap;
+    }
+    .composer-tool-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #9aa3c0;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all .15s;
+    }
+    .composer-tool-btn:hover { background: rgba(255,255,255,0.08); color: #e9ecf8; }
+    .composer-tool-btn.ai { border-color: rgba(124,106,215,0.35); color: #a78bfa; }
+    .composer-tool-btn.ai:hover { background: rgba(124,106,215,0.12); }
+
+    /* Account row */
+    .composer-accounts {
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .composer-accounts label { font-size: 12px; color: #6b7a99; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 8px; }
+    .composer-field.composer-account-wrap {
+      margin-bottom: 14px;
+    }
+    .composer-field.composer-account-wrap .account-select-shell {
+      position: relative;
+      width: 100%;
+    }
+    .composer-field.composer-account-wrap .account-select-shell input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      outline: none;
+      color: #e9ecf8;
+      font-size: 15px;
+      padding: 12px 14px;
+      font-family: inherit;
+      height: 44px;
+      box-sizing: border-box;
+    }
+    .composer-field.composer-account-wrap .account-select-shell input::placeholder {
+      color: rgba(255,255,255,0.55);
+    }
+    .account-list {
+      display: none;
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-top: none;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 20;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .account-list.show {
+      display: block;
+    }
+    .account-item {
+      width: 100%;
+      background: transparent;
+      border: none;
+      text-align: left;
+      padding: 12px 14px;
+      color: #e9ecf8;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .account-item:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .account-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #d0d7f0;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .account-meta {
+      display: grid;
+      gap: 2px;
+      width: calc(100% - 50px);
+    }
+    .account-name { font-size: 14px; color: #f7fafc; }
+    .account-sub { font-size: 12px; color: #8c9ab5; }
+
+    /* Schedule row */
+    .composer-schedule {
+      padding: 10px 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+    }
+    .composer-schedule .schedule-inputs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+    .composer-schedule label {
+      font-size: 12px;
+      color: #6b7a99;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      min-width: 110px;
+      flex-shrink: 0;
+    }
+    .composer-schedule input[type="date"],
+    .composer-schedule input[type="time"] {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      color: #e9ecf8;
+      font-size: 15px;
+      padding: 12px 14px;
+      outline: none;
+      height: 44px;
+      transition: border-color .15s, background .15s;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.12);
+    }
+    .composer-schedule input[type="date"]:focus,
+    .composer-schedule input[type="time"]:focus {
+      border-color: rgba(0,217,255,0.45);
+      background: rgba(255,255,255,0.08);
+    }
+    .composer-schedule input[type="date"] {
+      width: 220px;
+      min-width: 180px;
+    }
+    .composer-schedule input[type="time"] {
+      width: 130px;
+      min-width: 120px;
+    }
+
+    /* Action row */
+    .composer-actions {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .composer-post-now {
+      background: linear-gradient(135deg, #4bc9ff, #7c6ad7);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .composer-post-now:hover { opacity: .88; }
+    .composer-post-now:disabled { opacity: .45; cursor: not-allowed; }
+    .composer-schedule-btn {
+      background: rgba(255,255,255,0.06);
+      color: #c4cde8;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .composer-schedule-btn:hover { background: rgba(255,255,255,0.1); }
+    .composer-schedule-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── Preview card ── */
+    .preview-card { padding: 16px; }
+    .preview-card-header { font-size: 12px; font-weight: 700; color: #6b7a99; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+    .preview-phone {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .preview-phone-bar {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .preview-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#4bc9ff,#7c6ad7); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; flex-shrink:0; }
+    .preview-handle { font-weight: 700; font-size: 13px; color: #e9ecf8; }
+    .preview-time { font-size: 11px; color: #6b7a99; margin-left: auto; }
+    .preview-img-area {
+      width: 100%;
+      min-height: 200px;
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4a5568;
+      font-size: 13px;
+    }
+    .preview-img-area img { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+    .preview-caption-area { padding: 12px 14px; }
+    .preview-caption-text { font-size: 13px; color: #e5f2ff; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+    .preview-caption-text.empty { color: #7b8bac; }
+    #previewHashtags { color: #7fd6ff; margin-top: 6px; }
+    .preview-platform-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #6b7a99;
+      padding: 6px 14px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .preview-platform-badge img { width: 14px; height: 14px; border-radius: 3px; }
+
+    /* AI panel */
+    .ai-gen-row { margin-bottom: 12px; }
+    .ai-gen-row label { font-size: 12px; color: #6b7a99; font-weight: 600; display: block; margin-bottom: 5px; }
+    .ai-gen-input-row { display: flex; gap: 8px; }
+    .ai-gen-input-row input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: #e9ecf8; font-size: 13px; outline: none; }
+  </style>
 </head>
 <body>
   <aside class="sidebar" id="sidebar">
@@ -40,138 +451,160 @@
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h1>Scheduling</h1>
-            <p>Create, preview and schedule posts for approval.</p>
+            <h1>Create Post</h1>
+            <p>Compose, preview and publish or schedule your post.</p>
           </div>
           <div class="header-actions">
-            <button class="pill-btn outline small">New Post</button>
             <a href="post-queue.html" class="pill-btn outline small">Post Queue</a>
           </div>
         </div>
 
-        <div class="schedule-layout">
-          <section class="card schedule-panel">
-            <div class="section-header"><h2>Post Details</h2></div>
+        <div class="composer-wrap">
+          <!-- LEFT: Composer -->
+          <div class="composer-card">
+
+            <!-- Platform selector -->
+            <div class="composer-platforms" id="composerPlatforms">
+              <button type="button" class="cplat-btn active" data-platform="Instagram">
+                <img src="/ig.png" alt="" /> Instagram
+              </button>
+              <button type="button" class="cplat-btn" data-platform="Facebook">
+                <img src="/fb.png" alt="" /> Facebook
+              </button>
+              <button type="button" class="cplat-btn" data-platform="LinkedIn">
+                <img src="/linkedin.png" alt="" /> LinkedIn
+              </button>
+              <button type="button" class="cplat-btn" data-platform="TikTok">
+                <img src="/tiktok.png" alt="" /> TikTok
+              </button>
+              <button type="button" class="cplat-btn" data-platform="X">
+                <img src="/x.png" alt="" /> X
+              </button>
+            </div>
+
             <form id="scheduleForm">
-              <div class="platform-tabs">
-                <button type="button" class="platform-pill active">Instagram</button>
-                <button type="button" class="platform-pill">Facebook</button>
-                <button type="button" class="platform-pill">LinkedIn</button>
-                <button type="button" class="platform-pill">Twitter</button>
-                <button type="button" class="platform-pill">TikTok</button>
-                <button type="button" class="platform-pill">YouTube</button>
+              <div class="composer-body">
+
+                <div class="composer-field composer-title-wrap">
+                  <label for="postTitle">Post title</label>
+                  <input id="postTitle" placeholder="Write a short post title" />
+                </div>
+
+                <!-- Account -->
+                <div class="composer-field composer-account-wrap">
+                  <label for="accountSearch">Accounts</label>
+                  <div class="account-select-shell">
+                    <input type="text" id="accountSearch" placeholder="Search linked accounts" autocomplete="off" />
+                    <div id="accountList" class="account-list account-dropdown"></div>
+                  </div>
+                </div>
+                <div id="accountChips" class="chip-row" style="margin-top:6px"></div>
+
+                <!-- Media drop -->
+                <div class="composer-media-drop" id="composerMediaDrop">
+                  <input type="file" id="postFile" accept=".mp4,.mov,.avi,.mkv,.png,.jpg,.jpeg,.gif,.webp,video/*,image/*" />
+                  <span class="drop-icon">🖼️</span>
+                  <span class="drop-hint">Click or drag to add photo / video</span>
+                  <img id="composerMediaPreview" alt="preview" />
+                </div>
+                <div id="postFileLabel" class="file-label" style="font-size:12px;color:#6b7a99;margin-top:10px;">Click to upload image, video, or PDF</div>
+
+                <!-- AI generator -->
+                <div class="ai-gen-row">
+                  <label>AI Caption Generator</label>
+                  <div class="ai-gen-input-row">
+                    <input type="text" id="postDescription" placeholder="Describe your post…" />
+                    <button type="button" class="composer-tool-btn ai" id="generateCaption">⚡ Generate</button>
+                  </div>
+                </div>
+
+                <!-- Caption -->
+                <div class="composer-caption-wrap">
+                  <label for="postCaption">Caption</label>
+                  <textarea id="postCaption" placeholder="Write your caption…"></textarea>
+                  <div class="char-count"><span id="charCount">0</span> / 2200</div>
+                </div>
+
+                <!-- Hashtags -->
+                <div class="composer-caption-wrap" style="margin-top:-6px">
+                  <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+                    <span style="font-size:12px;color:#6b7a99;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Hashtags</span>
+                    <button type="button" class="composer-tool-btn" id="saveHashtags" style="padding:4px 10px;font-size:12px;margin-left:auto">Save set</button>
+                  </div>
+                  <input id="postHashtags" placeholder="#marketing #socialmedia …" style="background:transparent;border:none;outline:none;color:#c4cde8;font-size:14px;width:100%" />
+                  <div id="savedHashtagsList" style="margin-top:8px"></div>
+                </div>
+
               </div>
 
-            <div class="field field--spaced">
-              <label>Media (image / video / PDF)</label>
-              <div class="upload-shell upload-small">
-                <input type="file" id="postFile" accept=".pdf,.mp4,.mov,.avi,.mkv,.png,video/*,image/*" />
-                <div id="postFileLabel" class="upload-label">Click to upload image, video, or PDF</div>
+              <!-- Toolbar -->
+              <div class="composer-toolbar">
+                <select id="postType" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 11px;color:#9aa3c0;font-size:13px;outline:none;cursor:pointer">
+                  <option>Feed Post</option>
+                  <option>Story</option>
+                  <option>Reel / Short</option>
+                  <option>Carousel</option>
+                  <option>Video</option>
+                </select>
+                <input id="postMediaUrl" placeholder="Or paste media URL…" style="flex:1;min-width:160px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 11px;color:#e9ecf8;font-size:13px;outline:none" />
               </div>
-            </div>
 
-            <div class="field">
-              <label>Account</label>
-              <div class="account-select-shell">
-                <input type="text" id="accountSearch" placeholder="Choose connected account(s)" autocomplete="off" readonly />
-                <div id="accountList" class="account-list account-dropdown"></div>
-              </div>
-              <div id="accountChips" class="chip-row"></div>
-            </div>
-
-            <div class="field">
-              <label>Post type</label>
-              <select id="postType">
-                <option>Feed Post</option>
-                <option>Story</option>
-                <option>Reel / Short</option>
-                <option>Carousel</option>
-                <option>Video</option>
-              </select>
-            </div>
-
-            <div class="ai-panel">
-              <div class="ai-panel-head">Caption & Hashtag Generator</div>
-              <div class="field">
-                <label>Describe what this post is about</label>
-                <input type="text" id="postDescription" placeholder="Professional" />
-              </div>
-              <div class="btn-row left">
-                <button type="button" class="pill-btn outline" id="generateCaption">Generate</button>
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Caption</label>
-              <textarea id="postCaption" rows="4" placeholder="Write your caption..."></textarea>
-            </div>
-
-            <div class="field">
-              <label>Public media URL</label>
-              <input id="postMediaUrl" placeholder="https://... optional, required for direct media publishing" />
-              <span class="hint">Use a public image, video, or PDF URL when the post should publish with media.</span>
-            </div>
-
-            <div class="field">
-              <label>Hashtags</label>
-              <div class="input-row">
-                <input id="postHashtags" placeholder="#marketing #socialmedia ..." />
-                <button type="button" class="pill-btn outline small" id="saveHashtags">Save</button>
-              </div>
-              <span class="hint">Save a hashtag set and reuse it for future posts.</span>
-            </div>
-
-            <div class="saved-hashtags-panel">
-              <div class="saved-hashtags-head">Saved hashtag sets</div>
-              <div id="savedHashtagsList" class="saved-hashtags-list">
-                <p class="saved-empty">No saved hashtag sets yet. Generate and save a set to use it later.</p>
-              </div>
-            </div>
-
-            <div class="grid two-col gap">
-              <div class="field">
-                <label>Date</label>
-                <input type="date" id="scheduleDate" />
-              </div>
-              <div class="field">
-                <label>Time</label>
-                <input type="time" id="scheduleTime" />
-              </div>
-            </div>
-
-            <div class="field">
-              <label>Admin approval email <span class="muted">(optional)</span></label>
-              <input id="approvalEmail" placeholder="admin@yourcompany.com" />
-              <span class="hint">Add an email only when this post needs approval before publishing.</span>
-            </div>
-
-            <div class="btn-row">
-              <button type="submit" class="pill-btn">Schedule Post</button>
-            </div>
-            </form>
-          </section>
-
-          <section class="card preview-panel">
-            <div class="section-header"><h2>Live Preview</h2></div>
-            <div class="post-preview">
-              <div class="preview-header">
-                <span id="previewPlatform" class="preview-platform">Instagram</span>
-              </div>
-              <div class="preview-block">
-                <div id="previewFile" class="preview-file">
-                  <span>No media selected</span>
+              <div class="composer-schedule" id="scheduleRow">
+                <label for="scheduleDate">Schedule date</label>
+                <div class="schedule-inputs">
+                  <input type="date" id="scheduleDate" />
+                  <input type="time" id="scheduleTime" />
                 </div>
               </div>
-              <div class="preview-footer">
-                <div id="previewCaption">No caption yet...</div>
-                <div id="previewHashtags" class="preview-hashtags">No hashtags yet...</div>
+
+              <!-- Optional approval -->
+              <div class="composer-accounts">
+                <label>Approval email <span style="color:#4a5568;font-weight:400">(optional)</span></label>
+                <input id="approvalEmail" placeholder="admin@yourcompany.com" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 11px;color:#e9ecf8;font-size:13px;outline:none;width:100%" />
+              </div>
+
+              <!-- Actions -->
+              <div class="composer-actions">
+                <div style="display:flex;gap:10px">
+                  <button type="submit" class="composer-post-now" id="postNowBtn">Post Now</button>
+                  <button type="submit" class="composer-schedule-btn" id="scheduleLaterBtn">Schedule Post</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- RIGHT: Preview -->
+          <div class="composer-card preview-card">
+            <div class="preview-card-header">Preview</div>
+            <div class="preview-phone">
+              <div class="preview-phone-bar">
+                <div class="preview-avatar" id="previewAvatar">U</div>
+                <div>
+                  <div class="preview-handle" id="previewHandle">Your Account</div>
+                  <div style="font-size:11px;color:#6b7a99">Just now</div>
+                </div>
+                <span class="preview-time" id="previewPlatform">Instagram</span>
+              </div>
+              <div class="preview-caption-area">
+                <div class="preview-caption-text empty" id="previewCaption">Your caption will appear here…</div>
+                <div class="preview-caption-text" id="previewHashtags" style="color:#4bc9ff;margin-top:6px"></div>
+              </div>
+              <div class="preview-img-area" id="previewImgArea">
+                <span>No media selected</span>
+              </div>
+              <div class="preview-platform-badge" id="previewBadge">
+                <img src="/ig.png" alt="" id="previewBadgeIcon" /> Instagram
               </div>
             </div>
-          </section>
+          </div>
         </div>
       </section>
     </main>
   </div>
+
+  <!-- hidden inputs app.js still expects -->
+  <span id="previewFile" style="display:none"></span>
+  <span id="previewPlatforms" style="display:none"></span>
 
   <div class="modal-backdrop" id="modalBackdrop"></div>
   <div class="modal" id="modal">
@@ -183,6 +616,78 @@
     </form>
   </div>
   <div class="beams-overlay"></div>
+
+  <script>
+    (function() {
+      // Platform toggle
+      document.querySelectorAll('.cplat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.classList.toggle('active');
+          updatePreview();
+        });
+      });
+
+      // Media preview
+      const postFile = document.getElementById('postFile');
+      const composerDrop = document.getElementById('composerMediaDrop');
+      const composerPreview = document.getElementById('composerMediaPreview');
+      const previewImgArea = document.getElementById('previewImgArea');
+
+      postFile?.addEventListener('change', () => {
+        const file = postFile.files?.[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        if (file.type.startsWith('image/')) {
+          composerPreview.src = url;
+          composerPreview.style.display = 'block';
+          composerDrop.classList.add('has-media');
+          previewImgArea.innerHTML = `<img src="${url}" alt="preview" />`;
+        } else if (file.type.startsWith('video/')) {
+          composerPreview.style.display = 'none';
+          composerDrop.classList.add('has-media');
+          composerDrop.querySelector('.drop-icon').textContent = '🎬';
+          composerDrop.querySelector('.drop-icon').style.display = 'block';
+          composerDrop.querySelector('.drop-hint').textContent = file.name;
+          composerDrop.querySelector('.drop-hint').style.display = 'block';
+          previewImgArea.innerHTML = `<video src="${url}" style="width:100%;max-height:280px" controls></video>`;
+        }
+      });
+
+      // Caption live preview
+      const captionEl = document.getElementById('postCaption');
+      const charCount = document.getElementById('charCount');
+      captionEl?.addEventListener('input', () => {
+        const v = captionEl.value;
+        charCount.textContent = v.length;
+        const prev = document.getElementById('previewCaption');
+        if (prev) { prev.textContent = v || 'Your caption will appear here…'; prev.className = 'preview-caption-text' + (v ? '' : ' empty'); }
+      });
+
+      document.getElementById('postHashtags')?.addEventListener('input', (e) => {
+        const h = document.getElementById('previewHashtags');
+        if (h) h.textContent = e.target.value;
+      });
+
+      // Platform badge update
+      const PLAT_ICONS = { Instagram: '/ig.png', Facebook: '/fb.png', LinkedIn: '/linkedin.png', TikTok: '/tiktok.png', X: '/x.png' };
+      function updatePreview() {
+        const active = Array.from(document.querySelectorAll('.cplat-btn.active')).map(b => b.dataset.platform);
+        const first = active[0] || 'Instagram';
+        const badge = document.getElementById('previewBadge');
+        const icon = document.getElementById('previewBadgeIcon');
+        const plat = document.getElementById('previewPlatform');
+        if (badge) badge.lastChild.textContent = ' ' + active.join(', ');
+        if (icon) icon.src = PLAT_ICONS[first] || '/ig.png';
+        if (plat) plat.textContent = active.join(', ') || 'Instagram';
+      }
+
+      document.querySelectorAll('.cplat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.classList.toggle('active');
+          updatePreview();
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
-

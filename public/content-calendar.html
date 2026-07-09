@@ -46,7 +46,14 @@
               <span class="legend-pill reel">Reel</span>
               <span class="legend-pill text">Text</span>
             </div>
-            <button class="brand-btn" id="newPostBtn" type="button">+ New Post</button>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="view-toggle" id="viewToggle">
+                <button class="small-btn active" data-view="month">Month</button>
+                <button class="small-btn" data-view="week">Week</button>
+                <button class="small-btn" data-view="day">Day</button>
+              </div>
+              <button class="brand-btn" id="newPostBtn" type="button">+ New Post</button>
+            </div>
           </div>
           <div class="content-calendar-scroll" id="calendarGrid"></div>
         </section>
@@ -54,28 +61,105 @@
     </main>
   </div>
   <div class="modal content-modal" id="scheduleModal">
-    <div class="content-modal-card">
-      <h3>Schedule Post</h3>
-      <input id="schDate" class="brand-field" placeholder="Date (YYYY-MM-DD)" />
-      <select id="schPlatform" class="brand-select"><option>Instagram</option><option>Facebook</option><option>LinkedIn</option><option>TikTok</option><option>Snapchat</option></select>
-      <select id="schAccount" class="brand-select"><option value="">Loading connected accounts...</option></select>
-      <select id="schType" class="brand-select"><option value="image">Image</option><option value="video">Video</option><option value="carousel">Carousel</option><option value="story">Story</option><option value="reel">Reel</option><option value="text">Text</option></select>
-      <input id="schTitle" class="brand-field" placeholder="Post title" />
-      <input id="schTopic" class="brand-field" placeholder="Topic for caption generator" />
-      <input id="schMediaUrl" class="brand-field" placeholder="Public media URL (optional)" />
-      <label class="content-upload-field" for="schMedia">
-        <span>Upload image, video, or post file</span>
-        <input id="schMedia" type="file" accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx" />
-      </label>
-      <div class="content-media-preview" id="schMediaPreview">No media selected</div>
-      <textarea id="schCaption" class="brand-textarea" rows="4" placeholder="Caption..."></textarea>
-      <div class="content-modal-actions">
-        <button class="brand-btn" id="generateCaptionBtn" type="button">Generate Caption</button>
-        <button class="copy-btn" id="saveCaptionBtn" type="button">Save</button>
-        <button class="copy-btn" id="copyCaptionBtn" type="button">Copy</button>
-        <button class="brand-btn" id="saveScheduleBtn" type="button">Schedule Post</button>
-        <button class="copy-btn" id="cancelScheduleBtn" type="button">Cancel</button>
+    <div class="content-modal-card schedule-editor-card">
+      <div class="schedule-editor-left">
+        <div class="schedule-header-row">
+          <div>
+            <h3>Schedule Post</h3>
+            <div class="schedule-subtitle">Schedule a post with preview, caption and platform selection.</div>
+          </div>
+          <button class="modal-close schedule-close" id="cancelScheduleBtn">✕</button>
+        </div>
+        <div class="post-user-row">
+          <img src="/orbit-logo.svg" alt="User avatar" class="avatar" />
+          <div>
+            <div class="user-handle">@yourhandle</div>
+            <div class="user-platform">Select platform below</div>
+          </div>
+        </div>
+        <div class="schedule-fields-row">
+          <select id="schPlatform" class="brand-select"><option>Instagram</option><option>Facebook</option><option>LinkedIn</option><option>TikTok</option><option>Snapchat</option></select>
+          <select id="schAccount" class="brand-select"><option value="">Loading connected accounts...</option></select>
+        </div>
+        <div class="schedule-fields-row">
+          <input id="schDate" class="brand-field" placeholder="Date (YYYY-MM-DD)" />
+          <input id="schTime" class="brand-field" placeholder="Time (HH:MM)" />
+        </div>
+        <div class="schedule-fields-row">
+          <select id="schType" class="brand-select"><option value="image">Image</option><option value="video">Video</option><option value="carousel">Carousel</option><option value="story">Story</option><option value="reel">Reel</option><option value="text">Text</option></select>
+          <input id="schTitle" class="brand-field" placeholder="Post title" />
+        </div>
+        <textarea id="schCaption" class="brand-textarea editor-caption" rows="5" placeholder="Write your caption here..."></textarea>
+        <div class="editor-toolbar schedule-toolbar">
+          <button type="button" class="tool-btn" id="tool-emoji">😊</button>
+          <button type="button" class="tool-btn" id="tool-underline">U</button>
+          <button type="button" class="tool-btn" id="tool-bold"><strong>B</strong></button>
+        </div>
+        <div class="editor-actions">
+          <button class="small-btn" id="insertMediaBtn">Insert Media</button>
+          <button class="small-btn" id="designMediaBtn">Design Media</button>
+          <button class="small-btn" id="aiHashtagBtn">Generate Hashtags</button>
+        </div>
       </div>
+      <div class="schedule-editor-right">
+        <div class="preview-header">Post Preview</div>
+        <div class="preview-box schedule-preview" id="editorPreviewBox">Preview of image, caption and hashtags will appear here.</div>
+        <label class="content-upload-field schedule-upload-field" for="schMedia">
+          <span>Upload image, video, or post file</span>
+          <input id="schMedia" type="file" accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx" />
+        </label>
+        <div class="content-media-preview" id="schMediaPreview">No media selected</div>
+        <div class="content-modal-actions schedule-actions">
+          <button class="brand-btn" id="generateCaptionBtn" type="button">Generate Caption</button>
+          <button class="copy-btn" id="saveCaptionBtn" type="button">Save</button>
+          <button class="copy-btn" id="copyCaptionBtn" type="button">Copy</button>
+          <button class="brand-btn" id="saveScheduleBtn" type="button">Schedule Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rich post editor modal -->
+  <div class="modal post-editor-modal" id="postEditorModal">
+    <div class="post-editor-card">
+      <div class="post-editor-left">
+        <div class="post-editor-header">Edit Post</div>
+        <div class="post-user-row">
+          <img id="editorUserAvatar" src="/orbit-logo.svg" alt="avatar" class="avatar" />
+          <div id="editorUserHandle">@unknown</div>
+        </div>
+        <div class="editor-toolbar">
+          <button type="button" class="tool-btn" id="tool-emoji">😊</button>
+          <button type="button" class="tool-btn" id="tool-underline">U</button>
+          <button type="button" class="tool-btn" id="tool-bold"><strong>B</strong></button>
+        </div>
+        <textarea id="editorCaption" class="brand-textarea editor-caption" placeholder="Write caption..." rows="6"></textarea>
+        <div class="editor-actions">
+          <button class="small-btn" id="insertMediaBtn">Insert Media</button>
+          <button class="small-btn" id="designMediaBtn">Design Media</button>
+          <button class="small-btn" id="aiHashtagBtn">Generate Hashtags</button>
+        </div>
+        <div class="editor-bottom-actions">
+          <button class="danger-btn" id="editorDeleteBtn">Delete Post</button>
+          <button class="copy-btn" id="editorDraftBtn">Save as draft</button>
+          <div style="flex:1"></div>
+          <button class="brand-btn" id="editorPostNowBtn">Post Now</button>
+          <button class="brand-btn" id="editorUpdateBtn">Update</button>
+        </div>
+      </div>
+      <div class="post-editor-right">
+        <div class="editor-meta">
+          <label>Date</label>
+          <input id="editorDate" class="brand-field" />
+          <label>Time</label>
+          <input id="editorTime" class="brand-field" />
+        </div>
+        <div class="editor-preview">
+          <div class="preview-header">Preview</div>
+          <div class="preview-box" id="editorPreviewBox">Post preview will appear here</div>
+        </div>
+      </div>
+      <button class="modal-close" id="closePostEditor">✕</button>
     </div>
   </div>
   <div class="beams-overlay"></div>

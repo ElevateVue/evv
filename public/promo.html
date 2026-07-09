@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbit — Marketing Intelligence, Elevated</title>
+  <!-- Fonts: preconnect to both CDNs so TCP/TLS is ready before CSS parses -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+  <link rel="dns-prefetch" href="//api.fontshare.com" />
+  <!-- Inter only (Syne removed — unused since switching to Clash Display) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Clash Display — preload the CSS so it fires earlier in the waterfall -->
+  <link rel="preload" href="https://api.fontshare.com/v2/css?f[]=clash-display@700,800&display=swap" as="style" />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="promo-styles.css" />
+</head>
+<body>
+
+  <!-- ── SCROLL COMET CANVAS ── -->
+  <canvas id="comet-canvas"></canvas>
+
+  <!-- ── SITE SHELL — sits above comet canvas ── -->
+  <div class="site-shell">
+
+  <!-- ── CURSOR & PROGRESS ── -->
+  <div class="scroll-progress" id="scroll-progress"></div>
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <!-- ── NAVIGATION ── -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <img src="Orbit_Only.png" alt="Orbit" class="nav-logo-img" />
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#how-it-works" class="nav-link">How it works</a></li>
+        <li><a href="#metrics" class="nav-link">Results</a></li>
+        <li><a href="#pricing" class="nav-link">Pricing</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="signin.html" class="btn-ghost">Sign in</a>
+        <a href="login.html" class="btn-primary nav-cta">Get started <span class="btn-arrow">→</span></a>
+      </div>
+
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="nav-mobile" id="mobile-menu">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#metrics">Results</a>
+      <a href="#pricing">Pricing</a>
+      <a href="login.html" class="btn-primary">Get started</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero" id="hero">
+
+    <!-- Animated wavy contour canvas -->
+    <canvas id="wave-canvas"></canvas>
+
+    <div class="hero-content">
+      <div class="hero-badge reveal-up">
+        <span class="badge-label">WELCOME TO ELEVATE</span>
+      </div>
+
+      <h1 class="hero-title reveal-up" style="--delay:.1s">
+        Elevate Your <span class="gradient-text">Social Presence.</span>
+      </h1>
+
+      <p class="hero-sub reveal-up" style="--delay:.2s">
+        Campaign intelligence, real-time analytics, and strategic brand building
+        designed for the next generation of marketing teams.
+      </p>
+
+      <div class="hero-ctas reveal-up" style="--delay:.3s">
+        <a href="login.html" class="btn-hero-primary">
+          Get Started <span class="hero-arrow">↗</span>
+        </a>
+        <a href="#how-it-works" class="btn-hero-ghost">View Demo</a>
+      </div>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class="scroll-cue">
+      <div class="scroll-cue-line"></div>
+    </div>
+  </section>
+
+  <!-- ── BUILT FOR STRIP ── -->
+  <section class="built-for">
+    <div class="built-for-inner">
+      <div class="built-for-item">
+        <div class="bf-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <span>Real-time analytics</span>
+      </div>
+      <div class="bf-divider"></div>
+      <div class="built-for-item">
+        <div class="bf-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span>Smart scheduling</span>
+      </div>
+      <div class="bf-divider"></div>
+      <div class="built-for-item">
+        <div class="bf-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <span>AI-powered campaigns</span>
+      </div>
+      <div class="bf-divider"></div>
+      <div class="built-for-item">
+        <div class="bf-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <span>Team collaboration</span>
+      </div>
+      <div class="bf-divider"></div>
+      <div class="built-for-item">
+        <div class="bf-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <span>Brand intelligence</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag reveal-up">Platform capabilities</div>
+        <h2 class="section-title reveal-up">Everything your marketing<br/>team needs — unified.</h2>
+        <p class="section-sub reveal-up">From campaign creation to real-time analytics, Orbit puts every tool your team needs in one gravitational center.</p>
+      </div>
+
+      <div class="features-grid">
+
+        <!-- HERO CARD -->
+        <div class="feature-card feature-card--hero feat-tilt reveal-up" data-delay="0">
+          <div class="feat-spotlight"></div>
+          <div class="feat-border-glow"></div>
+          <div class="feat-depth-layer"></div>
+          <div class="feature-icon feat-icon-3d">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h3>Campaign Command Center</h3>
+          <p>Launch, monitor, and optimize every campaign from a single unified dashboard — connecting your channels, budgets, and creative assets in one gravitational center.</p>
+          <div class="feat-hero-visual">
+            <div class="feat-tabs">
+              <button class="feat-tab feat-tab--active" data-tab="overview">Overview</button>
+              <button class="feat-tab" data-tab="channels">Channels</button>
+              <button class="feat-tab" data-tab="budget">Budget</button>
+            </div>
+
+            <!-- OVERVIEW TAB -->
+            <div class="feat-tab-panel" data-panel="overview">
+              <div class="feat-dashboard">
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Email Campaign</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar animated" style="--w:72%;--c:var(--violet)"></div></div>
+                  <span class="feat-dash-stat up">↑ 34%</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Paid Social</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar animated" style="--w:55%;--c:#06b6d4"></div></div>
+                  <span class="feat-dash-stat up">↑ 21%</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">SEO / Organic</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar animated" style="--w:44%;--c:#a78bfa"></div></div>
+                  <span class="feat-dash-stat up">↑ 18%</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Direct / Referral</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar animated" style="--w:31%;--c:#34d399"></div></div>
+                  <span class="feat-dash-stat up">↑ 9%</span>
+                </div>
+              </div>
+              <div class="feat-kpi-row">
+                <div class="feat-kpi"><span class="feat-kpi-val" data-target="2.4">2.4</span><span class="feat-kpi-unit">M</span><span class="feat-kpi-label">Impressions</span></div>
+                <div class="feat-kpi"><span class="feat-kpi-val" data-target="18.7">18.7</span><span class="feat-kpi-unit">%</span><span class="feat-kpi-label">CTR</span></div>
+                <div class="feat-kpi"><span class="feat-kpi-val" data-target="94">94</span><span class="feat-kpi-unit">K</span><span class="feat-kpi-label">Conversions</span></div>
+              </div>
+            </div>
+
+            <!-- CHANNELS TAB -->
+            <div class="feat-tab-panel feat-tab-panel--hidden" data-panel="channels">
+              <div class="feat-dashboard">
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Instagram</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:81%;--c:#e1306c"></div></div>
+                  <span class="feat-dash-stat up">↑ 41%</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">LinkedIn</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:63%;--c:#0077b5"></div></div>
+                  <span class="feat-dash-stat up">↑ 27%</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">TikTok</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:88%;--c:#06b6d4"></div></div>
+                  <span class="feat-dash-stat up">↑ 58%</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">YouTube</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:49%;--c:#ff0000aa"></div></div>
+                  <span class="feat-dash-stat up">↑ 14%</span>
+                </div>
+              </div>
+              <div class="feat-kpi-row">
+                <div class="feat-kpi"><span class="feat-kpi-val">4</span><span class="feat-kpi-unit"> </span><span class="feat-kpi-label">Platforms</span></div>
+                <div class="feat-kpi"><span class="feat-kpi-val">1.2</span><span class="feat-kpi-unit">M</span><span class="feat-kpi-label">Reach</span></div>
+                <div class="feat-kpi"><span class="feat-kpi-val">58</span><span class="feat-kpi-unit">K</span><span class="feat-kpi-label">Engagements</span></div>
+              </div>
+            </div>
+
+            <!-- BUDGET TAB -->
+            <div class="feat-tab-panel feat-tab-panel--hidden" data-panel="budget">
+              <div class="feat-dashboard">
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Media Buy</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:68%;--c:#f59e0b"></div></div>
+                  <span class="feat-dash-stat" style="color:#f59e0b">$34K</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Creative</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:42%;--c:#a78bfa"></div></div>
+                  <span class="feat-dash-stat" style="color:#a78bfa">$21K</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Tools & Tech</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:22%;--c:#34d399"></div></div>
+                  <span class="feat-dash-stat" style="color:#34d399">$11K</span>
+                </div>
+                <div class="feat-dash-row">
+                  <span class="feat-dash-label">Events</span>
+                  <div class="feat-dash-bar-track"><div class="feat-dash-bar" style="--w:14%;--c:#06b6d4"></div></div>
+                  <span class="feat-dash-stat" style="color:#06b6d4">$7K</span>
+                </div>
+              </div>
+              <div class="feat-kpi-row">
+                <div class="feat-kpi"><span class="feat-kpi-val">$73</span><span class="feat-kpi-unit">K</span><span class="feat-kpi-label">Total Spend</span></div>
+                <div class="feat-kpi"><span class="feat-kpi-val">3.2</span><span class="feat-kpi-unit">×</span><span class="feat-kpi-label">ROAS</span></div>
+                <div class="feat-kpi"><span class="feat-kpi-val">$8</span><span class="feat-kpi-unit"> </span><span class="feat-kpi-label">Avg. CPC</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- AI INSIGHTS -->
+        <div class="feature-card feat-tilt reveal-up" style="--delay:.06s">
+          <div class="feat-spotlight"></div>
+          <div class="feat-border-glow"></div>
+          <div class="feature-icon feat-icon-3d">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+            </svg>
+          </div>
+          <h3>AI-Powered Insights</h3>
+          <p>Orbit's intelligence layer analyzes patterns across your entire marketing ecosystem and surfaces actionable recommendations before you even ask.</p>
+          <div class="feat-ai-pulses">
+            <div class="feat-ai-pulse" style="--d:0s">Audience engagement dropping on Fridays</div>
+            <div class="feat-ai-pulse" style="--d:.4s">LinkedIn CTR 2× above benchmark</div>
+            <div class="feat-ai-pulse" style="--d:.8s">Reallocate 12% budget to video</div>
+          </div>
+        </div>
+
+        <!-- REAL-TIME ANALYTICS -->
+        <div class="feature-card feat-tilt reveal-up" style="--delay:.12s">
+          <div class="feat-spotlight"></div>
+          <div class="feat-border-glow"></div>
+          <div class="feature-icon feat-icon-3d">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h3>Real-Time Analytics</h3>
+          <p>Watch your metrics move in real time. Track conversions, engagement, and ROI across every channel with pixel-perfect accuracy.</p>
+          <div class="feat-sparkline-wrap">
+            <svg class="feat-sparkline" viewBox="0 0 200 60" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="spark-grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path class="feat-spark-area" d="M0,45 L25,38 L50,42 L75,28 L100,32 L125,18 L150,22 L175,10 L200,14 L200,60 L0,60 Z"/>
+              <path class="feat-spark-line" d="M0,45 L25,38 L50,42 L75,28 L100,32 L125,18 L150,22 L175,10 L200,14"/>
+              <circle class="feat-spark-dot" cx="200" cy="14" r="3.5"/>
+            </svg>
+            <div class="feat-spark-labels">
+              <span>7 days ago</span><span class="feat-live-badge">● Live</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TEAM COLLABORATION -->
+        <div class="feature-card feat-tilt reveal-up" style="--delay:.18s">
+          <div class="feat-spotlight"></div>
+          <div class="feat-border-glow"></div>
+          <div class="feature-icon feat-icon-3d">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3>Team Collaboration</h3>
+          <p>Keep every stakeholder aligned. Assign tasks, share briefs, approve content, and communicate — all inside the platform.</p>
+          <div class="feat-avatars">
+            <div class="feat-avatar" style="--bg:#7c3aed" title="Maya">M</div>
+            <div class="feat-avatar" style="--bg:#06b6d4" title="Jake">J</div>
+            <div class="feat-avatar" style="--bg:#f59e0b" title="Sara">S</div>
+            <div class="feat-avatar" style="--bg:#34d399" title="Luis">L</div>
+            <div class="feat-avatar feat-avatar--more">+4</div>
+            <span class="feat-collab-status">● 3 active now</span>
+          </div>
+        </div>
+
+        <!-- BRAND ASSET MGMT -->
+        <div class="feature-card feat-tilt reveal-up" style="--delay:.24s">
+          <div class="feat-spotlight"></div>
+          <div class="feat-border-glow"></div>
+          <div class="feature-icon feat-icon-3d">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h3>Brand Asset Management</h3>
+          <p>Store, organize, and deploy every brand asset in one searchable library. Keep your team on-brand no matter the campaign.</p>
+          <div class="feat-asset-grid">
+            <div class="feat-asset feat-asset--img">IMG</div>
+            <div class="feat-asset feat-asset--vid">VID</div>
+            <div class="feat-asset feat-asset--doc">DOC</div>
+            <div class="feat-asset feat-asset--font">TTF</div>
+            <div class="feat-asset feat-asset--clr">CLR</div>
+            <div class="feat-asset feat-asset--add">+</div>
+          </div>
+        </div>
+
+        <!-- MARKETING AUTOMATION -->
+        <div class="feature-card feature-card--accent feat-tilt reveal-up" style="--delay:.30s">
+          <div class="feat-spotlight"></div>
+          <div class="feat-border-glow"></div>
+          <div class="feat-accent-left">
+            <div class="feature-icon feat-icon-3d">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <h3>Marketing Automation</h3>
+            <p>Build intelligent workflows that activate the right message at exactly the right moment. Nurture leads, re-engage audiences, and scale without scaling headcount.</p>
+            <div class="automation-pills">
+              <span class="pill">Email sequences</span>
+              <span class="pill">Lead scoring</span>
+              <span class="pill">A/B testing</span>
+              <span class="pill">Triggers</span>
+            </div>
+          </div>
+          <div class="feat-accent-right">
+            <div class="feat-workflow">
+              <div class="feat-wf-step feat-wf-step--done">
+                <div class="feat-wf-icon">✓</div>
+                <div class="feat-wf-info"><span class="feat-wf-name">Lead captured</span><span class="feat-wf-meta">via landing page</span></div>
+                <span class="feat-wf-badge feat-wf-badge--done">Done</span>
+              </div>
+              <div class="feat-wf-connector"></div>
+              <div class="feat-wf-step feat-wf-step--active">
+                <div class="feat-wf-icon feat-wf-icon--pulse">⚡</div>
+                <div class="feat-wf-info"><span class="feat-wf-name">Score &amp; qualify</span><span class="feat-wf-meta">threshold: 60 pts</span></div>
+                <span class="feat-wf-badge feat-wf-badge--active">Running</span>
+              </div>
+              <div class="feat-wf-connector"></div>
+              <div class="feat-wf-step feat-wf-step--pending">
+                <div class="feat-wf-icon">✉</div>
+                <div class="feat-wf-info"><span class="feat-wf-name">Send nurture email</span><span class="feat-wf-meta">personalised sequence</span></div>
+                <span class="feat-wf-badge feat-wf-badge--pending">Queued</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag reveal-up">Process</div>
+        <h2 class="section-title reveal-up">Up and running<br/>in three orbits.</h2>
+        <p class="section-sub reveal-up">Getting started with Orbit takes minutes, not months. No complex setup, no lengthy onboarding — just immediate velocity.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal-up">
+          <div class="step-number">01</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>Connect your universe</h3>
+            <p>Integrate your existing platforms in one click. Orbit speaks every marketing platform's language.</p>
+          </div>
+        </div>
+
+        <div class="step reveal-up" style="--delay:.1s">
+          <div class="step-number">02</div>
+          <div class="step-connector"></div>
+          <div class="step-content">
+            <h3>Build your first campaign</h3>
+            <p>Use Orbit's campaign builder or let us suggest a full strategy based on your goals, audience, and past performance data.</p>
+          </div>
+        </div>
+
+        <div class="step reveal-up" style="--delay:.2s">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3>Watch results arrive</h3>
+            <p>Launch, monitor, and optimize in real time. Orbit surfaces what's working, flags what isn't, and continuously fine-tunes your campaigns on autopilot.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── METRICS ── -->
+  <section class="metrics" id="metrics">
+    <div class="container">
+      <div class="metrics-label reveal-up">Built to deliver</div>
+      <div class="metrics-grid">
+        <div class="metric reveal-up">
+          <div class="metric-prefix">3×</div>
+          <p>Faster campaign execution — from brief to live in a fraction of the time</p>
+        </div>
+        <div class="metric reveal-up" style="--delay:.1s">
+          <div class="metric-prefix">50%</div>
+          <p>Less time spent on reporting — automated insights surface what matters</p>
+        </div>
+        <div class="metric reveal-up" style="--delay:.2s">
+          <div class="metric-prefix">One</div>
+          <p>Platform for strategy, execution, and analytics — no more tool switching</p>
+        </div>
+        <div class="metric reveal-up" style="--delay:.3s">
+          <div class="metric-number" data-target="99">0</div>
+          <div class="metric-suffix">.9%</div>
+          <p>Uptime guaranteed — always online when your campaigns are live</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DIGITAL CURATOR ── -->
+  <section class="curator">
+    <div class="container">
+      <div class="curator-inner">
+        <div class="curator-text">
+          <h2 class="curator-title reveal-up">The Digital Curator's Choice.</h2>
+          <p class="curator-sub reveal-up" style="--delay:.06s">We do not just surface metrics. We help teams read audience behavior, shape stronger content, and move from insight to execution with less friction.</p>
+          <ul class="curator-list">
+            <li class="curator-item reveal-up" style="--delay:.12s">
+              <span class="curator-check">✓</span>
+              Real-time sentiment heatmaps and focused opportunity spotting.
+            </li>
+            <li class="curator-item reveal-up" style="--delay:.18s">
+              <span class="curator-check">✓</span>
+              Multi-platform planning for Instagram, Facebook, LinkedIn, TikTok, and more.
+            </li>
+            <li class="curator-item reveal-up" style="--delay:.24s">
+              <span class="curator-check">✓</span>
+              Approval-ready workflows and reports built to share with clients or internal teams.
+            </li>
+            <li class="curator-item reveal-up" style="--delay:.30s">
+              <span class="curator-check">✓</span>
+              Actionable recommendations that connect directly to the dashboard and reporting flow.
+            </li>
+          </ul>
+        </div>
+        <div class="curator-visual reveal-up" style="--delay:.1s">
+          <div class="curator-card">
+            <div class="curator-card-header">
+              <div class="curator-card-dot curator-card-dot--red"></div>
+              <div class="curator-card-dot curator-card-dot--yellow"></div>
+              <div class="curator-card-dot curator-card-dot--green"></div>
+              <span class="curator-card-label">Sentiment Overview</span>
+            </div>
+            <div class="curator-bars">
+              <div class="curator-bar-row">
+                <span class="curator-bar-label">Instagram</span>
+                <div class="curator-bar-track"><div class="curator-bar-fill" style="width:82%"></div></div>
+                <span class="curator-bar-val">82%</span>
+              </div>
+              <div class="curator-bar-row">
+                <span class="curator-bar-label">LinkedIn</span>
+                <div class="curator-bar-track"><div class="curator-bar-fill" style="width:74%"></div></div>
+                <span class="curator-bar-val">74%</span>
+              </div>
+              <div class="curator-bar-row">
+                <span class="curator-bar-label">TikTok</span>
+                <div class="curator-bar-track"><div class="curator-bar-fill curator-bar-fill--cyan" style="width:91%"></div></div>
+                <span class="curator-bar-val">91%</span>
+              </div>
+              <div class="curator-bar-row">
+                <span class="curator-bar-label">Facebook</span>
+                <div class="curator-bar-track"><div class="curator-bar-fill" style="width:63%"></div></div>
+                <span class="curator-bar-val">63%</span>
+              </div>
+            </div>
+            <div class="curator-card-footer">
+              <span class="curator-trend">↑ 12% vs last week</span>
+              <span class="curator-live">● Live</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MANIFESTO ── -->
+  <section class="manifesto" id="manifesto">
+    <div class="manifesto-bg">
+      <div class="manifesto-orb manifesto-orb-1"></div>
+      <div class="manifesto-orb manifesto-orb-2"></div>
+    </div>
+    <div class="container">
+      <div class="manifesto-inner">
+        <div class="section-tag reveal-up">Our vision</div>
+
+        <h2 class="manifesto-title reveal-up" style="--delay:.08s">
+          Marketing has been <span class="manifesto-strike">chaotic</span><br/>
+          long enough.
+        </h2>
+
+        <div class="manifesto-body">
+          <p class="manifesto-lead reveal-up" style="--delay:.16s">
+            Too many tabs. Too many tools. Too many reports that tell you what happened — but never what to do next.
+          </p>
+
+          <div class="manifesto-pillars">
+            <div class="manifesto-pillar reveal-up" style="--delay:.22s">
+              <div class="pillar-line"></div>
+              <p>We built Orbit because we believe marketing teams deserve a single source of truth — one place where strategy, execution, and insight live together.</p>
+            </div>
+            <div class="manifesto-pillar reveal-up" style="--delay:.30s">
+              <div class="pillar-line"></div>
+              <p>We believe AI should make you a sharper marketer, not replace your judgement. Every recommendation Orbit makes is there to inform your decision — not override it.</p>
+            </div>
+            <div class="manifesto-pillar reveal-up" style="--delay:.38s">
+              <div class="pillar-line"></div>
+              <p>And we believe great marketing is about momentum. Orbit is built to keep you moving — from idea to live campaign, from data to action, without the drag.</p>
+            </div>
+          </div>
+
+          <div class="manifesto-sign reveal-up" style="--delay:.46s">
+            <div class="manifesto-sign-line"></div>
+            <p>This is what we're building. We're glad you found us early.</p>
+            <span class="manifesto-team">— The Elevate Team</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ROADMAP ── -->
+  <section class="roadmap" id="roadmap">
+    <div class="container">
+      <div class="section-label reveal-up">ROADMAP</div>
+      <h2 class="section-title reveal-up" style="--delay:.06s">The road ahead.</h2>
+      <p class="section-sub reveal-up" style="--delay:.12s">We're moving fast. Here's where we are and where we're going.</p>
+
+      <div class="roadmap-track">
+        <div class="roadmap-line"></div>
+
+        <!-- Phase 1 -->
+        <div class="roadmap-phase roadmap-phase--done reveal-up" style="--delay:.10s">
+          <div class="roadmap-node">
+            <div class="roadmap-dot"></div>
+          </div>
+          <div class="roadmap-content">
+            <div class="roadmap-meta">
+              <span class="roadmap-badge roadmap-badge--done">Shipped</span>
+              <span class="roadmap-date">Q1 2026</span>
+            </div>
+            <h3 class="roadmap-title">Foundation</h3>
+            <p class="roadmap-desc">The core platform — everything you need to launch and manage campaigns from one place.</p>
+            <ul class="roadmap-items">
+              <li>Campaign builder &amp; scheduler</li>
+              <li>Multi-channel publishing</li>
+              <li>Real-time analytics dashboard</li>
+              <li>Team workspace &amp; roles</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="roadmap-phase roadmap-phase--active reveal-up" style="--delay:.18s">
+          <div class="roadmap-node">
+            <div class="roadmap-dot"></div>
+            <div class="roadmap-pulse"></div>
+          </div>
+          <div class="roadmap-content">
+            <div class="roadmap-meta">
+              <span class="roadmap-badge roadmap-badge--active">In progress</span>
+              <span class="roadmap-date">Q2 2026</span>
+            </div>
+            <h3 class="roadmap-title">Early Access</h3>
+            <p class="roadmap-desc">Opening the doors to our first cohort of teams. Feedback shapes everything from here.</p>
+            <ul class="roadmap-items">
+              <li>Early access programme launch</li>
+              <li>AI campaign suggestions</li>
+              <li>Brand asset library</li>
+              <li>Onboarding &amp; guided setup</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="roadmap-phase roadmap-phase--upcoming reveal-up" style="--delay:.26s">
+          <div class="roadmap-node">
+            <div class="roadmap-dot"></div>
+          </div>
+          <div class="roadmap-content">
+            <div class="roadmap-meta">
+              <span class="roadmap-badge roadmap-badge--upcoming">Coming soon</span>
+              <span class="roadmap-date">Q3 2026</span>
+            </div>
+            <h3 class="roadmap-title">Scale</h3>
+            <p class="roadmap-desc">Power features for growing teams — deeper integrations, automation, and collaboration at scale.</p>
+            <ul class="roadmap-items">
+              <li>Native CRM &amp; Slack integrations</li>
+              <li>Automated reporting &amp; alerts</li>
+              <li>Custom approval workflows</li>
+              <li>White-label client portals</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="roadmap-phase roadmap-phase--future reveal-up" style="--delay:.34s">
+          <div class="roadmap-node">
+            <div class="roadmap-dot"></div>
+          </div>
+          <div class="roadmap-content">
+            <div class="roadmap-meta">
+              <span class="roadmap-badge roadmap-badge--future">On the horizon</span>
+              <span class="roadmap-date">Q4 2026</span>
+            </div>
+            <h3 class="roadmap-title">Intelligence</h3>
+            <p class="roadmap-desc">Elevate stops being a tool and starts being a strategic partner — predicting what works before you publish.</p>
+            <ul class="roadmap-items">
+              <li>Predictive performance scoring</li>
+              <li>Autonomous A/B optimisation</li>
+              <li>Competitive intelligence feed</li>
+              <li>AI-generated full campaign briefs</li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /.roadmap-track -->
+    </div>
+  </section>
+
+  <!-- ── PRICING ── -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag reveal-up">Pricing</div>
+        <h2 class="section-title reveal-up">Simple, transparent<br/>pricing for every orbit.</h2>
+        <p class="section-sub reveal-up">Start free. Scale as you grow. No hidden fees, no surprise invoices.</p>
+      </div>
+
+      <div class="toggle-row reveal-up">
+        <span class="toggle-label active" id="toggle-monthly">Monthly</span>
+        <div class="toggle-switch" id="billing-toggle">
+          <div class="toggle-knob"></div>
+        </div>
+        <span class="toggle-label" id="toggle-annual">Annual <span class="save-badge">Save 20%</span></span>
+      </div>
+
+      <div class="pricing-grid">
+
+        <div class="pricing-card reveal-up">
+          <div class="plan-name">Explorer</div>
+          <div class="plan-price">
+            <span class="price-amount" data-monthly="0" data-annual="0">$0</span>
+            <span class="price-period">/month</span>
+          </div>
+          <p class="plan-desc">Perfect for solo marketers and early-stage teams getting started.</p>
+          <ul class="plan-features">
+            <li><span class="check">✓</span> Up to 3 active campaigns</li>
+            <li><span class="check">✓</span> 5,000 contacts</li>
+            <li><span class="check">✓</span> Basic analytics dashboard</li>
+            <li><span class="check">✓</span> 2 team seats</li>
+            <li><span class="check">✓</span> Email support</li>
+          </ul>
+          <a href="login.html" class="btn-outline btn-full">Get started free</a>
+        </div>
+
+        <div class="pricing-card pricing-card--featured reveal-up" style="--delay:.1s">
+          <div class="card-glow"></div>
+          <div class="featured-badge">Most popular</div>
+          <div class="plan-name">Orbit Pro</div>
+          <div class="plan-price">
+            <span class="price-amount" data-monthly="79" data-annual="63">$79</span>
+            <span class="price-period">/month</span>
+          </div>
+          <p class="plan-desc">For growing marketing teams that need power, speed, and intelligence.</p>
+          <ul class="plan-features">
+            <li><span class="check">✓</span> Unlimited campaigns</li>
+            <li><span class="check">✓</span> 100,000 contacts</li>
+            <li><span class="check">✓</span> AI insights engine</li>
+            <li><span class="check">✓</span> Marketing automation</li>
+            <li><span class="check">✓</span> 15 team seats</li>
+            <li><span class="check">✓</span> Priority support</li>
+            <li><span class="check">✓</span> API access</li>
+          </ul>
+          <a href="login.html" class="btn-primary btn-full">Start free trial <span class="btn-arrow">→</span></a>
+        </div>
+
+        <div class="pricing-card reveal-up" style="--delay:.2s">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">
+            <span class="price-amount">Custom</span>
+          </div>
+          <p class="plan-desc">For large organizations with advanced security, compliance, and scale requirements.</p>
+          <ul class="plan-features">
+            <li><span class="check">✓</span> Everything in Pro</li>
+            <li><span class="check">✓</span> Unlimited contacts</li>
+            <li><span class="check">✓</span> Dedicated AI model</li>
+            <li><span class="check">✓</span> SSO / SAML</li>
+            <li><span class="check">✓</span> Custom integrations</li>
+            <li><span class="check">✓</span> SLA guarantee</li>
+            <li><span class="check">✓</span> Dedicated success manager</li>
+          </ul>
+          <a href="#" class="btn-outline btn-full">Talk to sales</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <div class="cta-orbs">
+      <div class="cta-orb cta-orb-1"></div>
+      <div class="cta-orb cta-orb-2"></div>
+    </div>
+    <div class="container">
+      <div class="cta-inner reveal-up">
+        <div class="cta-ring-wrap">
+          <div class="cta-ring cta-ring-1"></div>
+          <div class="cta-ring cta-ring-2"></div>
+          <div class="cta-ring cta-ring-3"></div>
+        </div>
+        <h2>Ready to enter orbit?</h2>
+        <p>Join 2,400+ marketing teams already using Orbit to move faster, smarter, and further.</p>
+        <div class="cta-buttons">
+          <a href="login.html" class="btn-primary btn-lg">
+            Start your free trial
+            <span class="btn-glow"></span>
+          </a>
+          <a href="signin.html" class="btn-ghost btn-lg">Schedule a demo</a>
+        </div>
+        <p class="cta-note">14-day free trial · No credit card required · Cancel anytime</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo">
+            <img src="Orbit_Only.png" alt="Orbit" class="nav-logo-img" />
+          </a>
+          <p>Marketing intelligence,<br/>elevated to a new orbit.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Twitter/X">𝕏</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="GitHub">⌥</a>
+          </div>
+        </div>
+
+        <div class="footer-links-group">
+          <h4>Product</h4>
+          <a href="#">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Changelog</a>
+          <a href="#">Roadmap</a>
+          <a href="#">Integrations</a>
+        </div>
+
+        <div class="footer-links-group">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Careers</a>
+          <a href="#">Press</a>
+          <a href="#">Contact</a>
+        </div>
+
+        <div class="footer-links-group">
+          <h4>Resources</h4>
+          <a href="#">Documentation</a>
+          <a href="#">API Reference</a>
+          <a href="#">Community</a>
+          <a href="#">Status</a>
+          <a href="#">Support</a>
+        </div>
+
+        <div class="footer-newsletter">
+          <h4>Stay in orbit</h4>
+          <p>Get product updates and marketing insights delivered to your inbox.</p>
+          <form class="newsletter-form" onsubmit="return false;">
+            <input type="email" placeholder="your@email.com" />
+            <button type="submit" class="btn-primary">→</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Orbit. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  </div><!-- /.site-shell -->
+
+  <script src="promo-script.js"></script>
+</body>
+</html>

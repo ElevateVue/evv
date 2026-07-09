@@ -2231,7 +2231,7 @@ const PUBLIC_API_ROUTES = new Set([
 ]);
 
 const serveStatic = (req, res) => {
-  let safePath = req.url === '/' ? '/landing.html' : req.url.split('?')[0];
+  let safePath = req.url === '/' ? '/promo.html' : req.url.split('?')[0];
   if (safePath === '/dashboard.html') safePath = '/featurehub.html';
   if (safePath === '/positioning-wizard.html') {
     res.writeHead(302, { Location: '/strategy.html#positioning' });
@@ -2449,6 +2449,50 @@ const server = http.createServer(async (req, res) => {
     return socialAuth.handleGetAccounts(req, res, getSession, sendJson);
   }
 
+  if (parsedUrl.pathname === '/api/upload-media' && req.method === 'POST') {
+    try {
+      const session = getSession(req);
+      if (!session) return sendJson(res, 401, { error: 'Not authenticated' });
+      const body = await parseBody(req);
+      const dataUrl = String(body.data || '');
+      if (!dataUrl.startsWith('data:')) return sendJson(res, 400, { error: 'Invalid image data' });
+
+      const crypto = require('crypto');
+      const https = require('https');
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const apiKey = process.env.CLOUDINARY_API_KEY;
+      const apiSecret = process.env.CLOUDINARY_API_SECRET;
+      if (!cloudName || !apiKey || !apiSecret) return sendJson(res, 500, { error: 'Cloudinary not configured' });
+
+      const timestamp = Math.floor(Date.now() / 1000);
+      const signature = crypto.createHash('sha1').update(`timestamp=${timestamp}${apiSecret}`).digest('hex');
+
+      const formBody = new URLSearchParams({ file: dataUrl, timestamp: String(timestamp), api_key: apiKey, signature }).toString();
+
+      const uploadResult = await new Promise((resolve, reject) => {
+        const req2 = https.request({
+          hostname: 'api.cloudinary.com',
+          path: `/v1_1/${cloudName}/image/upload`,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(formBody) },
+        }, (r) => {
+          let raw = '';
+          r.on('data', (c) => { raw += c; });
+          r.on('end', () => { try { resolve(JSON.parse(raw)); } catch { reject(new Error('Bad Cloudinary response')); } });
+        });
+        req2.on('error', reject);
+        req2.write(formBody);
+        req2.end();
+      });
+
+      if (uploadResult.error) return sendJson(res, 502, { error: `Cloudinary: ${uploadResult.error.message}` });
+      return sendJson(res, 200, { url: uploadResult.secure_url });
+    } catch (err) {
+      console.error('[upload-media]', err.message);
+      return sendJson(res, 500, { error: err.message });
+    }
+  }
+
   if (parsedUrl.pathname === '/api/schedule-post' && req.method === 'POST') {
     try {
       const session = getSession(req);
@@ -2470,9 +2514,27 @@ const server = http.createServer(async (req, res) => {
 
       // Platforms the user selected (lowercase for Supabase lookup)
       const platformKeys = selectedAccounts.map((a) => (a.platform || '').toLowerCase());
+      const userEmail = String(session.user.email || '').trim().toLowerCase();
+
+      // Verify these platforms have real OAuth tokens in Supabase before trying to post
+      const supabase = require('./lib/supabase');
+      const { data: tokenCheck } = await supabase
+        .from('connected_accounts')
+        .select('platform, account_name')
+        .eq('user_email', userEmail);
+      const tokenPlatforms = (tokenCheck || []).map((r) => r.platform);
+      const expandedKeys = [...new Set([...platformKeys, ...(platformKeys.includes('facebook') ? ['facebook_page'] : [])])];
+      const hasAnyToken = expandedKeys.some((p) => tokenPlatforms.includes(p));
+      if (!hasAnyToken) {
+        return sendJson(res, 400, {
+          error: `No connected accounts with posting access found for: ${platformKeys.join(', ')}. ` +
+            `Please go to Connect Platforms and reconnect via the OAuth button (not manual username entry). ` +
+            `Accounts connected by typing a username cannot post — only OAuth-connected accounts can.`
+        });
+      }
 
       const { post, results, scheduled } = await socialPost.saveAndMaybePublish({
-        userEmail: session.user.email,
+        userEmail,
         content,
         mediaUrl,
         platforms: platformKeys,
@@ -2505,6 +2567,9 @@ const server = http.createServer(async (req, res) => {
       if (publishedCount === 0 && errors.length) {
         return sendJson(res, 502, { error: `Posting failed: ${errors.join('; ')}` });
       }
+      if (publishedCount === 0 && !errors.length) {
+        return sendJson(res, 502, { error: `No accounts were posted to. Accounts found: ${(results||[]).map(r=>r.platform).join(', ') || 'none'}. Check server logs.` });
+      }
       return sendJson(res, 200, {
         success: true,
         published: publishedCount,
@@ -2526,27 +2591,48 @@ const server = http.createServer(async (req, res) => {
       const originalName = String(body.filename || 'media').trim();
       const match = mediaData.match(/^data:([^;]+);base64,(.+)$/);
       if (!match) return sendJson(res, 400, { message: 'A base64 data URL is required.' });
-
       const mimeType = match[1];
-      const extensionFromMime = {
-        'image/jpeg': '.jpg',
-        'image/png': '.png',
-        'image/gif': '.gif',
-        'image/webp': '.webp',
-        'video/mp4': '.mp4',
-        'video/quicktime': '.mov',
-        'application/pdf': '.pdf',
-      }[mimeType] || path.extname(originalName).toLowerCase() || '.bin';
+
+      // Upload to Cloudinary so the URL is publicly accessible for Instagram/Facebook
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const apiKey = process.env.CLOUDINARY_API_KEY;
+      const apiSecret = process.env.CLOUDINARY_API_SECRET;
+      if (cloudName && apiKey && apiSecret) {
+        const timestamp = Math.floor(Date.now() / 1000);
+        const signature = require('crypto').createHash('sha1').update(`timestamp=${timestamp}${apiSecret}`).digest('hex');
+        const formBody = new URLSearchParams({ file: mediaData, timestamp: String(timestamp), api_key: apiKey, signature }).toString();
+        const resourceType = mimeType.startsWith('video') ? 'video' : 'image';
+        const uploadResult = await new Promise((resolve, reject) => {
+          const r2 = require('https').request({
+            hostname: 'api.cloudinary.com',
+            path: `/v1_1/${cloudName}/${resourceType}/upload`,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(formBody) },
+          }, (r) => {
+            let raw = '';
+            r.on('data', (c) => { raw += c; });
+            r.on('end', () => { try { resolve(JSON.parse(raw)); } catch { reject(new Error('Bad Cloudinary response')); } });
+          });
+          r2.on('error', reject);
+          r2.write(formBody);
+          r2.end();
+        });
+        if (!uploadResult.error && uploadResult.secure_url) {
+          console.log('[media/upload] Cloudinary URL:', uploadResult.secure_url);
+          return sendJson(res, 200, { url: uploadResult.secure_url, filename: uploadResult.public_id, mimeType });
+        }
+        console.warn('[media/upload] Cloudinary failed, falling back to local:', uploadResult.error?.message);
+      }
+
+      // Fallback: save locally
+      const extensionFromMime = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/gif': '.gif', 'image/webp': '.webp', 'video/mp4': '.mp4', 'video/quicktime': '.mov', 'application/pdf': '.pdf' }[mimeType] || path.extname(originalName).toLowerCase() || '.bin';
       const safeExt = extensionFromMime.replace(/[^.a-z0-9]/gi, '').slice(0, 8) || '.bin';
       const filename = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${safeExt}`;
-
       fs.mkdirSync(uploadsDir, { recursive: true });
       fs.writeFileSync(path.join(uploadsDir, filename), Buffer.from(match[2], 'base64'));
-
       const protocol = req.headers['x-forwarded-proto'] || (req.headers.host?.startsWith('localhost') ? 'http' : 'https');
       const baseUrl = PUBLIC_APP_URL || `${protocol}://${req.headers.host}`;
-      const url = `${baseUrl}/uploads/${filename}`;
-      return sendJson(res, 200, { url, filename, mimeType });
+      return sendJson(res, 200, { url: `${baseUrl}/uploads/${filename}`, filename, mimeType });
     } catch (err) {
       return sendJson(res, 500, { message: `Media upload failed: ${err.message}` });
     }
@@ -3653,6 +3739,40 @@ Generate a professional, strategic brand positioning report based on this inform
 
   if (path0.startsWith('/api/social/accounts/') && req.method === 'DELETE') {
     return socialAuth.handleDeleteAccount(req, res, getSession, sendJson);
+  }
+
+  // Diagnostic: test what accounts exist and attempt a real post
+  if (path0 === '/api/social/test-post' && req.method === 'GET') {
+    const session = getSession(req);
+    if (!session) return sendJson(res, 401, { error: 'Not logged in' });
+    const supabaseLib = require('./lib/supabase');
+    const { data: accounts } = await supabaseLib
+      .from('connected_accounts')
+      .select('platform, account_id, account_name, access_token')
+      .eq('user_email', session.user.email);
+
+    const results = [];
+    for (const acct of (accounts || [])) {
+      let testResult = { platform: acct.platform, account: acct.account_name, accountId: acct.account_id };
+      try {
+        const https = require('https');
+        const testUrl = `https://graph.facebook.com/v19.0/${acct.account_id}/feed?message=Test+post+from+Orbit&access_token=${acct.access_token}`;
+        const postRes = await new Promise((resolve) => {
+          const r = https.request({ hostname:'graph.facebook.com', path:`/v19.0/${acct.account_id}/feed`, method:'POST' }, (res2) => {
+            let raw=''; res2.on('data',(c)=>{raw+=c;}); res2.on('end',()=>{ try{resolve(JSON.parse(raw));}catch{resolve({raw});}});
+          });
+          r.write(new URLSearchParams({ message: '🧪 Test post from Orbit (ignore)', access_token: acct.access_token }).toString());
+          r.setHeader('Content-Type','application/x-www-form-urlencoded');
+          r.end();
+        });
+        testResult.result = postRes;
+        testResult.success = !!postRes.id;
+      } catch(e) {
+        testResult.error = e.message;
+      }
+      results.push(testResult);
+    }
+    return sendJson(res, 200, { email: session.user.email, accountsFound: (accounts||[]).length, results });
   }
   // ── END SOCIAL MEDIA ROUTES ────────────────────────────────────────────
 

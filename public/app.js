@@ -1427,7 +1427,7 @@ modalForm?.addEventListener('submit', (e) => {
   renderAvailableAccounts();
 });
 
-const META_APP_ID = '1502053464099181';
+const META_APP_ID = '2514894362274037';
 const META_API_VERSION = 'v25.0';
 let facebookSdkReadyPromise = null;
 
@@ -1485,75 +1485,93 @@ function fbApi(path, params = {}) {
   });
 }
 
+// Handle FB login status responses
+function statusChangeCallback(response) {
+  try {
+    if (!response) return;
+    if (response.status === 'connected' && response.authResponse) {
+      handleFacebookAuth(response.authResponse).catch((err) => {
+        console.error('Error handling connected Facebook auth', err);
+        alert('Facebook connection failed: ' + (err?.message || err));
+      });
+    } else {
+      console.log('Facebook status:', response.status);
+    }
+  } catch (err) {
+    console.error('statusChangeCallback error', err);
+  }
+}
+
+// Shared handler to fetch profile/pages and persist connections client-side
+async function handleFacebookAuth(authResponse) {
+  if (!authResponse || !authResponse.accessToken) throw new Error('No auth response');
+
+  const profile = await fbApi('/me', { fields: 'id,name' });
+  const pageResponse = await fbApi('/me/accounts', {
+    fields: 'id,name,instagram_business_account{id,username,name}',
+  });
+
+  const existingConnections = readConnections().filter((connection) => {
+    return !(connection.authProvider === 'meta' && (connection.platform === 'Facebook' || connection.platform === 'Instagram'));
+  });
+
+  const nextConnections = [...existingConnections];
+  const pages = Array.isArray(pageResponse?.data) ? pageResponse.data : [];
+
+  if (pages.length) {
+    pages.forEach((page) => {
+      nextConnections.push({
+        platform: 'Facebook',
+        username: page.name || profile.name || 'Facebook Page',
+        userId: page.id || profile.id || '',
+        authProvider: 'meta',
+        savedAt: Date.now(),
+      });
+
+      const instagramAccount = page.instagram_business_account;
+      if (instagramAccount?.id) {
+        nextConnections.push({
+          platform: 'Instagram',
+          username: instagramAccount.username || instagramAccount.name || page.name || 'Instagram Business',
+          userId: instagramAccount.id,
+          authProvider: 'meta',
+          savedAt: Date.now(),
+        });
+      }
+    });
+  } else {
+    nextConnections.push({
+      platform: 'Facebook',
+      username: profile.name || 'Facebook User',
+      userId: profile.id || '',
+      authProvider: 'meta',
+      savedAt: Date.now(),
+    });
+  }
+
+  writeConnections(nextConnections);
+  trackClientActivity({
+    eventType: 'edit_connection',
+    eventLabel: 'Saved Meta connection',
+    eventDetail: 'Facebook and linked Instagram accounts synced',
+    pageName: 'Connect',
+    pageCategory: 'Connections',
+    eventMeta: { platform: 'Facebook', accounts: nextConnections.length }
+  });
+  renderConnections();
+  renderAvailableAccounts();
+}
+
 async function startFacebookConnection() {
   try {
     const FB = await loadFacebookSdk();
-    FB.login(async (loginResponse) => {
+    // Attempt to reuse status handling for both getLoginStatus and login flows
+    FB.login((loginResponse) => {
       if (!loginResponse?.authResponse) {
         alert('Facebook connection was cancelled or not approved.');
         return;
       }
-
-      try {
-        const profile = await fbApi('/me', { fields: 'id,name' });
-        const pageResponse = await fbApi('/me/accounts', {
-          fields: 'id,name,instagram_business_account{id,username,name}',
-        });
-
-        const existingConnections = readConnections().filter((connection) => {
-          return !(connection.authProvider === 'meta' && (connection.platform === 'Facebook' || connection.platform === 'Instagram'));
-        });
-
-        const nextConnections = [...existingConnections];
-        const pages = Array.isArray(pageResponse?.data) ? pageResponse.data : [];
-
-        if (pages.length) {
-          pages.forEach((page) => {
-            nextConnections.push({
-              platform: 'Facebook',
-              username: page.name || profile.name || 'Facebook Page',
-              userId: page.id || profile.id || '',
-              authProvider: 'meta',
-              savedAt: Date.now(),
-            });
-
-            const instagramAccount = page.instagram_business_account;
-            if (instagramAccount?.id) {
-              nextConnections.push({
-                platform: 'Instagram',
-                username: instagramAccount.username || instagramAccount.name || page.name || 'Instagram Business',
-                userId: instagramAccount.id,
-                authProvider: 'meta',
-                savedAt: Date.now(),
-              });
-            }
-          });
-        } else {
-          nextConnections.push({
-            platform: 'Facebook',
-            username: profile.name || 'Facebook User',
-            userId: profile.id || '',
-            authProvider: 'meta',
-            savedAt: Date.now(),
-          });
-        }
-
-        writeConnections(nextConnections);
-        trackClientActivity({
-          eventType: 'edit_connection',
-          eventLabel: 'Saved Meta connection',
-          eventDetail: 'Facebook and linked Instagram accounts synced',
-          pageName: 'Connect',
-          pageCategory: 'Connections',
-          eventMeta: { platform: 'Facebook', accounts: nextConnections.length }
-        });
-        renderConnections();
-        renderAvailableAccounts();
-        alert('Facebook connection saved. Any available Facebook Pages and linked Instagram business accounts are now available for scheduling.');
-      } catch (error) {
-        console.error('Meta connection error', error);
-        alert(`Facebook connected, but account details could not be loaded: ${error.message}`);
-      }
+      statusChangeCallback({ status: 'connected', authResponse: loginResponse.authResponse });
     }, {
       scope: 'public_profile,pages_show_list,instagram_basic',
       return_scopes: true,
@@ -1563,6 +1581,20 @@ async function startFacebookConnection() {
     alert(`Unable to start Facebook connection: ${error.message}`);
   }
 }
+
+// Global helper for XFBML login button: calls FB.getLoginStatus
+window.checkLoginState = async function checkLoginState() {
+  try {
+    const FB = await loadFacebookSdk();
+    if (!FB) throw new Error('Facebook SDK not available');
+    FB.getLoginStatus(function(response) {
+      try { statusChangeCallback(response); }
+      catch (err) { console.error('statusChangeCallback failed', err); }
+    });
+  } catch (err) {
+    console.error('checkLoginState error', err);
+  }
+};
 
 function showConnectConfirm(platform) {
   return new Promise((resolve) => {
@@ -1674,6 +1706,18 @@ async function handlePlatformConnect(platform) {
   if (DIRECT_OAUTH_PLATFORMS[platform]) {
     const confirmed = await showConnectConfirm(platform);
     if (!confirmed) return;
+
+    // Prefer client-side Meta SDK flow for Facebook/Instagram when available
+    if (platform === 'Facebook' || platform === 'Instagram') {
+      try {
+        await startFacebookConnection();
+      } catch (err) {
+        console.error('startFacebookConnection failed, falling back to server OAuth', err);
+        // fallback to server popup below
+      }
+      return;
+    }
+
     const token = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}')?.token || ''; } catch { return ''; } })();
     const url = DIRECT_OAUTH_PLATFORMS[platform] + (token ? `?t=${encodeURIComponent(token)}` : '');
     const w = 720, h = 820;
@@ -3942,6 +3986,7 @@ const postFileLabel = document.getElementById('postFileLabel');
 const accountSearch = document.getElementById('accountSearch');
 const accountList = document.getElementById('accountList');
 const accountChips = document.getElementById('accountChips');
+const postTitle = document.getElementById('postTitle');
 const postDescription = document.getElementById('postDescription');
 const postCaption = document.getElementById('postCaption');
 const postMediaUrl = document.getElementById('postMediaUrl');
@@ -3952,11 +3997,17 @@ const scheduleForm = document.getElementById('scheduleForm');
 const scheduleDate = document.getElementById('scheduleDate');
 const scheduleTime = document.getElementById('scheduleTime');
 const approvalEmail = document.getElementById('approvalEmail');
-const platformPills = document.querySelectorAll('.platform-pill');
+const postNowBtn = document.getElementById('postNowBtn');
+const scheduleLaterBtn = document.getElementById('scheduleLaterBtn');
+const platformPills = document.querySelectorAll('.platform-pill, .cplat-btn');
+let submitAction = 'postNow';
 const previewPlatform = document.getElementById('previewPlatform');
 const previewCaption = document.getElementById('previewCaption');
 const previewHashtags = document.getElementById('previewHashtags');
 const previewFile = document.getElementById('previewFile');
+const previewImgArea = document.getElementById('previewImgArea');
+const composerDrop = document.getElementById('composerMediaDrop');
+const composerPreview = document.getElementById('composerMediaPreview');
 const addAccountBtn = document.getElementById('addAccountBtn');
 const saveHashtagsBtn = document.getElementById('saveHashtags');
 const savedHashtagsList = document.getElementById('savedHashtagsList');
@@ -4595,7 +4646,7 @@ accountSearch?.addEventListener('focus', () => {
 });
 
 accountSearch?.addEventListener('click', () => {
-  accountList?.classList.toggle('show');
+  accountList?.classList.add('show');
   renderAvailableAccounts();
 });
 
@@ -4606,8 +4657,7 @@ document.addEventListener('click', (event) => {
 });
 
 function getSelectedPlatforms() {
-  return Array.from(platformPills || [])
-    .filter((pill) => pill.classList.contains('active'))
+  return Array.from(document.querySelectorAll('.platform-pill.active, .cplat-btn.active'))
     .map((pill) => pill.textContent.trim());
 }
 
@@ -4878,6 +4928,14 @@ postHashtags?.addEventListener('input', () => {
   if (previewHashtags) previewHashtags.textContent = postHashtags.value || 'No hashtags yet...';
 });
 
+postNowBtn?.addEventListener('click', () => {
+  submitAction = 'postNow';
+});
+
+scheduleLaterBtn?.addEventListener('click', () => {
+  submitAction = 'schedule';
+});
+
 platformPills?.forEach((pill) => {
   pill.addEventListener('click', () => {
     pill.classList.toggle('active');
@@ -4899,48 +4957,51 @@ scheduleForm?.addEventListener('submit', async (e) => {
   const accounts = selectedAccounts.map((account) => account.label);
   const selectedPlatforms = getSelectedPlatforms();
   const caption = [postCaption?.value.trim(), postHashtags?.value.trim()].filter(Boolean).join('\n\n');
-  const title = postCaption?.value.trim() || postDescription?.value.trim() || postFile?.files?.[0]?.name || 'Scheduled post';
+  const title = postTitle?.value.trim() || postCaption?.value.trim() || postDescription?.value.trim() || postFile?.files?.[0]?.name || 'New post';
+  const isScheduled = submitAction === 'schedule';
   if (!selectedAccounts.length) return alert('Choose at least one connected account.');
   if (!selectedPlatforms.length) return alert('Pick at least one platform.');
   if (selectedPlatforms.includes('LinkedIn') && postFile?.files?.[0] && !postFile.files[0].name.toLowerCase().endsWith('.pdf')) {
     return alert('LinkedIn requires a PDF upload.');
   }
   if (!caption && !postMediaUrl?.value.trim() && !postFile?.files?.length) return alert('Add a caption, media URL, or media file.');
-  if (!scheduleDate?.value || !scheduleTime?.value) return alert('Pick a date and time.');
+  if (isScheduled && (!scheduleDate?.value || !scheduleTime?.value)) return alert('Pick a date and time.');
 
   const queueItem = createQueueItem({
     title,
     accounts,
     platforms: selectedPlatforms,
-    date: scheduleDate.value,
-    time: scheduleTime.value,
+    date: isScheduled ? scheduleDate.value : new Date().toISOString().slice(0,10),
+    time: isScheduled ? scheduleTime.value : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     caption: postCaption?.value.trim() || 'No caption provided',
     hashtags: postHashtags?.value.trim() || 'No hashtags provided',
     adminEmail: approvalEmail.value.trim(),
-    status: approvalEmail?.value.trim() ? 'pending' : 'scheduled',
+    status: approvalEmail?.value.trim() ? 'pending' : (isScheduled ? 'scheduled' : 'published'),
   });
   try {
     const resolvedMediaUrl = await uploadSelectedMediaIfNeeded();
-    const scheduleResponse = await fetch('/api/schedule-post', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify({
-        title,
-        caption: caption || title,
-        content: caption || title,
-        scheduledFor: `${scheduleDate.value}T${scheduleTime.value}`,
-        platforms: selectedAccounts.map((account) => ({
-          platform: account.platform,
-          accountId: account.accountId,
-        })),
-        mediaUrl: resolvedMediaUrl,
-        mediaType: postFile?.files?.[0]?.type?.startsWith('video') ? 'video' : 'image',
-        postType: postType?.value || 'Feed Post',
-      }),
-    });
-    const scheduleResult = await scheduleResponse.json().catch(() => ({}));
-    if (!scheduleResponse.ok) throw new Error(scheduleResult.error || scheduleResult.message || 'Unable to schedule this post.');
+    if (isScheduled) {
+      const scheduleResponse = await fetch('/api/schedule-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          title,
+          caption: caption || title,
+          content: caption || title,
+          scheduledFor: `${scheduleDate.value}T${scheduleTime.value}`,
+          platforms: selectedAccounts.map((account) => ({
+            platform: account.platform,
+            accountId: account.accountId,
+          })),
+          mediaUrl: resolvedMediaUrl,
+          mediaType: postFile?.files?.[0]?.type?.startsWith('video') ? 'video' : 'image',
+          postType: postType?.value || 'Feed Post',
+        }),
+      });
+      const scheduleResult = await scheduleResponse.json().catch(() => ({}));
+      if (!scheduleResponse.ok) throw new Error(scheduleResult.error || scheduleResult.message || 'Unable to schedule this post.');
+    }
 
     if (approvalEmail?.value.trim()) {
       await sendApprovalRequestEmail(queueItem);
@@ -4952,7 +5013,9 @@ scheduleForm?.addEventListener('submit', async (e) => {
 
     alert(approvalEmail?.value.trim()
       ? `Post scheduled and approval request sent to ${queueItem.adminEmail}.`
-      : 'Post scheduled and added to the content calendar.');
+      : isScheduled
+        ? 'Post scheduled and added to the content calendar.'
+        : 'Post sent and added to the post queue.');
 
     scheduleForm.reset();
     platformPills?.forEach((pill) => pill.classList.remove('active'));
@@ -4960,10 +5023,18 @@ scheduleForm?.addEventListener('submit', async (e) => {
     accountChips.innerHTML = '';
     if (postFile) postFile.value = '';
     if (postFileLabel) postFileLabel.textContent = 'Click to upload image, video, or PDF';
-    renderPreviewFile(null);
+    if (previewImgArea) previewImgArea.innerHTML = '<span>No media selected</span>';
+    if (composerDrop) {
+      composerDrop.classList.remove('has-media');
+      const dropIcon = composerDrop.querySelector('.drop-icon');
+      const dropHint = composerDrop.querySelector('.drop-hint');
+      if (dropIcon) { dropIcon.textContent = '🖼️'; dropIcon.style.display = 'block'; }
+      if (dropHint) { dropHint.textContent = 'Click or drag to add photo / video'; dropHint.style.display = 'block'; }
+    }
+    if (composerPreview) { composerPreview.src = ''; composerPreview.style.display = 'none'; }
     if (previewCaption) previewCaption.textContent = 'No caption yet...';
     if (previewHashtags) previewHashtags.textContent = 'No hashtags yet...';
-    window.location.href = 'content-calendar.html';
+    window.location.href = isScheduled ? 'content-calendar.html' : 'post-queue.html';
   } catch (error) {
     alert(error.message || 'Unable to schedule the post right now.');
   }
