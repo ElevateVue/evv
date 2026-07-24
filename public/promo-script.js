@@ -201,13 +201,15 @@ document.addEventListener('mouseup',   () => cursorDot.classList.remove('clickin
     };
   }
 
-  // Critically-damped spring — smooth glide, no oscillation
+  // Critically-damped spring — smoother glide, no oscillation
   let pos = getTarget();
   let vel = { x: 0, y: 0 };
-  const K = 0.032, D = 0.82;
+  const K = 0.022, D = 0.92;
 
   // Mouse
   let mx = -9999, my = -9999;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
   window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
 
   // Trail history
@@ -247,10 +249,10 @@ document.addEventListener('mouseup',   () => cursorDot.classList.remove('clickin
     const tgt = getTarget();
     const dx = mx - pos.x, dy = my - pos.y;
     const mdist = Math.sqrt(dx * dx + dy * dy);
-    const pull = (mdist < 180 && mdist > 0) ? (1 - mdist / 180) * 0.012 : 0;
+    const pull = (mdist < 220 && mdist > 0) ? (1 - mdist / 220) * 0.005 : 0;
 
-    vel.x = (vel.x + (tgt.x - pos.x) * K + dx * pull) * D;
-    vel.y = (vel.y + (tgt.y - pos.y) * K + dy * pull) * D;
+    vel.x = lerp(vel.x, (tgt.x - pos.x) * K + dx * pull, 0.14);
+    vel.y = lerp(vel.y, (tgt.y - pos.y) * K + dy * pull, 0.14);
     pos.x += vel.x;
     pos.y += vel.y;
 
@@ -278,6 +280,8 @@ document.addEventListener('mouseup',   () => cursorDot.classList.remove('clickin
 
     // ── TAIL — long sweeping passes, sphere stays in margin ──
     if (trail.length > 4) {
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       const farI  = TLEN - 1;
       const midI  = Math.floor(TLEN * 0.55);
       const nearI = Math.floor(TLEN * 0.22);
@@ -290,10 +294,13 @@ document.addEventListener('mouseup',   () => cursorDot.classList.remove('clickin
       g1.addColorStop(0.80, 'rgba(140, 90, 255, 0.14)');
       g1.addColorStop(1,    'rgba(160,110, 255, 0.22)');
       ctx.strokeStyle = g1;
-      ctx.lineWidth   = coreR * 4.0;
+      ctx.lineWidth   = coreR * 4.2;
       ctx.lineCap     = 'round';
       ctx.lineJoin    = 'round';
+      ctx.shadowColor = 'rgba(140, 110, 255, 0.18)';
+      ctx.shadowBlur  = 10;
       ctx.stroke();
+      ctx.shadowBlur  = 0;
 
       // Pass 2: mid tail — medium width, more saturated
       trailPath(0, midI);
@@ -304,7 +311,10 @@ document.addEventListener('mouseup',   () => cursorDot.classList.remove('clickin
       ctx.strokeStyle = g2;
       ctx.lineWidth   = coreR * 1.8;
       ctx.lineJoin    = 'round';
+      ctx.shadowColor = 'rgba(170, 140, 255, 0.22)';
+      ctx.shadowBlur  = 8;
       ctx.stroke();
+      ctx.shadowBlur  = 0;
 
       // Pass 3: bright core streak — narrow, close to head
       trailPath(0, nearI);
@@ -314,7 +324,10 @@ document.addEventListener('mouseup',   () => cursorDot.classList.remove('clickin
       g3.addColorStop(1,    'rgba(250,245, 255, 0.95)');
       ctx.strokeStyle = g3;
       ctx.lineWidth   = coreR * 0.55;
+      ctx.shadowColor = 'rgba(246, 242, 255, 0.28)';
+      ctx.shadowBlur  = 4;
       ctx.stroke();
+      ctx.shadowBlur  = 0;
 
       // Pass 4: ion tail — offset cyan, long
       const ionI = Math.floor(TLEN * 0.70);

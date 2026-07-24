@@ -247,6 +247,83 @@ function parsePostedAt(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function normalizeCsvComparisonRows(fileObj = {}) {
+  const { filename, csv } = fileObj;
+  const parsed = parseCsvTable(csv || '');
+  const headers = parsed.headers || [];
+  const rows = parsed.rows || [];
+  const keyMap = headers.reduce((acc, header, index) => {
+    acc[normalizeKey(header)] = index;
+    return acc;
+  }, {});
+
+  return rows.map((row, index) => ({
+    id: `cmp-${index + 1}`,
+    platform: getRowValue(row, keyMap, ['platform', 'Platform', 'Network']) || platformFromFilename(filename),
+    title: getRowValue(row, keyMap, ['title', 'Title', 'post title', 'content']) || `Row ${index + 1}`,
+    reach: coerceNumber(getRowValue(row, keyMap, ['reach', 'impressions', 'views', 'reach/impressions'])),
+    interactions: coerceNumber(getRowValue(row, keyMap, ['interactions', 'engagements', 'total interactions', 'total engagements'])),
+    clicks: coerceNumber(getRowValue(row, keyMap, ['clicks', 'link clicks', 'profile visits', 'ctr'])),
+    reactions: coerceNumber(getRowValue(row, keyMap, ['reactions', 'likes', 'love', 'thumbs up'])),
+    follows: coerceNumber(getRowValue(row, keyMap, ['follows', 'followers', 'new followers'])),
+    postedAt: parsePostedAt(getRowValue(row, keyMap, ['postedAt', 'Posted At', 'date', 'Date', 'timestamp'])),
+  }));
+}
+
+function summarizeComparisonPosts(posts = []) {
+  const totals = {
+    totalRows: posts.length,
+    totalReach: 0,
+    totalInteractions: 0,
+    totalClicks: 0,
+    totalReactions: 0,
+    totalFollows: 0,
+    tops: [],
+    byPlatform: {},
+  };
+
+  posts.forEach((post) => {
+    const platform = post.platform || 'Unknown';
+    totals.totalReach += post.reach || 0;
+    totals.totalInteractions += post.interactions || 0;
+    totals.totalClicks += post.clicks || 0;
+    totals.totalReactions += post.reactions || 0;
+    totals.totalFollows += post.follows || 0;
+
+    if (!totals.byPlatform[platform]) {
+      totals.byPlatform[platform] = {
+        count: 0,
+        reach: 0,
+        interactions: 0,
+        clicks: 0,
+        reactions: 0,
+        follows: 0,
+      };
+    }
+
+    totals.byPlatform[platform].count += 1;
+    totals.byPlatform[platform].reach += post.reach || 0;
+    totals.byPlatform[platform].interactions += post.interactions || 0;
+    totals.byPlatform[platform].clicks += post.clicks || 0;
+    totals.byPlatform[platform].reactions += post.reactions || 0;
+    totals.byPlatform[platform].follows += post.follows || 0;
+  });
+
+  totals.tops = posts
+    .slice()
+    .sort((a, b) => (b.reach || 0) - (a.reach || 0))
+    .slice(0, 3)
+    .map((post) => ({ title: post.title, platform: post.platform, reach: post.reach, interactions: post.interactions }));
+
+  totals.averageReach = totals.totalRows ? Number((totals.totalReach / totals.totalRows).toFixed(2)) : 0;
+  totals.averageInteractions = totals.totalRows ? Number((totals.totalInteractions / totals.totalRows).toFixed(2)) : 0;
+  totals.averageClicks = totals.totalRows ? Number((totals.totalClicks / totals.totalRows).toFixed(2)) : 0;
+  totals.averageReactions = totals.totalRows ? Number((totals.totalReactions / totals.totalRows).toFixed(2)) : 0;
+  totals.averageFollows = totals.totalRows ? Number((totals.totalFollows / totals.totalRows).toFixed(2)) : 0;
+
+  return totals;
+}
+
 function formatIsoDate(value) {
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return '';
@@ -2215,9 +2292,15 @@ function registerClientSignIn(user = {}) {
 }
 
 const PUBLIC_ROUTES = new Set([
+  '/promo.html',
   '/landing.html',
   '/login.html',
   '/signin.html',
+  '/terms-of-service.html',
+  '/privacy-policy.html',
+  '/legal-terms-content.html',
+  '/legal-privacy-content.html',
+  '/comparison-metrics.html',
 ]);
 const PUBLIC_API_ROUTES = new Set([
   '/api/health',
@@ -2228,6 +2311,7 @@ const PUBLIC_API_ROUTES = new Set([
   '/api/generate/ghost',
   '/api/generate/hooks',
   '/api/generate/ideas',
+  '/api/compare-metrics',
 ]);
 
 const serveStatic = (req, res) => {
@@ -2374,6 +2458,48 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 200, { ok: true, onboarding: nextOnboarding });
   }
 
+  if (req.url.split('?')[0] === '/api/compare-metrics' && req.method === 'POST') {
+    try {
+      const { fileOne, fileTwo } = await parseBody(req);
+      if (!fileOne || !fileTwo) {
+        return sendJson(res, 400, { message: 'Both CSV files are required for comparison.' });
+      }
+
+      const fileOneRows = normalizeCsvComparisonRows({ filename: 'file-one.csv', csv: fileOne });
+      const fileTwoRows = normalizeCsvComparisonRows({ filename: 'file-two.csv', csv: fileTwo });
+      const fileOneSummary = summarizeComparisonPosts(fileOneRows);
+      const fileTwoSummary = summarizeComparisonPosts(fileTwoRows);
+
+      const prompt = [
+        'You are an analytics consultant skilled at comparing marketing CSV exports.',
+        'Compare the two CSV summaries in plain, helpful language.',
+        'Explain when each file performs well, what is good, what is bad, and how the team can improve.',
+        'Return JSON only in this exact shape:',
+        '{"strengths":["string"],"weaknesses":["string"],"recommendations":["string"],"growthSteps":["string"]}',
+        'Rules:',
+        '- Keep each item short and actionable.',
+        '- Mention reach, engagement, clicks, reactions, follows, and audience signals where available.',
+        '- Note which file is stronger in each key area.',
+        '- Use the growthSteps array for future actions and next steps tied to performance.',
+        '- Do not include markdown, backticks, or extra wrappers in the values.',
+      ].join('\n');
+
+      const input = `File One Summary: ${JSON.stringify(fileOneSummary)}\nFile Two Summary: ${JSON.stringify(fileTwoSummary)}`;
+      const raw = await callAiJsonSequence(getCampaignProviderSequence(), prompt, input, 'AI returned an invalid comparison payload');
+
+      return sendJson(res, 200, {
+        fileOneSummary,
+        fileTwoSummary,
+        strengths: raw.strengths || raw.strongPoints || raw.strength || [],
+        weaknesses: raw.weaknesses || raw.weakness || raw.weakPoints || [],
+        recommendations: raw.recommendations || raw.nextSteps || raw.actionItems || [],
+        growthSteps: raw.growthSteps || raw.nextSteps || raw.actionItems || [],
+      });
+    } catch (err) {
+      return sendJson(res, 500, { message: err.message || 'Failed to compare metrics' });
+    }
+  }
+
   if (req.url === '/api/posts' && req.method === 'GET') {
     const workspace = ensureWorkspace(getSession(req)?.user, true);
     return sendJson(res, 200, { posts: workspace?.posts || [] });
@@ -2423,6 +2549,14 @@ const server = http.createServer(async (req, res) => {
     if (!post) return sendJson(res, 404, { message: 'not found' });
 
     try {
+      // Merge publish body into the post so platformAccounts, mediaUrl etc. are available
+      const body = await parseBody(req);
+      if (body.platformAccounts) post.platformAccounts = body.platformAccounts;
+      if (body.mediaUrl) post.mediaUrl = body.mediaUrl;
+      if (body.mediaUrls !== undefined) post.mediaUrls = body.mediaUrls;
+      if (body.mediaType) post.mediaType = body.mediaType;
+      if (body.transcript) post.transcript = body.transcript;
+
       const publishedPost = await publishSocialPost(session?.user?.email, post);
       post.status = 'posted';
       post.postedAt = Date.now();
@@ -2539,6 +2673,7 @@ const server = http.createServer(async (req, res) => {
         mediaUrl,
         platforms: platformKeys,
         scheduledAt,
+        selectedAccounts,
       });
 
       // Also save to local workspace for dashboard display
@@ -3795,8 +3930,9 @@ server.on('error', (err) => {
 });
 server.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
-  // Check for due scheduled posts every 60 seconds
-  setInterval(() => {
-    socialPost.runDuePosts().catch((err) => console.error('[Scheduler]', err.message));
-  }, 60 * 1000);
+  if (typeof socialPost.runDuePosts === 'function') {
+    setInterval(() => {
+      socialPost.runDuePosts().catch((err) => console.error('[Scheduler]', err.message));
+    }, 60 * 1000);
+  }
 });

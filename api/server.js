@@ -1311,7 +1311,7 @@ function upsertClientHubRecord(sessionUser, payload = {}) {
   return nextRecord;
 }
 
-const PUBLIC_ROUTES = new Set(['/landing.html', '/login.html', '/signin.html']);
+const PUBLIC_ROUTES = new Set(['/promo.html', '/landing.html', '/login.html', '/signin.html']);
 const PUBLIC_API_ROUTES = new Set([
   '/api/health',
   '/api/newsletter/subscribe',
@@ -1321,6 +1321,7 @@ const PUBLIC_API_ROUTES = new Set([
   '/api/generate/ghost',
   '/api/generate/hooks',
   '/api/generate/ideas',
+  '/api/compare-metrics',
 ]);
 
 const serveStatic = (req, res) => {
@@ -1450,7 +1451,7 @@ const server = http.createServer(async (req, res) => {
       ].join('\n');
 
       const input = `Topic: ${safeTopic}\nPlatform: ${safePlatform}\nPostType: ${safePostType}\nLength: ${safeLength}`;
-      const providers = ['gemini', 'deepseek'];
+      const providers = getCampaignProviderSequence();
       const raw = await callAiJsonSequence(providers, prompt, input, 'AI returned an invalid caption payload');
       return sendJson(res, 200, { provider: raw.provider || 'gemini', caption: raw.caption || raw.text || '', hashtags: raw.hashtags || raw.tags || [] });
     } catch (err) {
@@ -1547,31 +1548,34 @@ const server = http.createServer(async (req, res) => {
 
   if (parsedUrl.pathname === '/api/compare-metrics' && req.method === 'POST') {
     try {
-      const { platform, fileOne, fileTwo } = await parseBody(req);
-      if (!platform || !fileOne || !fileTwo) {
-        return sendJson(res, 400, { message: 'Platform and both CSV files are required.' });
+      const { platform = '', fileOne, fileTwo } = await parseBody(req);
+      if (!fileOne || !fileTwo) {
+        return sendJson(res, 400, { message: 'Both CSV files are required for comparison.' });
       }
 
-      const fileOneRows = normalizeCsvComparisonRows({ filename: `${platform}-one.csv`, csv: fileOne });
-      const fileTwoRows = normalizeCsvComparisonRows({ filename: `${platform}-two.csv`, csv: fileTwo });
+      const safePlatform = String(platform).trim() || 'mixed platform exports';
+      const fileOneRows = normalizeCsvComparisonRows({ filename: `${safePlatform}-one.csv`, csv: fileOne });
+      const fileTwoRows = normalizeCsvComparisonRows({ filename: `${safePlatform}-two.csv`, csv: fileTwo });
 
       const fileOneSummary = summarizeComparisonPosts(fileOneRows);
       const fileTwoSummary = summarizeComparisonPosts(fileTwoRows);
 
       const prompt = [
-        'You are an analytics consultant skilled at comparing social media reporting exports.',
-        'Compare the two CSV summaries and explain the main differences, strengths, weaknesses, and recommendations for the next campaign.',
+        'You are an analytics consultant skilled at comparing marketing CSV exports.',
+        'Compare the two CSV summaries in plain, helpful language.',
+        'Explain when each file performs well, what is good, what is bad, and how the team can improve.',
         'Return JSON only in this exact shape:',
-        '{"strengths":["string"],"weaknesses":["string"],"recommendations":["string"]}',
+        '{"strengths":["string"],"weaknesses":["string"],"recommendations":["string"],"growthSteps":["string"]}',
         'Rules:',
-        '- Focus on the platform and file comparison context.',
-        '- Mention which file is stronger on reach, engagement, clicks, and audience growth.',
-        '- Provide at least 3 strengths and 3 weaknesses, plus 3 practical recommendations.',
+        '- Keep each item short and actionable.',
+        '- Mention specific differences in reach, engagement, clicks, reactions, follows, and audience signals where available.',
+        '- Note which file is stronger in each key area.',
+        '- Use the growthSteps array for future actions and next steps tied to performance.',
         '- Do not include markdown, backticks, or extra wrappers in the values.',
       ].join('\n');
 
-      const input = `Platform: ${platform}\nFile One Summary: ${JSON.stringify(fileOneSummary)}\nFile Two Summary: ${JSON.stringify(fileTwoSummary)}`;
-      const providers = ['deepseek', 'gemini'];
+      const input = `Platform or source: ${safePlatform}\nFile One Summary: ${JSON.stringify(fileOneSummary)}\nFile Two Summary: ${JSON.stringify(fileTwoSummary)}`;
+      const providers = ['gemini', 'deepseek'];
       const raw = await callAiJsonSequence(providers, prompt, input, 'AI returned an invalid comparison payload');
 
       return sendJson(res, 200, {
@@ -1580,6 +1584,7 @@ const server = http.createServer(async (req, res) => {
         strengths: raw.strengths || raw.strongPoints || raw.strength || [],
         weaknesses: raw.weaknesses || raw.weakness || raw.weakPoints || [],
         recommendations: raw.recommendations || raw.nextSteps || raw.actionItems || [],
+        growthSteps: raw.growthSteps || raw.nextSteps || raw.actionItems || [],
       });
     } catch (err) {
       return sendJson(res, 500, { message: err.message || 'Failed to compare metrics' });

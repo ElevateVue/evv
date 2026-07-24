@@ -8,6 +8,8 @@ const existingAccountLoginLink = document.getElementById('existingAccountLoginLi
 const accountTypeOptions = Array.from(document.querySelectorAll('[data-account-type-option]'));
 const passwordInput = document.getElementById('password');
 const passwordToggle = document.getElementById('passwordToggle');
+const legalAgreementInput = document.getElementById('legalAgreement');
+const createAccountButton = document.getElementById('createAccountButton');
 
 function togglePasswordVisibility() {
   if (!passwordInput || !passwordToggle) return;
@@ -18,6 +20,14 @@ function togglePasswordVisibility() {
 }
 
 passwordToggle?.addEventListener('click', togglePasswordVisibility);
+
+function syncCreateAccountAvailability() {
+  if (!createAccountButton || !legalAgreementInput) return;
+  createAccountButton.disabled = !legalAgreementInput.checked;
+  localStorage.setItem('evvLegalAgreementAccepted', legalAgreementInput.checked ? 'true' : 'false');
+}
+
+legalAgreementInput?.addEventListener('change', syncCreateAccountAvailability);
 
 function setAccountType(type) {
   const isCompany = type === 'company';
@@ -85,6 +95,11 @@ form?.addEventListener('submit', async (e) => {
     return;
   }
 
+  if (!legalAgreementInput?.checked) {
+    alert('Please agree to the Terms of Service and Privacy Policy before creating your account.');
+    return;
+  }
+
   try {
     const response = await fetch('/api/login', {
       method: 'POST',
@@ -96,6 +111,8 @@ form?.addEventListener('submit', async (e) => {
         lastName,
         accountType,
         companyName: accountType === 'company' ? companyName : '',
+        legalAccepted: true,
+        legalAcceptedAt: new Date().toISOString(),
         role: 'client',
         view: 'client',
       }),
@@ -130,4 +147,8 @@ form?.addEventListener('submit', async (e) => {
 });
 
 setAccountType('individual');
+if (legalAgreementInput && localStorage.getItem('evvLegalAgreementAccepted') === 'true') {
+  legalAgreementInput.checked = true;
+}
+syncCreateAccountAvailability();
 

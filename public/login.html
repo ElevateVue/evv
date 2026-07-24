@@ -108,7 +108,17 @@
           </div>
         </div>
 
-        <button class="btn-primary full login-submit login-reference-submit" type="submit">Create Account</button>
+        <label class="signup-terms-row force-visible" for="legalAgreement">
+          <input type="checkbox" id="legalAgreement" required />
+          <span>
+            I read and agree to
+            <a href="terms-of-service.html?from=signup">Terms of Service</a>
+            and
+            <a href="privacy-policy.html?from=signup">Privacy Policy</a>.
+          </span>
+        </label>
+
+        <button class="btn-primary full login-submit login-reference-submit" id="createAccountButton" type="submit" disabled>Create Account</button>
       </form>
     </div>
   </section>

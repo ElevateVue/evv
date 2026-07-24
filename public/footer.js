@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function injectSharedFooter() {
   if (document.body.classList.contains('login-shell')) return;
-  if (document.querySelector('.evv-site-footer')) return;
 
   const legacyLandingFooter = document.querySelector('.footer-wrap');
   if (legacyLandingFooter) {
@@ -14,10 +13,10 @@ function injectSharedFooter() {
   const host = document.querySelector('.page') || document.body;
   if (!host) return;
 
-  const footer = document.createElement('footer');
+  const footer = document.querySelector('.evv-site-footer') || document.createElement('footer');
   footer.className = 'evv-site-footer';
   footer.innerHTML = buildFooterMarkup();
-  host.appendChild(footer);
+  if (!footer.parentElement) host.appendChild(footer);
 
   ensureLegalModal();
   bindFooterInteractions(footer);

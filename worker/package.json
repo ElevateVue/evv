@@ -1,0 +1,21 @@
+{
+  "name": "evv-scheduler-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Independent Supabase-backed social media scheduler worker for EVV.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "docker:build": "docker build -t evv-scheduler-worker .",
+    "docker:run": "docker run --rm --env-file .env evv-scheduler-worker"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "dotenv": "^17.3.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
