@@ -1,0 +1,15 @@
+name: OmniRoute Config
+version: 1.0.0
+schema: v1
+
+models:
+  - name: OmniRoute Coding
+    provider: openai
+    model: auto/coding:free
+    apiBase: http://localhost:20128/v1
+    apiKey: sk-7834c951315b9bdc-3bdfad-98efa21f
+    roles:
+      - chat
+      - autocomplete
+      - edit
+      - apply

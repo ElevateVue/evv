@@ -4999,6 +4999,39 @@ scheduleForm?.addEventListener('submit', async (e) => {
       });
       const scheduleResult = await scheduleResponse.json().catch(() => ({}));
       if (!scheduleResponse.ok) throw new Error(scheduleResult.error || scheduleResult.message || 'Unable to schedule this post.');
+    } else {
+      // Immediate publish flow: create a post record then call publish endpoint
+      const mediaUrls = resolvedMediaUrl ? [resolvedMediaUrl] : [];
+      const mediaType = postFile?.files?.[0]?.type?.startsWith('video') ? 'video' : 'image';
+      const createResponse = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          platform: selectedPlatforms.join(',') || 'Social',
+          title: title,
+          transcript: caption,
+          postType: postType?.value || 'Feed Post',
+          mediaName: postFile?.files?.[0]?.name || '',
+          mediaType,
+        }),
+      });
+      const created = await createResponse.json().catch(() => ({}));
+      if (!createResponse.ok || !created.post) throw new Error(created.message || 'Failed to create post');
+
+      const publishResponse = await fetch('/api/posts/' + created.post.id + '/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          platformAccounts: selectedAccounts.map((a) => ({ platform: a.platform, accountId: a.accountId })),
+          transcript: caption,
+          mediaUrls,
+          mediaType,
+        }),
+      });
+      const published = await publishResponse.json().catch(() => ({}));
+      if (!publishResponse.ok) throw new Error(published.message || published.error || 'Publish failed');
     }
 
     if (approvalEmail?.value.trim()) {

@@ -11,16 +11,16 @@
     "view": "client",
     "initials": "D",
     "firstSeen": 1785187200767,
-    "lastActive": 1785966648714,
-    "totalVisits": 57,
-    "lastPage": "Feature Hub",
+    "lastActive": 1786052780541,
+    "totalVisits": 74,
+    "lastPage": "Scheduling",
     "pageUsage": {
       "featurehub.html": {
         "name": "Feature Hub",
         "category": "Overview",
-        "visits": 11,
+        "visits": 15,
         "firstVisited": 1785187201131,
-        "lastVisited": 1785966648714
+        "lastVisited": 1786049982497
       },
       "dashboard-overview.html": {
         "name": "Dashboard",
@@ -32,9 +32,9 @@
       "report.html": {
         "name": "Report",
         "category": "Insights",
-        "visits": 1,
+        "visits": 2,
         "firstVisited": 1785187207026,
-        "lastVisited": 1785187207026
+        "lastVisited": 1786049985398
       },
       "comparison-metrics.html": {
         "name": "Comparison Metrics",
@@ -46,16 +46,16 @@
       "connect.html": {
         "name": "Connect",
         "category": "Connections",
-        "visits": 6,
+        "visits": 7,
         "firstVisited": 1785187213912,
-        "lastVisited": 1785871222323
+        "lastVisited": 1786046731078
       },
       "upload.html": {
         "name": "Scheduling",
         "category": "Publishing",
-        "visits": 26,
+        "visits": 37,
         "firstVisited": 1785187218839,
-        "lastVisited": 1785963199105
+        "lastVisited": 1786052780541
       },
       "post-queue.html": {
         "name": "Post Queue",
@@ -73,31 +73,31 @@
       }
     },
     "pagesUsed": [
-      "Feature Hub",
       "Scheduling",
+      "Report",
+      "Feature Hub",
+      "Connect",
       "Post Queue",
       "Content Calendar",
-      "Connect",
       "Comparison Metrics",
-      "Dashboard",
-      "Report"
+      "Dashboard"
     ],
     "toolsUsed": [
-      "Feature Hub",
       "Scheduling",
+      "Report",
+      "Feature Hub",
+      "Connect",
       "Post Queue",
       "Content Calendar",
-      "Connect",
       "Comparison Metrics",
-      "Dashboard",
-      "Report"
+      "Dashboard"
     ],
     "totalToolsUsed": 8,
     "recentTools": [
-      "Feature Hub",
       "Scheduling",
-      "Post Queue",
-      "Content Calendar"
+      "Report",
+      "Feature Hub",
+      "Connect"
     ],
     "metrics": {
       "connections": 2,
@@ -109,9 +109,218 @@
       "totalSavedItems": 28
     },
     "onboarding": null,
-    "signInCount": 8,
-    "lastSignInAt": 1785966648529,
+    "signInCount": 11,
+    "lastSignInAt": 1786046341890,
     "activity": [
+      {
+        "id": "evt-1786052780541-b45400",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786052780541,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786051356531-6c3c97",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786051356531,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786050383538-2d5984",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786050383538,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786050310518-87d59f",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786050310518,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786050109803-01cf7f",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786050109803,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786049985399-a96135",
+        "type": "page_view",
+        "label": "Report",
+        "detail": "",
+        "pageFile": "report.html",
+        "pageName": "Report",
+        "timestamp": 1786049985399,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786049982497-86a17c",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1786049982497,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786048906123-ec66f0",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786048906123,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786046735271-759a80",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786046735271,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786046731078-5b636f",
+        "type": "page_view",
+        "label": "Connect",
+        "detail": "",
+        "pageFile": "connect.html",
+        "pageName": "Connect",
+        "timestamp": 1786046731079,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786046725063-95b04f",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786046725063,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786046343963-0f314e",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786046343963,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786046342618-39015c",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1786046342618,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786046341891-079bd8",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1786046341891,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
+      {
+        "id": "evt-1786044240223-7d949d",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786044240223,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786044234187-b9898f",
+        "type": "page_view",
+        "label": "Scheduling",
+        "detail": "",
+        "pageFile": "upload.html",
+        "pageName": "Scheduling",
+        "timestamp": 1786044234187,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786044200402-f1d099",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1786044200402,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786044199416-795597",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1786044199416,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
+      {
+        "id": "evt-1786041877353-318632",
+        "type": "page_view",
+        "label": "Feature Hub",
+        "detail": "",
+        "pageFile": "featurehub.html",
+        "pageName": "Feature Hub",
+        "timestamp": 1786041877353,
+        "meta": {}
+      },
+      {
+        "id": "evt-1786041877069-47be3f",
+        "type": "login",
+        "label": "Signed in",
+        "detail": "Client session started",
+        "pageFile": "",
+        "pageName": "",
+        "timestamp": 1786041877069,
+        "meta": {
+          "role": "client",
+          "view": "client"
+        }
+      },
       {
         "id": "evt-1785966648714-eb4857",
         "type": "page_view",
@@ -317,225 +526,13 @@
         "pageName": "Scheduling",
         "timestamp": 1785872187475,
         "meta": {}
-      },
-      {
-        "id": "evt-1785871984657-496922",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785871984657,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785871980940-b71fd6",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1785871980940,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785871980820-afde25",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1785871980820,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1785871922255-51dd78",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785871922255,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785871699597-bf44d8",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785871699598,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785871225008-4b91b2",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785871225008,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785871222323-8eb65e",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1785871222323,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785871221304-c8805b",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1785871221304,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785871219761-e24490",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1785871219761,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1785447255081-e7bf21",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785447255081,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785446825928-dce760",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785446825928,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785445567327-d4b070",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785445567327,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785445512634-941429",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785445512635,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785445510112-1610e2",
-        "type": "page_view",
-        "label": "Connect",
-        "detail": "",
-        "pageFile": "connect.html",
-        "pageName": "Connect",
-        "timestamp": 1785445510112,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785445507982-5c9f97",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1785445507982,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785445507626-c4cc34",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1785445507626,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
-      },
-      {
-        "id": "evt-1785445449505-b6072c",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785445449505,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785444199305-060de1",
-        "type": "page_view",
-        "label": "Scheduling",
-        "detail": "",
-        "pageFile": "upload.html",
-        "pageName": "Scheduling",
-        "timestamp": 1785444199305,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785444194634-03292d",
-        "type": "page_view",
-        "label": "Feature Hub",
-        "detail": "",
-        "pageFile": "featurehub.html",
-        "pageName": "Feature Hub",
-        "timestamp": 1785444194634,
-        "meta": {}
-      },
-      {
-        "id": "evt-1785444194112-07e706",
-        "type": "login",
-        "label": "Signed in",
-        "detail": "Client session started",
-        "pageFile": "",
-        "pageName": "",
-        "timestamp": 1785444194112,
-        "meta": {
-          "role": "client",
-          "view": "client"
-        }
       }
     ],
     "activitySummary": {
-      "pageViews": 34,
+      "pageViews": 35,
       "edits": 0,
       "actions": 0,
-      "signIns": 8
+      "signIns": 11
     }
   }
 }

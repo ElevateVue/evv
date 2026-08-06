@@ -3,6 +3,111 @@
     "sabiha.habeeb1972@gmail.com": {
       "posts": [
         {
+          "id": "p55",
+          "platform": "Instagram,Facebook",
+          "title": "orbit",
+          "transcript": "lbgf",
+          "postType": "image",
+          "mediaName": "Screenshot 2026-05-26 013653.png",
+          "mediaType": "image",
+          "mediaData": null,
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0
+          },
+          "status": "posted",
+          "postedAt": 1786052820965,
+          "platformAccounts": [
+            {
+              "platform": "instagram",
+              "accountId": "17841439270562681"
+            }
+          ],
+          "mediaUrls": [
+            "https://res.cloudinary.com/wcdthfc2/image/upload/v1786052813/andeyd81ouxs68m13ibc.png"
+          ],
+          "publishResults": [
+            {
+              "accountId": "17841439270562681",
+              "platform": "Instagram",
+              "success": true,
+              "result": {
+                "id": "17901290856521152"
+              }
+            }
+          ],
+          "publishError": null
+        },
+        {
+          "id": "p54",
+          "platform": "Instagram,Facebook",
+          "title": "orbit",
+          "transcript": "orbiteS",
+          "postType": "image",
+          "mediaName": "Screenshot 2026-05-26 013653.png",
+          "mediaType": "image",
+          "mediaData": null,
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0
+          },
+          "status": "posted",
+          "postedAt": 1786051832491,
+          "platformAccounts": [
+            {
+              "platform": "instagram",
+              "accountId": "17841439270562681"
+            }
+          ],
+          "mediaUrls": [
+            "https://res.cloudinary.com/wcdthfc2/image/upload/v1786051821/ozlgzrjjlqguwh18mjyx.png"
+          ],
+          "publishResults": [
+            {
+              "accountId": "17841439270562681",
+              "platform": "Instagram",
+              "success": true,
+              "result": {
+                "id": "18165011875461933"
+              }
+            }
+          ],
+          "publishError": null
+        },
+        {
+          "id": "p53",
+          "platform": "Instagram,Facebook",
+          "title": "insta",
+          "transcript": "insta",
+          "postType": "image",
+          "mediaName": "Screenshot 2026-05-26 013653.png",
+          "mediaType": "image",
+          "mediaData": null,
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0
+          },
+          "status": "failed",
+          "postedAt": null,
+          "platformAccounts": [
+            {
+              "platform": "facebook",
+              "accountId": "122102362070588192"
+            },
+            {
+              "platform": "instagram",
+              "accountId": "17841439270562681"
+            }
+          ],
+          "mediaUrls": [
+            "https://res.cloudinary.com/wcdthfc2/image/upload/v1786050594/zu764iftfiyrtwme5cfd.png"
+          ],
+          "publishError": "Publishing failed: Facebook:122102362070588192 (#200) This endpoint is deprecated since the required permission publish_actions is deprecated; Instagram:17841439270562681 Media ID is not available"
+        },
+        {
           "id": "a5827e29-c229-4cd7-9b5a-512c4e3123b4",
           "title": "tik tok\n\nHere is the part worth paying attention to: a specific moment, idea, or",
           "transcript": "tik tok\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.",
@@ -1112,6 +1217,14 @@
         "engagementRate": 2.01
       },
       "perPlatform": {
+        "Instagram,Facebook": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        },
         "instagram": {
           "reach": 0,
           "interactions": 0,
@@ -1121,14 +1234,6 @@
           "follows": 0
         },
         "facebook_page": {
-          "reach": 0,
-          "interactions": 0,
-          "clicks": 0,
-          "reactions": 0,
-          "views": 0,
-          "follows": 0
-        },
-        "Instagram,Facebook": {
           "reach": 0,
           "interactions": 0,
           "clicks": 0,
@@ -3352,7 +3457,7 @@
         "completedAt": "2026-07-07T21:09:38.971Z"
       },
       "strategyReports": {},
-      "updatedAt": "2026-08-05T20:52:26.289Z"
+      "updatedAt": "2026-08-06T21:47:00.965Z"
     },
     "queenofall8747@gmail.com": {
       "posts": [
@@ -5533,5 +5638,5 @@
       "updatedAt": "2026-07-04T18:21:08.617Z"
     }
   },
-  "updatedAt": "2026-08-05T20:52:26.289Z"
+  "updatedAt": "2026-08-06T21:47:00.965Z"
 }
