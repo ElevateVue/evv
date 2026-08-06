@@ -30,7 +30,7 @@
   const schCaption = document.getElementById('schCaption');
   const schMedia = document.getElementById('schMedia');
   const schMediaPreview = document.getElementById('schMediaPreview');
-  let selectedMedia = null;
+  let selectedMedia = [];
   let socialAccounts = [];
 
   function setButtonLoading(button, isLoading, label = 'Generating...') {
@@ -83,6 +83,15 @@
     const original = button.textContent;
     button.textContent = 'Saved';
     setTimeout(() => { button.textContent = original; }, 1200);
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('Unable to read the selected file.'));
+      reader.readAsDataURL(file);
+    });
   }
 
   function getHooksText() {
@@ -566,7 +575,7 @@
   }
 
   function resetMedia() {
-    selectedMedia = null;
+    selectedMedia = [];
     if (schMedia) schMedia.value = '';
     if (schMediaPreview) schMediaPreview.textContent = 'No media selected';
   }
@@ -576,9 +585,18 @@
     const caption = schCaption?.value || '';
     const title = schTitle?.value || '';
     const platform = schPlatform?.value || '';
-    const mediaText = selectedMedia?.mediaName ? `Media: ${selectedMedia.mediaName}` : (schMediaUrl?.value.trim() ? `Media URL: ${schMediaUrl.value.trim()}` : 'No media selected');
+    const mediaText = selectedMedia.length
+      ? selectedMedia.length === 1
+        ? `Media: ${selectedMedia[0].mediaName}`
+        : `Media (${selectedMedia.length} files): ${selectedMedia.map((item) => item.mediaName).join(', ')}`
+      : (schMediaUrl?.value.trim() ? `Media URL: ${schMediaUrl.value.trim()}` : 'No media selected');
     if (preview) {
-      preview.textContent = `${platform}\n${title ? `Title: ${title}\n` : ''}${mediaText}\n\n${caption}`.trim();
+      const previewLines = [];
+      if (platform) previewLines.push(platform);
+      if (title) previewLines.push(`Title: ${title}`);
+      previewLines.push(mediaText);
+      if (caption) previewLines.push('', caption);
+      preview.textContent = previewLines.join('\n');
     }
   }
 
@@ -615,20 +633,30 @@
     updateSchedulePreview();
   });
 
-  schMedia?.addEventListener('change', () => {
-    const file = schMedia.files?.[0];
-    if (!file) return resetMedia();
-    const reader = new FileReader();
-    reader.onload = () => {
-      selectedMedia = {
-        mediaName: file.name,
-        mediaType: file.type || 'application/octet-stream',
-        mediaData: String(reader.result || ''),
-      };
-      if (schMediaPreview) schMediaPreview.textContent = `${file.name} (${Math.round(file.size / 1024)} KB)`;
-      updateSchedulePreview();
-    };
-    reader.readAsDataURL(file);
+  schMedia?.addEventListener('change', async () => {
+    const files = Array.from(schMedia.files || []);
+    if (!files.length) return resetMedia();
+    const items = [];
+    for (const file of files) {
+      try {
+        const dataUrl = await readFileAsDataUrl(file);
+        items.push({
+          mediaName: file.name,
+          mediaType: file.type || 'application/octet-stream',
+          mediaData: dataUrl,
+          size: file.size,
+        });
+      } catch (err) {
+        console.warn('Unable to read file:', file.name, err);
+      }
+    }
+    selectedMedia = items;
+    if (schMediaPreview) {
+      schMediaPreview.textContent = items.length === 1
+        ? `${items[0].mediaName} (${Math.round(items[0].size / 1024)} KB)`
+        : `${items.length} files selected: ${items.map((item) => item.mediaName).join(', ')}`;
+    }
+    updateSchedulePreview();
   });
 
   document.getElementById('generateCaptionBtn')?.addEventListener('click', async (event) => {
@@ -670,32 +698,43 @@
     const timeValue = document.getElementById('schTime')?.value || '09:00';
     const scheduleDate = schDate?.value;
     const scheduledFor = scheduleDate ? `${scheduleDate}T${timeValue}:00` : undefined;
+    const accountId = schAccount?.value;
+    if (!accountId) {
+      alert('Choose a connected account before scheduling.');
+      return;
+    }
+
     const payload = {
-      platform: schPlatform?.value,
-      accountId: schAccount?.value,
+      platforms: [{ platform: schPlatform?.value, accountId }],
       title: schTitle?.value || 'Untitled',
       transcript: captionWithHashtags,
       caption: captionWithHashtags,
       postType: schType?.value,
       scheduledFor,
     };
+
     try {
-      if (!payload.accountId) {
-        alert('Choose a connected account before scheduling.');
-        return;
-      }
-      // If a local file was selected, upload to Cloudinary first (takes priority over URL field)
-      if (selectedMedia?.mediaData) {
-        const upRes = await fetch('/api/upload-media', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: selectedMedia.mediaData }),
-          credentials: 'same-origin',
-        });
-        const upJson = await upRes.json();
-        if (!upRes.ok) throw new Error(upJson.error || 'Image upload failed');
-        payload.mediaUrl = upJson.url;
-        payload.mediaType = selectedMedia.mediaType?.startsWith('video') ? 'video' : 'image';
+      if (selectedMedia.length) {
+        const uploadedUrls = [];
+        for (const media of selectedMedia) {
+          const upRes = await fetch('/api/media/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: media.mediaName, mediaType: media.mediaType, mediaData: media.mediaData }),
+            credentials: 'same-origin',
+          });
+          const upJson = await upRes.json();
+          if (!upRes.ok) throw new Error(upJson.error || 'Media upload failed');
+          if (!upJson.url) throw new Error('Media upload did not return a URL');
+          uploadedUrls.push(upJson.url);
+        }
+        if (!uploadedUrls.length) throw new Error('Media upload failed');
+        payload.mediaUrls = uploadedUrls;
+        payload.mediaUrl = uploadedUrls[0];
+        payload.mediaType = selectedMedia.some((item) => item.mediaType?.startsWith('video')) ? 'video' : 'image';
+        if (uploadedUrls.length > 1 && payload.postType === 'image') {
+          payload.postType = 'carousel';
+        }
       } else if (schMediaUrl?.value.trim()) {
         payload.mediaUrl = schMediaUrl.value.trim();
         payload.mediaType = schType?.value === 'video' || schType?.value === 'reel' ? 'video' : 'image';

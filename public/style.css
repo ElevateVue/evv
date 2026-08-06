@@ -869,7 +869,7 @@ main { padding:24px 28px 36px; display:flex; flex-direction:column; gap:20px; fl
 .content-modal-card .content-upload-field { gap:6px; }
 .content-modal-card .content-upload-field input { padding:8px 12px; }
 .content-modal-card .brand-btn { min-height:36px; padding:0 14px; }
-.schedule-editor-card { width:min(880px, 100%); max-height:calc(100vh - 36px); overflow-y:auto; display:grid; grid-template-columns:1.1fr 0.9fr; gap:18px; background:#090f1b; border:1px solid rgba(49,65,91,0.78); border-radius:18px; padding:20px; }
+.schedule-editor-card { width:min(880px, 100%); max-height:calc(100vh - 36px); overflow-y:auto; display:grid; grid-template-columns:1.2fr 0.8fr; gap:18px; background:#090f1b; border:1px solid rgba(49,65,91,0.78); border-radius:18px; padding:20px; }
 .schedule-editor-left, .schedule-editor-right { display:flex; flex-direction:column; gap:14px; }
 .schedule-header-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
 .schedule-subtitle { color:#8fa0c2; font-size:13px; margin-top:4px; }

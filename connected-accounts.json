@@ -10,26 +10,6 @@
     "created_at": "2026-07-07T21:10:07.427Z"
   },
   {
-    "id": "local-1783458607670-5z5pozo0",
-    "user_email": "sabiha.habeeb1972@gmail.com",
-    "platform": "facebook_page",
-    "account_name": "Orbittesting",
-    "account_id": "1140674272467922",
-    "access_token": "EAAsFNCfrcYkBR6LZCAFYOv1EAQcJqI2iNPSmQKu92BgUSxfuY6JZAN22Kd5Oc0bbAjGCFV20BtlRxWkLZBWeUO6194YEKXlEZBASDRT5Ot8QD0DcdCR5HHTaXmnSNn0QPLSQ0yBI9OwmvQ2DBg6lRyvZCMm7UKrhRG308iv9XCE5tZCDQPlUmbnXfQi4kgJKe0pk7P",
-    "expires_at": null,
-    "created_at": "2026-07-07T21:10:07.670Z"
-  },
-  {
-    "id": "local-1783458608822-g9zlxnch",
-    "user_email": "sabiha.habeeb1972@gmail.com",
-    "platform": "instagram",
-    "account_name": "@i_artsy_heartsy_",
-    "account_id": "17841439270562681",
-    "access_token": "EAAsFNCfrcYkBR6LZCAFYOv1EAQcJqI2iNPSmQKu92BgUSxfuY6JZAN22Kd5Oc0bbAjGCFV20BtlRxWkLZBWeUO6194YEKXlEZBASDRT5Ot8QD0DcdCR5HHTaXmnSNn0QPLSQ0yBI9OwmvQ2DBg6lRyvZCMm7UKrhRG308iv9XCE5tZCDQPlUmbnXfQi4kgJKe0pk7P",
-    "expires_at": null,
-    "created_at": "2026-07-07T21:10:08.822Z"
-  },
-  {
     "id": "local-1783188714811-wljgtvc1",
     "user_email": "ashwin@admin.com",
     "platform": "facebook",

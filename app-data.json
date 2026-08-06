@@ -3,6 +3,90 @@
     "sabiha.habeeb1972@gmail.com": {
       "posts": [
         {
+          "id": "a5827e29-c229-4cd7-9b5a-512c4e3123b4",
+          "title": "tik tok\n\nHere is the part worth paying attention to: a specific moment, idea, or",
+          "transcript": "tik tok\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.",
+          "platform": "instagram",
+          "platforms": [
+            "instagram"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1785963141/lx9icdifur5lt1wubcbx.png",
+          "scheduledAt": "2026-08-06T08:53:00+00:00",
+          "status": "pending",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-08-05T20:52:23.79119+00:00"
+        },
+        {
+          "id": "3f83290d-a873-49a5-9237-7e6317098616",
+          "title": "orbit\n\nHere is the part worth paying attention to: a specific moment, idea, or o",
+          "transcript": "orbit\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.",
+          "platform": "facebook_page",
+          "platforms": [
+            "facebook_page"
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1785962893/q5hmwmzz7gxqvoppdgz0.png",
+          "scheduledAt": "2026-08-06T08:49:00+00:00",
+          "status": "pending",
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0,
+            "reactions": 0,
+            "clicks": 0,
+            "views": 0,
+            "reach": 0,
+            "follows": 0
+          },
+          "createdAt": "2026-08-05T20:48:16.086734+00:00"
+        },
+        {
+          "id": "p50",
+          "platform": "Instagram,Facebook",
+          "title": "flower",
+          "transcript": "flower",
+          "postType": "image",
+          "mediaName": "Screenshot 2026-05-08 173004.png",
+          "mediaType": "image",
+          "mediaData": null,
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0
+          },
+          "status": "posted",
+          "postedAt": 1785873170451,
+          "platformAccounts": [
+            {
+              "platform": "instagram",
+              "accountId": "17841439270562681"
+            }
+          ],
+          "mediaUrl": "https://res.cloudinary.com/wcdthfc2/image/upload/v1785873154/idossldxneyzumldndm1.png",
+          "mediaUrls": [
+            "https://res.cloudinary.com/wcdthfc2/image/upload/v1785873154/idossldxneyzumldndm1.png"
+          ],
+          "publishResults": [
+            {
+              "accountId": "17841439270562681",
+              "platform": "Instagram",
+              "success": true,
+              "result": {
+                "id": "18108910597919330"
+              }
+            }
+          ],
+          "publishError": null
+        },
+        {
           "id": "0d050f07-f5da-43da-80bf-d9d88d56179a",
           "title": ";as..",
           "transcript": ";as..",
@@ -1029,6 +1113,22 @@
       },
       "perPlatform": {
         "instagram": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        },
+        "facebook_page": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        },
+        "Instagram,Facebook": {
           "reach": 0,
           "interactions": 0,
           "clicks": 0,
@@ -3252,7 +3352,7 @@
         "completedAt": "2026-07-07T21:09:38.971Z"
       },
       "strategyReports": {},
-      "updatedAt": "2026-07-09T14:52:48.920Z"
+      "updatedAt": "2026-08-05T20:52:26.289Z"
     },
     "queenofall8747@gmail.com": {
       "posts": [
@@ -5433,5 +5533,5 @@
       "updatedAt": "2026-07-04T18:21:08.617Z"
     }
   },
-  "updatedAt": "2026-07-09T14:52:48.920Z"
+  "updatedAt": "2026-08-05T20:52:26.289Z"
 }

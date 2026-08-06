@@ -2634,8 +2634,8 @@ const server = http.createServer(async (req, res) => {
 
       const body = await parseBody(req);
       const selectedAccounts = Array.isArray(body.platforms)
-        ? body.platforms.filter((item) => item && item.platform)
-        : [];
+        ? body.platforms.filter((item) => item && item.platform && item.accountId)
+        : (body.platform && body.accountId ? [{ platform: body.platform, accountId: body.accountId }] : []);
       if (!selectedAccounts.length) {
         return sendJson(res, 400, { error: 'Choose at least one connected account before scheduling.' });
       }

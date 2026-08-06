@@ -4072,53 +4072,45 @@ function createQueueItem({ title, accounts, platforms, date, time, caption, hash
   };
 }
 
-function renderPostQueue() {
-  if (!postQueueList) return;
-  postQueueList.innerHTML = '';
-  if (!postQueue.length) {
-    postQueueList.innerHTML = `<div class="queue-empty"><strong>No queued posts yet.</strong><p>Create a post and submit for approval to see it here.</p></div>`;
-    if (queueCount) queueCount.textContent = '0';
-    return;
-  }
+function normalizeScheduledAt(value) {
+  if (!value) return null;
+  var normalized = String(value).trim().replace(' ', 'T');
+  var date = new Date(normalized);
+  return isNaN(date.getTime()) ? null : date;
+}
 
-  if (queueCount) queueCount.textContent = String(postQueue.length);
-  postQueue.forEach((item) => {
-    const card = document.createElement('div');
-    card.className = 'queue-item';
-    card.innerHTML = `
-      <div class="queue-row">
-        <div>
-          <div class="queue-title">${item.title}</div>
-          <div class="queue-meta">${item.platforms.join(', ')} • ${item.accounts.join(', ')} • ${item.scheduledAt}</div>
-        </div>
-        <div class="queue-status ${item.status}">${item.status === 'approved' ? 'Approved ✅' : 'Pending ⏳'}</div>
-      </div>
-      <div class="queue-caption">${item.caption}</div>
-      <div class="queue-hashtags">${item.hashtags}</div>
-      <div class="queue-footer">
-        <span>Approval request sent to ${item.adminEmail}</span>
-        ${item.status === 'pending' ? '<button class="pill-btn outline small approve-btn">Approve</button>' : ''}
-      </div>
-    `;
-
-    if (item.status === 'pending') {
-      card.querySelector('.approve-btn')?.addEventListener('click', () => {
-        item.status = 'approved';
-        persistPostQueue();
-      });
-    }
-
-    postQueueList.appendChild(card);
-  });
+function editQueuedPost(item) {
+  if (!item) return;
+  var scheduledParts = String(item.scheduledAt || '').split(' ');
+  localStorage.setItem('orbitScheduleDraft', JSON.stringify({
+    id: item.id,
+    selectedPlatforms: item.platforms || [],
+    selectedAccounts: item.selectedAccounts || [],
+    title: item.title || '',
+    caption: item.caption || '',
+    hashtags: item.hashtags || '',
+    date: scheduledParts[0] || '',
+    time: scheduledParts[1] || '',
+    savedAt: new Date().toISOString(),
+  }));
+  window.location.href = 'upload.html';
 }
 
 function renderPostQueue() {
   if (!postQueueList) return;
 
-  postQueue = (postQueue || []).map((item) => ({
-    ...item,
-    status: item.status === 'pending' && !String(item.adminEmail || '').trim() ? 'scheduled' : item.status,
-  }));
+  var now = new Date();
+  postQueue = (postQueue || []).map((item) => {
+    var status = item.status || 'scheduled';
+    var scheduledAt = normalizeScheduledAt(item.scheduledAt);
+    if (status === 'scheduled' && scheduledAt && scheduledAt <= now) {
+      status = 'uploaded';
+    }
+    return {
+      ...item,
+      status: status === 'pending' && !String(item.adminEmail || '').trim() ? 'scheduled' : status,
+    };
+  });
   writeScopedJson('postQueue', postQueue);
 
   postQueueList.innerHTML = '';
@@ -4130,10 +4122,11 @@ function renderPostQueue() {
 
   if (queueCount) queueCount.textContent = String(postQueue.length);
   postQueue.forEach((item) => {
-    const status = item.status || 'scheduled';
-    const statusLabel = status === 'approved' ? 'Approved' : status === 'pending' ? 'Pending approval' : 'Scheduled';
-    const footerText = item.adminEmail ? `Approval request sent to ${item.adminEmail}` : 'Scheduled directly. No approval email was added.';
-    const card = document.createElement('div');
+    var status = item.status || 'scheduled';
+    var statusLabel = status === 'approved' ? 'Approved' : status === 'pending' ? 'Pending approval' : status === 'uploaded' ? 'Uploaded' : 'Scheduled';
+    var footerText = item.adminEmail ? `Approval request sent to ${item.adminEmail}` : status === 'uploaded' ? 'Published automatically when scheduled time passed.' : 'Scheduled directly. No approval email was added.';
+    var actionButton = status !== 'uploaded' ? '<button class="pill-btn outline small edit-btn">Edit</button>' : '';
+    var card = document.createElement('div');
     card.className = 'queue-item';
     card.innerHTML = `
       <div class="queue-row">
@@ -4148,6 +4141,7 @@ function renderPostQueue() {
       <div class="queue-footer">
         <span>${escapeHtml(footerText)}</span>
         ${status === 'pending' ? '<button class="pill-btn outline small approve-btn">Approve</button>' : ''}
+        ${actionButton}
       </div>
     `;
 
@@ -4157,6 +4151,10 @@ function renderPostQueue() {
         persistPostQueue();
       });
     }
+
+    card.querySelector('.edit-btn')?.addEventListener('click', () => {
+      editQueuedPost(item);
+    });
 
     postQueueList.appendChild(card);
   });

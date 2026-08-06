@@ -29,15 +29,18 @@ async function getAccountsForUser(userEmail, platformList) {
   return hasPages ? accounts.filter((account) => account.platform !== 'facebook') : accounts;
 }
 
-async function saveAndMaybePublish({ userEmail, content, mediaUrl, platforms, scheduledAt }) {
+async function saveAndMaybePublish({ userEmail, content, mediaUrl, mediaUrls, platforms, scheduledAt }) {
   const scheduledFor = scheduledAt || new Date().toISOString();
+  const mediaUrlList = Array.isArray(mediaUrls)
+    ? mediaUrls.map((item) => String(item || '').trim()).filter(Boolean)
+    : (mediaUrl ? [String(mediaUrl).trim()] : []);
 
   const { data: savedPost, error: insertErr } = await supabase
     .from('scheduled_posts')
     .insert({
       user_email: userEmail,
       content,
-      media_urls: mediaUrl ? [mediaUrl] : [],
+      media_urls: mediaUrlList,
       platforms: normalizePlatforms(platforms),
       scheduled_at: scheduledFor,
       status: 'pending',
