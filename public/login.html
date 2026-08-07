@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Account • EVV</title>
+  <title>Create Account • Orbit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <script>
     function loadScript(callback) {
@@ -22,39 +25,80 @@
   <script defer src="login.js"></script>
   <script defer src="footer.js"></script>
 </head>
-<body class="login-shell login-reference-shell">
-  <section class="login-hero login-reference-hero">
+<body class="login-shell login-reference-shell client-auth-shell">
+  <section class="login-hero login-reference-hero client-auth-hero">
     <div class="hero-overlay"></div>
+    <div class="hero-streak"></div>
+    <div class="login-hero-graphic">
+      <div class="mockup-glow"></div>
+      <div class="mockup-ring"></div>
+      <div class="mockup-device">
+        <div class="mockup-topbar">
+          <span></span><span></span><span></span>
+          <div class="mockup-topbar-icons"><i></i><i></i></div>
+        </div>
+        <div class="mockup-body">
+          <svg class="mockup-line-chart" viewBox="0 0 120 40" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="orbitLineGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#8b7bff" />
+                <stop offset="1" stop-color="#5fd7ff" />
+              </linearGradient>
+            </defs>
+            <polyline points="0,32 15,26 30,28 45,18 60,20 75,10 90,14 105,6 120,9" fill="none" stroke="url(#orbitLineGrad)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <div class="mockup-lower-row">
+            <div class="mockup-donut"></div>
+            <div class="mockup-bars">
+              <span style="height:38%"></span>
+              <span style="height:68%"></span>
+              <span style="height:52%"></span>
+              <span style="height:84%"></span>
+              <span style="height:44%"></span>
+            </div>
+            <div class="mockup-stat-lines"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+      <img class="mockup-badge badge-instagram" src="/ig.png" alt="Instagram" />
+      <img class="mockup-badge badge-facebook" src="/fb.png" alt="Facebook" />
+      <img class="mockup-badge badge-tiktok" src="/tiktok.png" alt="TikTok" />
+    </div>
     <div class="hero-content login-reference-content">
-      <div class="login-hero-chip">LET'S TALK</div>
-      <h1>Ready to <span class="gradient-text">Elevate</span><br />Your Brand?</h1>
+      <h1>Welcome to <span class="gradient-text">Orbit</span></h1>
       <p class="lead">
-        We combine strategic thinking with creative execution to build brands that stand out
-        and drive measurable results. We are more than marketers. We are growth partners.
+        The all-in-one platform to manage, schedule and grow your social presence effortlessly.
       </p>
 
-      <div class="login-reference-points">
-        <div class="login-reference-point">
-          <span class="login-reference-icon">✉</span>
-          <span>operations@elevate-vue.com</span>
+      <div class="login-feature-list">
+        <div class="login-feature-item">
+          <span class="login-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+          <div><strong>Smart Scheduling</strong><p>Plan and schedule posts across multiple platforms from one place.</p></div>
         </div>
-        <div class="login-reference-point">
-          <span class="login-reference-icon">●</span>
-          <span>Available remotely worldwide</span>
+        <div class="login-feature-item">
+          <span class="login-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          <div><strong>Powerful Analytics</strong><p>Track performance and gain meaningful insights that drive growth.</p></div>
         </div>
-        <div class="login-reference-point">
-          <span class="login-reference-icon">⚡</span>
-          <span>Response within 24 hours</span>
+        <div class="login-feature-item">
+          <span class="login-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <div><strong>Seamless Collaboration</strong><p>Work with your team and clients in perfect sync.</p></div>
         </div>
       </div>
     </div>
   </section>
 
   <section class="login-panel login-reference-panel">
-    <div class="panel-inner login-card login-reference-card signup-mode">
-      <h2 id="loginTitle">Create Your Account</h2>
+    <div class="panel-inner login-card login-reference-card client-auth-card signup-mode">
+      <h2 id="loginTitle">Create Account</h2>
       <p class="muted" id="loginSubtitle">Choose whether you are signing in as an individual or a company.</p>
-      <div class="login-linkline" id="loginLinkline">Already have an account? <a href="signin.html" id="existingAccountLoginLink">Log in</a></div>
+      <div class="login-linkline" id="loginLinkline">Already have an account? <a href="signin.html" id="existingAccountLoginLink">Sign in</a></div>
+
+      <div class="social-auth-row">
+        <button type="button" class="social-auth-btn" data-provider="Google"><span class="social-auth-icon google-icon">G</span> Google</button>
+        <button type="button" class="social-auth-btn" data-provider="Facebook"><span class="social-auth-icon facebook-icon">f</span> Facebook</button>
+        <button type="button" class="social-auth-btn" data-provider="LinkedIn"><span class="social-auth-icon linkedin-icon">in</span> LinkedIn</button>
+      </div>
+      <div class="auth-divider">or sign up with email</div>
 
       <form id="loginForm" class="stack">
         <input type="hidden" id="loginRole" value="client" />
@@ -118,7 +162,13 @@
           </span>
         </label>
 
-        <button class="btn-primary full login-submit login-reference-submit" id="createAccountButton" type="submit" disabled>Create Account</button>
+        <button class="btn-primary full login-submit login-reference-submit orbit-submit" id="createAccountButton" type="submit" disabled>
+          <span class="orbit-submit-text">Create Account →</span>
+          <span class="orbit-submit-figure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-3 7M12 13l3 7M9 11l3-2 3 2"/></svg></span>
+          <span class="orbit-submit-door" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect class="door-frame" x="3" y="2" width="18" height="20" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><rect class="door-leaf" x="4" y="3" width="16" height="18" rx="1" fill="currentColor"/></svg>
+          </span>
+        </button>
       </form>
     </div>
   </section>

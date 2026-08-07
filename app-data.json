@@ -3462,6 +3462,70 @@
     "queenofall8747@gmail.com": {
       "posts": [
         {
+          "id": "p34",
+          "platform": "Instagram,Facebook",
+          "title": "orbit",
+          "transcript": "flowee",
+          "postType": "image",
+          "mediaName": "Screenshot 2026-05-08 173004.png",
+          "mediaType": "image",
+          "mediaData": null,
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0
+          },
+          "status": "posted",
+          "postedAt": 1786128872607,
+          "platformAccounts": [
+            {
+              "platform": "instagram",
+              "accountId": "17841439270562681"
+            }
+          ],
+          "mediaUrls": [
+            "https://res.cloudinary.com/wcdthfc2/image/upload/v1786128862/phmyl7l9u7fqexmpk9qf.png"
+          ],
+          "publishResults": [
+            {
+              "accountId": "17841439270562681",
+              "platform": "Instagram",
+              "success": true,
+              "result": {
+                "id": "18219750358328068"
+              }
+            }
+          ],
+          "publishError": null
+        },
+        {
+          "id": "p33",
+          "platform": "Instagram,Facebook",
+          "title": "orbit",
+          "transcript": "flowee",
+          "postType": "image",
+          "mediaName": "Screenshot 2026-05-08 173004.png",
+          "mediaType": "image",
+          "mediaData": null,
+          "engagement": {
+            "likes": 0,
+            "comments": 0,
+            "shares": 0
+          },
+          "status": "failed",
+          "postedAt": null,
+          "platformAccounts": [
+            {
+              "platform": "instagram",
+              "accountId": "17841439270562681"
+            }
+          ],
+          "mediaUrls": [
+            "https://res.cloudinary.com/wcdthfc2/image/upload/v1786128834/lbdtldbjg4axxa8hpzzi.png"
+          ],
+          "publishError": "Publishing failed: Instagram:17841439270562681 Media ID is not available"
+        },
+        {
           "id": "post-1783190412168",
           "title": "brand streatrgy\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it w",
           "transcript": "brand streatrgy\n\nHere is the part worth paying attention to: a specific moment, idea, or outcome your audience can actually use. Save this for later, share it with someone who needs it, or tell us what you would add next.\n\n#ContentStrategy #SocialMedia #Marketing #BrandGrowth",
@@ -4322,6 +4386,14 @@
         "engagementRate": 2.01
       },
       "perPlatform": {
+        "Instagram,Facebook": {
+          "reach": 0,
+          "interactions": 0,
+          "clicks": 0,
+          "reactions": 0,
+          "views": 0,
+          "follows": 0
+        },
         "Facebook, Instagram": {
           "reach": 0,
           "interactions": 0,
@@ -4841,7 +4913,7 @@
         "completedAt": null
       },
       "strategyReports": {},
-      "updatedAt": "2026-07-04T18:40:12.168Z"
+      "updatedAt": "2026-08-07T18:54:32.607Z"
     },
     "codex-smoke@example.com": {
       "posts": [],
@@ -5638,5 +5710,5 @@
       "updatedAt": "2026-07-04T18:21:08.617Z"
     }
   },
-  "updatedAt": "2026-08-06T21:47:00.965Z"
+  "updatedAt": "2026-08-07T18:54:32.607Z"
 }

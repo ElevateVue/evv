@@ -1,6 +1,31 @@
 const form = document.getElementById('signinForm');
 const passwordInput = document.getElementById('password');
 const passwordToggle = document.getElementById('passwordToggle');
+const loginSubmitButton = form?.querySelector('.orbit-submit');
+
+function showAuthToast(message) {
+  let toast = document.getElementById('authToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'authToast';
+    toast.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translate(-50%,80px);z-index:100;min-width:min(360px,calc(100vw - 32px));border:1px solid rgba(115,230,255,0.25);border-radius:10px;background:rgba(8,13,28,0.96);color:#eff6ff;padding:13px 16px;box-shadow:0 22px 70px rgba(0,0,0,0.42);opacity:0;pointer-events:none;transition:opacity .22s ease, transform .22s ease;font-size:13px;font-weight:800;text-align:center;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translate(-50%, 0)';
+  clearTimeout(toast._hide);
+  toast._hide = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translate(-50%, 80px)';
+  }, 2800);
+}
+
+document.querySelectorAll('.social-auth-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    showAuthToast(btn.dataset.provider + ' sign-in is coming soon.');
+  });
+});
 
 function togglePasswordVisibility() {
   if (!passwordInput || !passwordToggle) return;
@@ -22,6 +47,8 @@ form?.addEventListener('submit', async (e) => {
     alert('Please enter your email and password.');
     return;
   }
+
+  loginSubmitButton?.classList.add('animating');
 
   try {
     const response = await fetch('/api/login', {
@@ -56,14 +83,17 @@ form?.addEventListener('submit', async (e) => {
     localStorage.setItem('portalRole', loginUser.role || 'client');
     document.cookie = `session=${encodeURIComponent(data.token)}; path=/`;
 
+    let nextUrl = loginUser.role === 'admin' || loginUser.view === 'admin'
+      ? '/clienthub.html'
+      : '/featurehub.html';
+
     if (loginUser.role !== 'admin' && loginUser.view !== 'admin') {
       try {
         const onboardingResponse = await fetch('/api/onboarding');
         if (onboardingResponse.ok) {
           const onboardingData = await onboardingResponse.json();
           if (onboardingData?.onboarding?.started && !onboardingData?.onboarding?.completed) {
-            window.location.href = '/onboarding.html';
-            return;
+            nextUrl = '/onboarding.html';
           }
         }
       } catch (error) {
@@ -71,10 +101,10 @@ form?.addEventListener('submit', async (e) => {
       }
     }
 
-    window.location.href = loginUser.role === 'admin' || loginUser.view === 'admin'
-      ? '/clienthub.html'
-      : '/featurehub.html';
+    await new Promise((resolve) => setTimeout(resolve, 850));
+    window.location.href = nextUrl;
   } catch (error) {
+    loginSubmitButton?.classList.remove('animating');
     alert('Login failed. Please try again.');
   }
 });

@@ -493,6 +493,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initializeSidebarNav();
 
+  // Logo click-through: pre-auth pages go home, authenticated pages go to Feature Hub
+  const preAuthPages = ['', 'landing.html', 'login.html', 'signin.html'];
+  const logoDestination = preAuthPages.includes(location.pathname.split('/').pop())
+    ? 'landing.html'
+    : 'featurehub.html';
+  document.querySelectorAll('.brand, .brand-inline').forEach((el) => {
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('button, a')) return;
+      window.location.href = logoDestination;
+    });
+  });
+
   // Activate current nav link
   const current = location.pathname.split('/').pop() || 'featurehub.html';
   document.querySelectorAll('.nav-link').forEach((link) => {

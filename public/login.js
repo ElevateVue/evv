@@ -11,6 +11,30 @@ const passwordToggle = document.getElementById('passwordToggle');
 const legalAgreementInput = document.getElementById('legalAgreement');
 const createAccountButton = document.getElementById('createAccountButton');
 
+function showAuthToast(message) {
+  let toast = document.getElementById('authToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'authToast';
+    toast.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translate(-50%,80px);z-index:100;min-width:min(360px,calc(100vw - 32px));border:1px solid rgba(115,230,255,0.25);border-radius:10px;background:rgba(8,13,28,0.96);color:#eff6ff;padding:13px 16px;box-shadow:0 22px 70px rgba(0,0,0,0.42);opacity:0;pointer-events:none;transition:opacity .22s ease, transform .22s ease;font-size:13px;font-weight:800;text-align:center;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translate(-50%, 0)';
+  clearTimeout(toast._hide);
+  toast._hide = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translate(-50%, 80px)';
+  }, 2800);
+}
+
+document.querySelectorAll('.social-auth-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    showAuthToast(btn.dataset.provider + ' sign-up is coming soon.');
+  });
+});
+
 function togglePasswordVisibility() {
   if (!passwordInput || !passwordToggle) return;
   const isVisible = passwordInput.type === 'text';
@@ -100,6 +124,8 @@ form?.addEventListener('submit', async (e) => {
     return;
   }
 
+  createAccountButton?.classList.add('animating');
+
   try {
     const response = await fetch('/api/login', {
       method: 'POST',
@@ -138,10 +164,12 @@ form?.addEventListener('submit', async (e) => {
     localStorage.setItem('user', JSON.stringify(createdUser));
     localStorage.setItem('portalRole', createdUser.role || 'client');
     document.cookie = `session=${encodeURIComponent(data.token)}; path=/`;
+    await new Promise((resolve) => setTimeout(resolve, 850));
     window.location.href = createdUser.role === 'admin' || createdUser.view === 'admin'
       ? '/clienthub.html'
       : '/onboarding.html';
   } catch (error) {
+    createAccountButton?.classList.remove('animating');
     alert('Unable to continue right now. Please try again.');
   }
 });

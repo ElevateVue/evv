@@ -25,13 +25,13 @@
     }
 
     main.schedule-main {
-      padding: 20px 24px 0;
+      padding: 12px 20px 12px;
     }
 
     .schedule-workspace {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
-      gap: 18px;
+      grid-template-columns: minmax(0, 1.85fr) minmax(300px, 360px);
+      gap: 14px;
       align-items: start;
       min-width: 0;
     }
@@ -41,7 +41,7 @@
       grid-template-columns: minmax(240px, 1fr) minmax(260px, 460px) auto;
       gap: 18px;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       min-width: 0;
     }
 
@@ -107,12 +107,6 @@
       white-space: nowrap;
     }
 
-    .autosave {
-      color: #62e7f0;
-      font-size: 12px;
-      margin-right: 6px;
-    }
-
     .btn {
       border: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(255, 255, 255, 0.045);
@@ -164,7 +158,7 @@
       background: rgba(9, 14, 29, 0.88);
       border: 1px solid rgba(127, 151, 191, 0.13);
       border-radius: 8px;
-      padding: 14px;
+      padding: 12px;
       box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
     }
 
@@ -173,7 +167,7 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .block-title {
@@ -218,7 +212,7 @@
       background: rgba(9, 14, 29, 0.88);
       border: 1px solid rgba(127, 151, 191, 0.13);
       border-radius: 8px;
-      padding: 14px;
+      padding: 12px;
       box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
       min-width: 0;
     }
@@ -226,7 +220,7 @@
     .platform-card,
     .content-card {
       position: relative;
-      min-height: 76px;
+      min-height: 64px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.025);
@@ -247,6 +241,30 @@
       border-color: rgba(119, 82, 255, 0.9);
       background: rgba(91, 62, 214, 0.18);
       box-shadow: inset 0 0 0 1px rgba(132, 104, 255, 0.2), 0 0 22px rgba(104, 76, 255, 0.16);
+    }
+
+    .platform-card.disabled {
+      opacity: 0.34;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+
+    .platform-card.disabled:hover {
+      transform: none;
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .content-hint {
+      margin: 8px 2px 0;
+      color: rgba(154, 202, 255, 0.75);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .content-card.locked {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
     .platform-card .check {
@@ -421,7 +439,7 @@
 
     .drop-zone {
       position: relative;
-      min-height: 96px;
+      min-height: 78px;
       border: 1px dashed rgba(144, 163, 202, 0.35);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.025);
@@ -447,9 +465,22 @@
       margin-top: 3px;
     }
 
+    .drop-zone.locked {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .drop-zone svg {
+      width: 22px;
+      height: 22px;
+      color: #7f97ff;
+      margin: 0 auto 2px;
+      display: block;
+    }
+
     .media-thumb,
     .add-more {
-      min-height: 96px;
+      min-height: 78px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.025);
@@ -458,6 +489,12 @@
       place-items: center;
       color: rgba(211, 226, 250, 0.42);
       font-size: 11px;
+    }
+
+    .media-thumb svg {
+      width: 20px;
+      height: 20px;
+      color: rgba(211, 226, 250, 0.4);
     }
 
     .media-thumb img,
@@ -514,11 +551,11 @@
     }
 
     .caption-area {
-      min-height: 142px;
+      min-height: 104px;
       width: 100%;
-      padding: 12px;
+      padding: 10px 12px;
       resize: vertical;
-      line-height: 1.55;
+      line-height: 1.5;
       min-width: 0;
     }
 
@@ -528,11 +565,27 @@
       min-width: 0;
     }
 
+    .caption-panel {
+      container-type: inline-size;
+      min-width: 0;
+    }
+
     .field-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 130px 130px;
       gap: 8px;
       margin-bottom: 8px;
+      min-width: 0;
+    }
+
+    .field-row > * {
+      min-width: 0;
+    }
+
+    @container (max-width: 460px) {
+      .field-row {
+        grid-template-columns: 1fr;
+      }
     }
 
     .field-label {
@@ -652,24 +705,19 @@
       background: #04121d;
     }
 
-    .schedule-options {
-      display: grid;
-      grid-template-columns: minmax(120px, 1fr) minmax(220px, 1fr) minmax(220px, 1fr);
+    .publish-mode-row {
+      display: flex;
       gap: 10px;
-      align-items: stretch;
-      min-width: 0;
-    }
-
-    .schedule-options > div {
-      min-width: 0;
+      margin-bottom: 12px;
     }
 
     .radio-box {
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.03);
-      padding: 10px;
-      display: grid;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
       gap: 7px;
       color: rgba(225, 236, 255, 0.76);
       font-size: 12px;
@@ -682,26 +730,205 @@
       background: rgba(91, 62, 214, 0.16);
     }
 
-    .date-grid {
+    .schedule-panel {
+      container-type: inline-size;
+    }
+
+    .schedule-builder {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 8px;
+      grid-template-columns: minmax(180px, 250px) minmax(140px, 1fr);
+      gap: 14px;
+      min-width: 0;
+      transition: opacity 0.16s ease;
     }
 
-    .schedule-options > div:first-child {
+    @container (max-width: 420px) {
+      .schedule-builder {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .schedule-builder.disabled-block {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .calendar-widget {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.025);
+      padding: 8px;
+      min-width: 0;
+    }
+
+    .cal-head {
       display: flex;
-      gap: 12px;
       align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
     }
 
-    .date-grid .timezone-field {
-      grid-column: 1 / -1;
+    .cal-month {
+      font-size: 12px;
+      font-weight: 900;
+      color: #edf4ff;
+    }
+
+    .cal-nav {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      color: #dce8fb;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .cal-weekdays,
+    .cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .cal-weekdays span {
+      color: rgba(213, 228, 250, 0.42);
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 0;
+    }
+
+    .cal-day {
+      border: 1px solid transparent;
+      background: transparent;
+      color: #dce8fb;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 6px;
+      min-height: 20px;
+      cursor: pointer;
+    }
+
+    .cal-day:hover:not(:disabled) {
+      border-color: rgba(119, 82, 255, 0.5);
+    }
+
+    .cal-day:disabled {
+      color: rgba(220, 232, 251, 0.18);
+      cursor: default;
+    }
+
+    .cal-day.today {
+      color: #62e7f0;
+    }
+
+    .cal-day.selected {
+      background: #7b5dff;
+      border-color: #7b5dff;
+      color: #fff;
+      box-shadow: 0 0 14px rgba(123, 93, 255, 0.5);
+    }
+
+    .cal-day.empty {
+      visibility: hidden;
+    }
+
+    .schedule-side {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      min-width: 0;
+    }
+
+    .time-picker {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.025);
+      padding: 8px 10px;
+      min-width: 0;
+    }
+
+    .time-fields {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .time-num {
+      width: 44px;
+      min-height: 32px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: #edf5ff;
+      border-radius: 7px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .time-fields > span {
+      color: rgba(213, 228, 250, 0.5);
+      font-weight: 900;
+    }
+
+    .ampm-toggle {
+      display: flex;
+      margin-left: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .ampm-btn {
+      border: 0;
+      background: rgba(255, 255, 255, 0.03);
+      color: rgba(220, 232, 251, 0.65);
+      min-height: 32px;
+      padding: 0 10px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .ampm-btn.active {
+      background: #7b5dff;
+      color: #fff;
     }
 
     .approval-grid {
       display: grid;
       gap: 8px;
       min-width: 0;
+    }
+
+    .approval-email-row {
+      display: flex;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .approval-email-input {
+      min-height: 30px;
+      padding: 0 9px;
+      font-size: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .approval-email-row .mini-btn {
+      min-height: 30px;
+      padding: 0 10px;
+      font-size: 11px;
+      flex: 0 0 auto;
     }
 
     .bottom-bar {
@@ -712,8 +939,8 @@
       grid-template-columns: auto minmax(220px, 1fr) auto auto;
       gap: 10px;
       align-items: center;
-      margin-top: 14px;
-      padding: 12px 0;
+      margin-top: 10px;
+      padding: 8px 0;
       background: linear-gradient(180deg, transparent, rgba(5, 8, 20, 0.9) 25%, rgba(5, 8, 20, 0.98));
     }
 
@@ -730,8 +957,9 @@
       background: rgba(11, 17, 33, 0.94);
       border: 1px solid rgba(127, 151, 191, 0.13);
       border-radius: 10px;
-      padding: 16px;
+      padding: 14px;
       box-shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+      min-width: 0;
     }
 
     .preview-title {
@@ -790,19 +1018,19 @@
     }
 
     .device-frame {
-      width: min(100%, 330px);
+      width: min(100%, 270px);
       margin: 0 auto;
-      border: 7px solid #05070c;
-      border-radius: 30px;
+      border: 6px solid #05070c;
+      border-radius: 26px;
       background: #05070c;
       box-shadow: 0 22px 60px rgba(0, 0, 0, 0.48);
       overflow: hidden;
     }
 
     .device-screen {
-      min-height: 520px;
+      min-height: 380px;
       background: #070a11;
-      border-radius: 22px;
+      border-radius: 20px;
       overflow: hidden;
       color: #f7f9ff;
     }
@@ -875,9 +1103,14 @@
     .ig-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 12px 4px;
-      font-size: 18px;
+      gap: 14px;
+      padding: 9px 12px 3px;
+    }
+
+    .ig-actions svg {
+      width: 20px;
+      height: 20px;
+      color: #f7f9ff;
     }
 
     .ig-actions span:last-child {
@@ -973,6 +1206,31 @@
       text-align: center;
     }
 
+    .fb-actions button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      border: 0;
+      background: transparent;
+      color: #657080;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+    }
+
+    .fb-actions button:hover {
+      background: #f0f2f5;
+    }
+
+    .fb-actions svg {
+      width: 15px;
+      height: 15px;
+    }
+
     .generic-preview .device-screen {
       background: #0b1222;
       padding: 14px;
@@ -1044,11 +1302,10 @@
       }
       .media-row,
       .field-row,
-      .schedule-options,
       .bottom-bar {
         grid-template-columns: 1fr;
       }
-      .date-grid {
+      .schedule-builder {
         grid-template-columns: 1fr;
       }
       .action-status {
@@ -1085,7 +1342,6 @@
           <span data-step="4">Review</span>
         </div>
         <div class="top-actions">
-          <span class="autosave" id="autosaveText">Auto-saved just now</span>
           <a href="post-queue.html" class="btn ghost" style="text-decoration:none;display:inline-grid;place-items:center">Post Queue</a>
           <button type="button" class="btn" id="saveDraftBtn">Save Draft</button>
         </div>
@@ -1125,7 +1381,7 @@
             </div>
           </div>
 
-          <div class="panel-block" style="margin-top:14px">
+          <div class="panel-block" style="margin-top:10px">
             <div class="block-head">
               <div>
                 <div class="block-title"><span class="step-badge">3</span> Content Type</div>
@@ -1140,9 +1396,10 @@
               <button type="button" class="content-card" data-type="reel">Reel</button>
               <button type="button" class="content-card" data-type="text">Text</button>
             </div>
+            <p class="content-hint" id="contentHint">Upload exactly 1 image.</p>
           </div>
 
-          <div class="panel-block" style="margin-top:14px">
+          <div class="panel-block" style="margin-top:10px">
             <div class="block-head">
               <div>
                 <div class="block-title"><span class="step-badge">4</span> Media</div>
@@ -1151,19 +1408,20 @@
             </div>
             <div class="media-row">
               <label class="drop-zone" id="mediaZone">
-                <input type="file" id="mediaFile" multiple accept=".mp4,.mov,.avi,.png,.jpg,.jpeg,.gif,.webp,video/*,image/*" />
+                <input type="file" id="mediaFile" multiple accept="image/*" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 <span>Drag &amp; drop files here<strong>or browse files</strong></span>
               </label>
-              <div class="media-thumb" id="thumbOne">Preview</div>
+              <div class="media-thumb" id="thumbOne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
               <div class="media-thumb" id="thumbTwo" style="display:none">Empty</div>
               <div class="media-thumb" id="thumbThree" style="display:none">Empty</div>
-              <label class="add-more">+<input type="file" id="mediaFileSecondary" multiple accept=".mp4,.mov,.avi,.png,.jpg,.jpeg,.gif,.webp,video/*,image/*" style="display:none" /></label>
+              <label class="add-more">+<input type="file" id="mediaFileSecondary" multiple accept="image/*" style="display:none" /></label>
             </div>
             <input type="hidden" id="mediaUrlInput" />
           </div>
 
-          <div class="editor-grid" style="margin-top:14px">
-            <div class="panel-block">
+          <div class="editor-grid" style="margin-top:10px">
+            <div class="panel-block caption-panel">
               <div class="caption-top">
                 <div>
                   <div class="block-title"><span class="step-badge">5</span> Caption</div>
@@ -1214,23 +1472,36 @@
             </div>
           </div>
 
-          <div class="editor-grid" style="margin-top:14px">
-            <div class="panel-block">
+          <div class="editor-grid" style="margin-top:10px">
+            <div class="panel-block schedule-panel">
               <div class="block-title"><span class="step-badge">6</span> Schedule</div>
               <p class="block-sub">Choose when to publish</p>
-              <div class="schedule-options" style="margin-top:12px">
-                <div>
-                  <label class="radio-box" id="postNowChoice"><input type="radio" name="publishMode" value="now" /> Post Now</label>
-                  <label class="radio-box active" id="scheduleChoice"><input type="radio" name="publishMode" value="schedule" checked /> Schedule Later</label>
-                </div>
-                <div class="date-grid">
-                  <div>
-                    <label class="field-label" for="scheduleDate">Date</label>
-                    <input type="date" id="scheduleDate" class="text-input" />
+              <div class="publish-mode-row" style="margin-top:12px">
+                <label class="radio-box" id="postNowChoice"><input type="radio" name="publishMode" value="now" /> Post Now</label>
+                <label class="radio-box active" id="scheduleChoice"><input type="radio" name="publishMode" value="schedule" checked /> Schedule Later</label>
+              </div>
+              <div class="schedule-builder" id="scheduleBuilder">
+                <div class="calendar-widget">
+                  <div class="cal-head">
+                    <button type="button" class="cal-nav" id="calPrev" aria-label="Previous month">&lsaquo;</button>
+                    <span class="cal-month" id="calMonthLabel"></span>
+                    <button type="button" class="cal-nav" id="calNext" aria-label="Next month">&rsaquo;</button>
                   </div>
-                  <div>
-                    <label class="field-label" for="scheduleTime">Time</label>
-                    <input type="time" id="scheduleTime" class="text-input" />
+                  <div class="cal-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                  <div class="cal-days" id="calDays"></div>
+                </div>
+                <div class="schedule-side">
+                  <div class="time-picker">
+                    <label class="field-label">Time</label>
+                    <div class="time-fields">
+                      <input type="number" id="timeHour" class="time-num" min="1" max="12" value="7" />
+                      <span>:</span>
+                      <input type="number" id="timeMinute" class="time-num" min="0" max="59" value="30" />
+                      <div class="ampm-toggle">
+                        <button type="button" class="ampm-btn" data-ampm="AM">AM</button>
+                        <button type="button" class="ampm-btn active" data-ampm="PM">PM</button>
+                      </div>
+                    </div>
                   </div>
                   <div class="timezone-field">
                     <label class="field-label" for="timezoneSelect">Timezone</label>
@@ -1242,6 +1513,8 @@
                   </div>
                 </div>
               </div>
+              <input type="hidden" id="scheduleDate" />
+              <input type="hidden" id="scheduleTime" />
             </div>
 
             <div class="panel-block approval-grid">
@@ -1252,7 +1525,11 @@
                 </div>
                 <button type="button" class="switch on" id="approvalSwitch" aria-label="Toggle approval"></button>
               </div>
-              <input id="approvalEmail" class="text-input" placeholder="approver@company.com" />
+              <div class="approval-email-row">
+                <input id="approvalEmail" class="text-input approval-email-input" placeholder="approver@company.com" />
+                <button type="button" class="mini-btn" id="saveApprovalEmailBtn" title="Save this email for next time">Save</button>
+              </div>
+              <div class="tag-list" id="savedApprovalEmails"></div>
               <textarea id="approvalNote" class="caption-area" style="min-height:76px" placeholder="Please review and approve this post."></textarea>
             </div>
           </div>
@@ -1325,7 +1602,6 @@
       const approvalSwitch = document.getElementById('approvalSwitch');
       const postNowChoice = document.getElementById('postNowChoice');
       const scheduleChoice = document.getElementById('scheduleChoice');
-      const autosaveText = document.getElementById('autosaveText');
 
       const platformMeta = {
         Instagram: { key: 'instagram', icon: 'ig.png' },
@@ -1394,6 +1670,10 @@
       platformBar.addEventListener('click', function(e) {
         const btn = e.target.closest('.platform-card');
         if (!btn || btn.dataset.platform === 'More') return;
+        if (btn.classList.contains('disabled')) {
+          showToast('Connect ' + btn.dataset.platform + ' first in Connect Platforms.', 'error');
+          return;
+        }
         btn.classList.toggle('active');
         selectedPlatforms = Array.from(platformBar.querySelectorAll('.platform-card.active'))
           .map(function(b) { return b.dataset.platform; })
@@ -1410,13 +1690,70 @@
         renderPreview();
       });
 
+      const contentTypeRules = {
+        image: { accept: 'image/*', max: 1, hint: 'Upload exactly 1 image.' },
+        video: { accept: 'video/*', max: 1, hint: 'Upload 1 video file.' },
+        carousel: { accept: 'image/*,video/*', max: 10, hint: 'Upload 2-10 images or videos.' },
+        story: { accept: 'image/*,video/*', max: 1, hint: 'Upload 1 image or video for your story.' },
+        reel: { accept: 'video/*', max: 1, hint: 'Upload 1 vertical video.' },
+        text: { accept: '', max: 0, hint: "Text posts don't include media." },
+      };
+
+      const mediaZone = document.getElementById('mediaZone');
+      const contentHint = document.getElementById('contentHint');
+
+      function applyContentTypeRules() {
+        const rule = contentTypeRules[currentContentType] || contentTypeRules.image;
+        mediaFile.accept = rule.accept;
+        mediaFileSecondary.accept = rule.accept;
+        contentHint.textContent = rule.hint;
+
+        const locked = rule.max === 0;
+        mediaFile.disabled = locked;
+        mediaFileSecondary.disabled = locked;
+        mediaZone.classList.toggle('locked', locked);
+
+        const acceptedPrefixes = rule.accept.split(',').map(function(item) { return item.split('/')[0]; });
+        mediaFiles = mediaFiles.filter(function(file) {
+          return acceptedPrefixes.some(function(prefix) { return file.type.startsWith(prefix + '/'); });
+        }).slice(0, rule.max);
+        rebuildMediaThumbs();
+      }
+
       contentTypeBar.addEventListener('click', function(e) {
         const btn = e.target.closest('.content-card');
         if (!btn) return;
         contentTypeBar.querySelectorAll('.content-card').forEach(function(item) { item.classList.remove('active'); });
         btn.classList.add('active');
         currentContentType = btn.dataset.type || 'image';
+        applyContentTypeRules();
+        renderPreview();
       });
+
+      function applyPlatformConnections() {
+        const connected = {};
+        Object.keys(platformMeta).forEach(function(name) {
+          connected[name] = accountsList.some(function(acct) { return accountMatchesPlatform(acct, name); });
+        });
+        Array.from(platformBar.querySelectorAll('.platform-card')).forEach(function(btn) {
+          const name = btn.dataset.platform;
+          if (name === 'More' || !(name in connected)) return;
+          const isConnected = connected[name];
+          btn.classList.toggle('disabled', !isConnected);
+          btn.title = isConnected ? '' : 'Connect ' + name + ' first';
+          if (!isConnected) btn.classList.remove('active');
+        });
+        selectedPlatforms = selectedPlatforms.filter(function(name) { return connected[name]; });
+        if (!selectedPlatforms.length) {
+          const firstConnected = Object.keys(connected).find(function(name) { return connected[name]; });
+          if (firstConnected) {
+            selectedPlatforms = [firstConnected];
+            const btn = platformBar.querySelector('[data-platform="' + firstConnected + '"]');
+            if (btn) btn.classList.add('active');
+          }
+        }
+        if (!selectedPlatforms.includes(previewPlatform)) previewPlatform = selectedPlatforms[0] || previewPlatform;
+      }
 
       function fetchAccounts() {
         fetch('/api/social/accounts', { credentials: 'same-origin' })
@@ -1427,7 +1764,9 @@
               return;
             }
             accountsList = result.data.accounts || [];
+            applyPlatformConnections();
             renderAccountDropdown();
+            renderPreview();
           })
           .catch(function() {
             acctDropdown.innerHTML = '<div style="color:rgba(255,177,168,.85);font-size:12px">Could not load connected accounts.</div>';
@@ -1512,6 +1851,8 @@
         window.location.href = '/connect.html';
       });
 
+      const emptyThumbIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+
       function createPreviewCard(file, index) {
         const url = URL.createObjectURL(file);
         const isVideo = file.type.startsWith('video/');
@@ -1525,21 +1866,16 @@
         return url;
       }
 
-      function addMediaFiles(files) {
-        const newFiles = Array.from(files || []).filter(function(file) {
-          return file && (file.type.startsWith('image/') || file.type.startsWith('video/'));
-        });
-        if (!newFiles.length) return;
-        mediaFiles = mediaFiles.concat(newFiles);
-        mediaFiles = mediaFiles.slice(0, 10);
+      function rebuildMediaThumbs() {
         mediaPreviewUrl = mediaFiles[0] ? URL.createObjectURL(mediaFiles[0]) : '';
         [thumbOne, thumbTwo, thumbThree].forEach(function(thumb, index) {
+          thumb.style.position = '';
           if (mediaFiles[index]) {
             createPreviewCard(mediaFiles[index], index);
           } else {
-            thumb.innerHTML = index === 0 ? 'Preview' : 'Empty';
+            thumb.innerHTML = emptyThumbIcon;
             thumb.style.opacity = '0.35';
-            if (index > 0) thumb.style.display = 'none';
+            thumb.style.display = index === 0 ? 'block' : 'none';
           }
         });
         if (mediaFiles.length > 3) {
@@ -1547,6 +1883,24 @@
           thumbThree.style.position = 'relative';
         }
         if (mediaUrlInput) mediaUrlInput.value = '';
+      }
+
+      function addMediaFiles(files) {
+        const rule = contentTypeRules[currentContentType] || contentTypeRules.image;
+        if (rule.max === 0) {
+          showToast("Text posts don't include media.", 'error');
+          return;
+        }
+        const acceptedPrefixes = rule.accept.split(',').map(function(item) { return item.split('/')[0]; });
+        const newFiles = Array.from(files || []).filter(function(file) {
+          return file && acceptedPrefixes.some(function(prefix) { return file.type.startsWith(prefix + '/'); });
+        });
+        if (!newFiles.length) {
+          showToast('That file type is not allowed for ' + currentContentType + ' posts.', 'error');
+          return;
+        }
+        mediaFiles = mediaFiles.concat(newFiles).slice(0, rule.max);
+        rebuildMediaThumbs();
         renderPreview();
       }
 
@@ -1565,10 +1919,7 @@
 
       captionText.addEventListener('input', updateCaptionState);
       hashtagInput.addEventListener('input', renderPreview);
-      postTitle.addEventListener('input', function() {
-        autosaveText.textContent = 'Auto-saved just now';
-        renderPreview();
-      });
+      postTitle.addEventListener('input', renderPreview);
 
       genCaptionBtn.addEventListener('click', function() {
         const topic = aiTopicInput.value.trim() || postTitle.value.trim();
@@ -1681,18 +2032,151 @@
         }
       });
 
+      const approvalEmailInput = document.getElementById('approvalEmail');
+      const saveApprovalEmailBtn = document.getElementById('saveApprovalEmailBtn');
+      const savedApprovalEmailsEl = document.getElementById('savedApprovalEmails');
+
+      function loadSavedApprovalEmails() {
+        try { return JSON.parse(localStorage.getItem('savedApprovalEmails') || '[]'); }
+        catch { return []; }
+      }
+
+      function renderSavedApprovalEmails() {
+        const emails = loadSavedApprovalEmails();
+        savedApprovalEmailsEl.innerHTML = emails.map(function(email, index) {
+          return '<span class="saved-set" data-index="' + index + '">' + escapeHtml(email) + ' <button type="button" class="del-set" data-index="' + index + '">x</button></span>';
+        }).join('');
+      }
+
+      saveApprovalEmailBtn.addEventListener('click', function() {
+        const email = approvalEmailInput.value.trim();
+        if (!email) return;
+        const emails = loadSavedApprovalEmails();
+        if (emails.includes(email)) {
+          showToast('That email is already saved.', '');
+          return;
+        }
+        emails.push(email);
+        localStorage.setItem('savedApprovalEmails', JSON.stringify(emails));
+        renderSavedApprovalEmails();
+        showToast('Email saved for next time.', 'success');
+      });
+
+      savedApprovalEmailsEl.addEventListener('click', function(e) {
+        const del = e.target.closest('.del-set');
+        const chip = e.target.closest('.saved-set');
+        if (!chip) return;
+        const index = Number(chip.dataset.index);
+        const emails = loadSavedApprovalEmails();
+        if (del) {
+          emails.splice(index, 1);
+          localStorage.setItem('savedApprovalEmails', JSON.stringify(emails));
+          renderSavedApprovalEmails();
+          return;
+        }
+        approvalEmailInput.value = emails[index] || '';
+      });
+
+      const scheduleBuilder = document.getElementById('scheduleBuilder');
+
       function setPublishMode(mode) {
         const isSchedule = mode === 'schedule';
         postNowChoice.classList.toggle('active', !isSchedule);
         scheduleChoice.classList.toggle('active', isSchedule);
         postNowChoice.querySelector('input').checked = !isSchedule;
         scheduleChoice.querySelector('input').checked = isSchedule;
+        scheduleBuilder.classList.toggle('disabled-block', !isSchedule);
       }
 
       postNowChoice.addEventListener('click', function() { setPublishMode('now'); });
       scheduleChoice.addEventListener('click', function() { setPublishMode('schedule'); });
 
-      // Suggested time removed per UX request
+      // ── Schedule calendar + time picker ────────────────────────────────
+      const calPrev = document.getElementById('calPrev');
+      const calNext = document.getElementById('calNext');
+      const calMonthLabel = document.getElementById('calMonthLabel');
+      const calDays = document.getElementById('calDays');
+      const timeHour = document.getElementById('timeHour');
+      const timeMinute = document.getElementById('timeMinute');
+      const ampmToggle = document.querySelector('.ampm-toggle');
+
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let calendarViewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      let selectedDate = new Date(today);
+      let ampmValue = 'PM';
+
+      function pad2(n) { return String(n).padStart(2, '0'); }
+
+      function syncHiddenSchedule() {
+        const y = selectedDate.getFullYear();
+        const m = pad2(selectedDate.getMonth() + 1);
+        const d = pad2(selectedDate.getDate());
+        scheduleDate.value = y + '-' + m + '-' + d;
+
+        let hour24 = Number(timeHour.value) % 12;
+        if (ampmValue === 'PM') hour24 += 12;
+        scheduleTime.value = pad2(hour24) + ':' + pad2(Number(timeMinute.value));
+      }
+
+      function renderCalendar() {
+        calMonthLabel.textContent = monthNames[calendarViewDate.getMonth()] + ' ' + calendarViewDate.getFullYear();
+        const firstWeekday = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth(), 1).getDay();
+        const daysInMonth = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + 1, 0).getDate();
+
+        let html = '';
+        for (let i = 0; i < firstWeekday; i++) html += '<button type="button" class="cal-day empty" disabled></button>';
+        for (let day = 1; day <= daysInMonth; day++) {
+          const cellDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth(), day);
+          const isPast = cellDate < today;
+          const isToday = cellDate.getTime() === today.getTime();
+          const isSelected = cellDate.getTime() === selectedDate.getTime();
+          const classes = ['cal-day'];
+          if (isToday) classes.push('today');
+          if (isSelected) classes.push('selected');
+          html += '<button type="button" class="' + classes.join(' ') + '" data-day="' + day + '"' + (isPast ? ' disabled' : '') + '>' + day + '</button>';
+        }
+        calDays.innerHTML = html;
+        syncHiddenSchedule();
+      }
+
+      calPrev.addEventListener('click', function() {
+        calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() - 1, 1);
+        renderCalendar();
+      });
+
+      calNext.addEventListener('click', function() {
+        calendarViewDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth() + 1, 1);
+        renderCalendar();
+      });
+
+      calDays.addEventListener('click', function(e) {
+        const btn = e.target.closest('.cal-day');
+        if (!btn || btn.disabled) return;
+        selectedDate = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth(), Number(btn.dataset.day));
+        renderCalendar();
+      });
+
+      function clampTimeFields() {
+        let hour = Math.min(12, Math.max(1, Number(timeHour.value) || 1));
+        let minute = Math.min(59, Math.max(0, Number(timeMinute.value) || 0));
+        timeHour.value = hour;
+        timeMinute.value = pad2(minute);
+        syncHiddenSchedule();
+      }
+
+      timeHour.addEventListener('input', clampTimeFields);
+      timeMinute.addEventListener('input', clampTimeFields);
+
+      ampmToggle.addEventListener('click', function(e) {
+        const btn = e.target.closest('.ampm-btn');
+        if (!btn) return;
+        ampmToggle.querySelectorAll('.ampm-btn').forEach(function(item) { item.classList.remove('active'); });
+        btn.classList.add('active');
+        ampmValue = btn.dataset.ampm;
+        syncHiddenSchedule();
+      });
 
       approvalSwitch.addEventListener('click', function() {
         approvalSwitch.classList.toggle('on');
@@ -1860,6 +2344,13 @@
         renderPreview();
       });
 
+      const actionIcons = {
+        like: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+        comment: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+        share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+        save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+      };
+
       function mediaMarkup() {
         if (mediaPreviewUrl) {
           const currentFile = mediaFiles[0];
@@ -1884,7 +2375,7 @@
           '<div class="social-chrome"><span>Instagram</span><span>...</span></div>' +
           '<div class="post-head"><div class="post-avatar">' + escapeHtml(handle.slice(0, 1).replace('@', '') || 'O') + '</div><div><span class="post-handle">' + escapeHtml(handle) + '</span><span class="post-loc">Dubai, UAE</span></div><span>...</span></div>' +
           '<div class="preview-media">' + mediaMarkup() + '</div>' +
-          '<div class="ig-actions"><span>Like</span><span>Com</span><span>Send</span><span>Save</span></div>' +
+          '<div class="ig-actions"><span>' + actionIcons.like + '</span><span>' + actionIcons.comment + '</span><span>' + actionIcons.share + '</span><span>' + actionIcons.save + '</span></div>' +
           '<div class="ig-dots">...</div>' +
           captionMarkup('Your Instagram caption will appear here...') +
           '</div></div>';
@@ -1900,7 +2391,7 @@
           '<div class="post-head"><div class="post-avatar">' + escapeHtml(handle.slice(0, 1) || 'O') + '</div><div><span class="post-handle">' + escapeHtml(handle) + '</span><span class="post-loc">Just now - Public</span></div><span>...</span></div>' +
           captionMarkup('Your Facebook caption will appear here...') +
           '<div class="preview-media">' + mediaMarkup() + '</div>' +
-          '<div class="fb-actions"><span>Like</span><span>Comment</span><span>Share</span></div>' +
+          '<div class="fb-actions"><button type="button">' + actionIcons.like + 'Like</button><button type="button">' + actionIcons.comment + 'Comment</button><button type="button">' + actionIcons.share + 'Share</button></div>' +
           '</div></div></div>';
       }
 
@@ -1932,25 +2423,15 @@
         mediaFileSecondary.value = '';
         mediaFiles = [];
         mediaPreviewUrl = '';
-        if (mediaUrlInput) mediaUrlInput.value = '';
-        thumbOne.textContent = 'Preview';
-        thumbTwo.textContent = 'Empty';
-        thumbThree.textContent = 'Empty';
-        thumbOne.style.opacity = '0.35';
-        thumbTwo.style.opacity = '0.35';
-        thumbThree.style.opacity = '0.35';
-        thumbTwo.style.display = 'none';
-        thumbThree.style.display = 'none';
+        rebuildMediaThumbs();
         updateCaptionState();
       }
 
-      (function initScheduleDefaults() {
-        const now = new Date();
-        scheduleDate.value = now.toISOString().slice(0, 10);
-        scheduleTime.value = now.toISOString().slice(11, 16);
-      })();
-
+      applyContentTypeRules();
+      renderCalendar();
+      clampTimeFields();
       renderSavedSets();
+      renderSavedApprovalEmails();
       renderPreview();
       fetchAccounts();
     })();
